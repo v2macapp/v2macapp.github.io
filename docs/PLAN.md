@@ -21,7 +21,7 @@ title, which re-forms into chapter 3's, and so on. The real heading stays in the
 readers, and the page without 3D); with the 3D on it is drawn by the particles instead.
 
 1. **Glass V**: the logo as real refractive glass (dispersion on Ultra), Download button.
-2. **The app**: the glass V lands in the real app icon and the real main window rises (README
+2. **The app**: the camera passes through the glass V and the real main window assembles (README
    screenshots, demo data only). Pinned; Apple-style beats with a big caption on the left while the
    camera moves across real windows: Add Subscription sheet, zoom into Delay and Speed, the Rule
    Editor slides in, the Connections window comes up (and TUN in its caption). A hand-built HTML copy
@@ -42,6 +42,25 @@ The cursor is a small black hole: real point-mass lensing in screen space bends 
 particle titles around it (Einstein ring, a faint inner image of each star, a dark shadow). The V tilts
 toward it; phones use tilt. The stars are a real-looking sky (mostly faint, few bright, white, blue-white
 and warm, slight twinkle) fixed to the camera, so scrolling never moves them.
+
+**The "wow" pass** (chosen by the user on 2026-10-30, after M1 was "good but not wow"):
+- **One shot, no cuts.** Scrolling pushes the camera into the glass V and through it (a liquid glass
+  zoom): the app window is seen refracted through the V before the camera comes out in front of it.
+  The V no longer flies into the app icon.
+- **The window is a 3D object.** The real screenshot is cut into its layers (sidebar, toolbar, list,
+  the selected row, the glass connection bar, the inspector) as planes in the scene. It arrives
+  exploded, layers spread in depth at an angle, and assembles as you scroll; it tilts toward the
+  cursor so the layers show their depth. "Fastest in green" is a liquid glass magnifier sliding along
+  the Delay and Speed columns. The other screenshots (sheet, Rule Editor, Connections) are planes too.
+  The HTML images stay for screen readers and the page without 3D.
+- **One packet, the whole page.** A glowing `youtube.com` packet leaves the V's bottom node, lands on
+  the Frankfurt row, rides into the connection bar, then passes under the observer's lens (its label
+  scrambles to what the protocol shows) and dives down toward the tunnel (M2). Scroll moves it; a
+  light trail follows it.
+- **Cinematic finish.** Film grain, chromatic aberration at the edges and a vignette on the 3D (Medium
+  and up). Depth of field: later, if the frame budget allows.
+- **Physical play.** Drag and throw the glass V: it spins with inertia and springs back. Buttons and
+  protocol chips lean toward the cursor (magnetic).
 
 References the user liked: Apple AirPods Pro and MacBook Pro pages, oryzo.ai, raycast.com (chapter 2);
 the Codrops square lens effect (3); Shopify Editions Spring 2026 and the Codrops "Gommage" text
@@ -100,6 +119,7 @@ liquid glass grid (5).
    app) and chapter 3 (the lens). The user reviews it in the browser. A first M1 with a glass wall
    was built and dropped on 2026-10-30.
    Built 2026-10-30, waiting for review (`npm run dev`, `?fps` shows the counter, `?webgl` forces WebGL 2).
+1b. **Wow pass** (see above): one shot, the 3D window, the packet, cinematic finish, physical play.
 2. **M2**: tunnel → globe with clickable countries, the liquid glass sandbox grid.
 3. **M3**: all pages, FAQ, SEO, blog from releases, Send to my Mac.
 4. **M4**: `/noleaker` with the leak test.
