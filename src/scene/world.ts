@@ -35,7 +35,6 @@ const BARS = [
 ].map((bar) => bar.map(([x, y]) => new THREE.Vector2(x * S, y * S)));
 const BAR_Z = [-0.3, 0];
 const BAR_DEPTH = 0.22;
-export const V_NODE = new THREE.Vector3(0, -0.54 * S, -0.04); // the logo's bottom node, where the packet starts
 
 const fresnel = pow(float(1).sub(abs(dot(normalView, positionViewDirection))), 3);
 

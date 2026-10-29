@@ -7,20 +7,16 @@ import { chromaticAberration } from 'three/addons/tsl/display/ChromaticAberratio
 import { film } from 'three/addons/tsl/display/FilmNode.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { CONFIG, FpsWatcher, PRESETS, startPreset, type Choice, type Preset } from './presets';
-import { DIST, FOV, STAR_DIST, U, V_NODE, buildWorld, type World } from './world';
-import { POWER, ROW, buildApp, type AppProgress } from './app';
-import { buildPacket } from './packet';
+import { DIST, FOV, STAR_DIST, U, buildWorld, type World } from './world';
+import { buildApp, type AppProgress } from './app';
 
-/** `packet`: 0 on the V, 1 on the Frankfurt row, 2 on the power button, 3 under the lens, 4 gone down. */
-export type Progress = { burst: number; title: number; out: number; packet: number } & AppProgress;
+export type Progress = { burst: number; title: number; out: number } & AppProgress;
 /** An element and the pinned section it sits in: its place on screen is taken as when that section is pinned. */
 export type Pinned = { el: HTMLElement; section: HTMLElement };
 
 
-/** `frame`: where the HTML puts the app window in chapter 2; the 3D window follows it.
- *  `stream`: chapter 3's traffic, where the packet passes the lens; `label`: the packet's name tag. */
-export async function startScene(canvas: HTMLCanvasElement, choice: Choice, progress: Progress, titles: Pinned[], frame: Pinned,
-  stream: HTMLElement, label: HTMLElement) {
+/** `frame`: where the HTML puts the app window in chapter 2; the 3D window follows it. */
+export async function startScene(canvas: HTMLCanvasElement, choice: Choice, progress: Progress, titles: Pinned[], frame: Pinned) {
   const renderer = new THREE.WebGPURenderer({
     canvas, antialias: true, forceWebGL: new URLSearchParams(location.search).has('webgl'),
   });
@@ -43,10 +39,6 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
   const app = await buildApp(preset);
   scene.add(app.root);
   const appAt = new THREE.Vector3();
-  const packet = buildPacket();
-  scene.add(packet.sprite);
-  const stops = [0, 1, 2, 3, 4].map(() => new THREE.Vector3());
-  const head = new THREE.Vector3(), ctrl = new THREE.Vector3(), onScreen = new THREE.Vector3();
 
   function apply(p: Preset) {
     preset = p;
@@ -213,26 +205,6 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
     app.root.visible = progress.build > 0.01; // its exploded corner would peek into the hero
     app.update(progress, aimNow);
 
-    // The packet: from stop to stop along an arc, wherever those places are right now.
-    world.v.updateMatrixWorld();
-    world.v.localToWorld(stops[0].copy(V_NODE));
-    app.worldOf(...ROW, 0.03, stops[1]);
-    app.worldOf(...POWER, 0.03, stops[2]);
-    const sr = stream.getBoundingClientRect();
-    const [sx, sy] = toWorld(sr.left + sr.width / 2, sr.top + sr.height / 2);
-    stops[3].set(sx, sy, 0);
-    stops[4].set(sx, -halfH * 1.6, 0);
-    const t = THREE.MathUtils.clamp(progress.packet, 0, 3.999), i = Math.floor(t);
-    const f = THREE.MathUtils.smootherstep(t - i, 0, 1);
-    ctrl.lerpVectors(stops[i], stops[i + 1], 0.5);
-    ctrl.y += stops[i].distanceTo(stops[i + 1]) * 0.3;
-    ctrl.z += 1.5;
-    head.copy(stops[i]).multiplyScalar((1 - f) ** 2).addScaledVector(ctrl, 2 * f * (1 - f)).addScaledVector(stops[i + 1], f * f);
-    packet.move(head);
-    camera.updateMatrixWorld();
-    onScreen.copy(head).project(camera);
-    label.style.transform = `translate(${(onScreen.x + 1) / 2 * innerWidth}px, ${(1 - onScreen.y) / 2 * innerHeight}px)`;
-    label.classList.toggle('on', progress.packet > 0.03 && progress.packet < 3.9);
 
     if (pipeline) pipeline.render(); else renderer.render(scene, camera);
     if (!started) { started = true; document.documentElement.classList.add('live'); }

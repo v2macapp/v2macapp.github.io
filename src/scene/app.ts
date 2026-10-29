@@ -5,8 +5,6 @@ import { abs, color, dot, float, length, materialColor, max, mix, normalView, po
 import type { Preset } from './presets';
 
 export type AppProgress = { build: number; sub: number; mag: number; rules: number; conns: number; dim: number };
-// Where the packet stops on the window (main.webp pixels): the Frankfurt row, the power button.
-export const ROW = [300, 164] as const, POWER = [296, 743] as const;
 
 const W = 1440, H = 787; // main.webp
 const AH = H / W; // the window's height when its width is 1
@@ -23,7 +21,7 @@ const LAYERS: { r: [number, number, number, number]; z: number }[] = [
 const MAG_X = 840, MAG_Y0 = 170, MAG_Y1 = 384, MAG_R = 110;
 
 /** Window-local place of a main.webp pixel: x right, y up, the window 1 wide, centered on 0. */
-export const local = (px: number, py: number) => new THREE.Vector2(px / W - 0.5, (0.5 - py / H) * AH);
+const local = (px: number, py: number) => new THREE.Vector2(px / W - 0.5, (0.5 - py / H) * AH);
 
 /** Rounded corners: alpha 1 inside a rect of the given aspect, 0 outside (radius as a share of width). */
 function rounded(aspect: number, radius: number) {
@@ -113,11 +111,6 @@ export async function buildApp(preset: Preset) {
   const aim = new THREE.Vector2();
   return {
     root,
-    /** The world place of a main.webp pixel, on the window as it is drawn now. */
-    worldOf(px: number, py: number, z = 0, out = new THREE.Vector3()) {
-      const l = local(px, py);
-      return tilt.localToWorld(out.set(l.x, l.y, z));
-    },
     update(p: AppProgress, cursor: THREE.Vector2) {
       const e = 1 - THREE.MathUtils.smootherstep(p.build, 0, 1); // 1 = fully exploded
       apart.value = e;
@@ -146,7 +139,6 @@ export async function buildApp(preset: Preset) {
       const at = local(MAG_X, THREE.MathUtils.lerp(MAG_Y0, MAG_Y1, THREE.MathUtils.smoothstep(p.mag, 0.15, 0.85)));
       lens.position.set(at.x, at.y, 0.06);
       lens.scale.set(on, on, 0.5 * on);
-      root.updateMatrixWorld(true); // worldOf reads it this frame
     },
     setPreset(p: Preset) {
       (lens.material as THREE.Material).dispose();

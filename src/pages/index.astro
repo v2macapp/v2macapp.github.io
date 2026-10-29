@@ -59,7 +59,6 @@ import Lens from '../components/Lens.astro';
   </footer>
   </div></div>
   <div id="fps" hidden></div>
-  <div class="packet" aria-hidden="true"><span class="seen" data-real={t.packet}>{t.packet}</span></div>
 
   <script>
     import { gsap } from 'gsap';
@@ -75,7 +74,7 @@ import Lens from '../components/Lens.astro';
     const $$ = <T extends Element = HTMLElement>(s: string) => [...document.querySelectorAll<T>(s)];
 
     // ---- Scroll: one timeline per chapter; the 3D reads `progress`.
-    const progress: Progress = { burst: 0, title: 0, out: 0, packet: 0, build: 0, sub: 0, mag: 0, rules: 0, conns: 0, dim: 0 };
+    const progress: Progress = { burst: 0, title: 0, out: 0, build: 0, sub: 0, mag: 0, rules: 0, conns: 0, dim: 0 };
     const scrub = 0.6;
     // Wheel and trackpad scrolling glide; touch keeps the phone's own scrolling.
     ScrollSmoother.create({ wrapper: '#smooth-wrapper', content: '#smooth-content', smooth: reducedMotion() ? 0 : 1.2, smoothTouch: false });
@@ -92,8 +91,6 @@ import Lens from '../components/Lens.astro';
       { y: 0, rotateX: 0, opacity: 1, scale: 1, ease: 'power2.out', scrollTrigger: { trigger: '.app', start: 'top 85%', end: 'top top', scrub } });
     // The 3D window arrives exploded and assembles as it rises.
     gsap.to(progress, { build: 1, ease: 'none', scrollTrigger: { trigger: '.app', start: 'top bottom', end: 'top top', scrub } });
-    // The packet leaves the V's node and lands on the Frankfurt row as the window assembles.
-    gsap.to(progress, { packet: 1, ease: 'none', scrollTrigger: { trigger: '.app', start: 'top 70%', end: 'top top', scrub } });
     gsap.fromTo('.app .appicon img', { opacity: 0, scale: 0.6 },
       { opacity: 1, scale: 1, scrollTrigger: { trigger: '.app', start: 'top 15%', end: 'top top', scrub } });
     gsap.set('.app .rules, .app .conns, .app .sub', { opacity: 0 });
@@ -119,7 +116,6 @@ import Lens from '../components/Lens.astro';
       .to({}, { duration: 0.8 });
     // 4: the Connections window comes up
     beat(3).to('.app .rules', { xPercent: 30, opacity: 0, duration: 0.6 }, '<')
-      .to(progress, { packet: 2, duration: 0.8 }, '<') // into the connection bar: connected
       .to(progress, { rules: 0, duration: 0.6 }, '<')
       .fromTo('.app .conns', { yPercent: 25, opacity: 0, scale: 0.94 }, { yPercent: 0, opacity: 1, scale: 1, duration: 0.8 }, '<0.2')
       .to(progress, { conns: 1, duration: 0.8 }, '<')
@@ -139,12 +135,9 @@ import Lens from '../components/Lens.astro';
     gsap.to(progress, { title: 1, ease: 'none', scrollTrigger: { trigger: '.see', start: 'top bottom', end: 'top top', scrub } });
     // The window explodes again as it leaves.
     gsap.fromTo(progress, { build: 1 }, { build: 0, ease: 'none', immediateRender: false, scrollTrigger: { trigger: '.see', start: 'top bottom', end: 'top top', scrub } });
-    gsap.fromTo(progress, { packet: 2 }, { packet: 3, ease: 'none', immediateRender: false, scrollTrigger: { trigger: '.see', start: 'top bottom', end: 'top top', scrub } });
     const seePin = ScrollTrigger.create({ trigger: '.see', start: 'top top', end: '+=100%', pin: true });
     // The particle title can't scroll with the page, so it fades as soon as the stage unpins.
     gsap.to(progress, { out: 1, ease: 'none', scrollTrigger: { start: () => seePin.end, end: () => seePin.end + innerHeight * 0.08, scrub: true } });
-    // ...and the packet dives on toward the tunnel.
-    gsap.fromTo(progress, { packet: 3 }, { packet: 4, ease: 'none', immediateRender: false, scrollTrigger: { start: () => seePin.end - innerHeight * 0.3, end: () => seePin.end + innerHeight * 0.3, scrub } });
 
     // ---- The lens follows the pointer; until then it wanders on its own.
     const stream = $('.stream');
@@ -174,7 +167,7 @@ import Lens from '../components/Lens.astro';
     const line = $('.see .line');
     const what = $('.see .what');
     const chips = $$<HTMLButtonElement>('.see .chip');
-    const seen = $$('.seen'); // the lanes and the packet's name tag
+    const seen = $$('.see .seen');
     let connected = false;
     let proto = 0;
     let run = 0; // the latest click wins
@@ -263,7 +256,7 @@ import Lens from '../components/Lens.astro';
         const { startScene } = await import('../scene/scene');
         const pinned = (sel: string) => ({ el: $(`${sel} .ptitle`), section: $(sel) });
         stage = await startScene($<HTMLCanvasElement>('#stage'), choice, progress,
-          [pinned('.app'), pinned('.see')], { el: $('.app .frame'), section: $('.app') }, $('.stream'), $('.packet'));
+          [pinned('.app'), pinned('.see')], { el: $('.app .frame'), section: $('.app') });
         ScrollTrigger.addEventListener('refresh', stage.layout);
         stage.onPreset.add(markChoice);
         markChoice();
@@ -398,33 +391,6 @@ import Lens from '../components/Lens.astro';
     cursor: pointer;
   }
   .graphics button[aria-pressed='true'] { color: var(--text); border-color: rgba(255, 255, 255, 0.2); }
-
-  /* The packet's name tag; the 3D moves it. */
-  .packet {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 5;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.4s;
-  }
-  .packet.on { opacity: 1; }
-  .packet span {
-    position: absolute;
-    left: 16px;
-    bottom: 10px;
-    white-space: nowrap;
-    font: 500 13px var(--mono);
-    color: var(--text);
-    padding: 5px 10px;
-    border-radius: 999px;
-    background: rgba(10, 132, 255, 0.18);
-    border: 1px solid rgba(191, 224, 255, 0.35);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 0 24px rgba(10, 132, 255, 0.35);
-  }
 
   #fps {
     position: fixed;

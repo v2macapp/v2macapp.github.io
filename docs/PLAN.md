@@ -53,10 +53,6 @@ and warm, slight twinkle) fixed to the camera, so scrolling never moves them.
   cursor so the layers show their depth. "Fastest in green" is a liquid glass magnifier sliding along
   the Delay and Speed columns. The other screenshots (sheet, Rule Editor, Connections) are planes too.
   The HTML images stay for screen readers and the page without 3D.
-- **One packet, the whole page.** A glowing `youtube.com` packet leaves the V's bottom node, lands on
-  the Frankfurt row, rides into the connection bar, then passes under the observer's lens (its label
-  scrambles to what the protocol shows) and dives down toward the tunnel (M2). Scroll moves it; a
-  light trail follows it.
 - **Cinematic finish.** Film grain, chromatic aberration at the edges and a vignette on the 3D (Medium
   and up). Depth of field: later, if the frame budget allows.
 - **Physical play.** Drag and throw the glass V: it spins with inertia and springs back. Buttons and
@@ -119,7 +115,7 @@ liquid glass grid (5).
    app) and chapter 3 (the lens). The user reviews it in the browser. A first M1 with a glass wall
    was built and dropped on 2026-10-30.
    Built 2026-10-30, waiting for review (`npm run dev`, `?fps` shows the counter, `?webgl` forces WebGL 2).
-1b. **Wow pass** (see above): one shot, the 3D window, the packet, cinematic finish, physical play.
+1b. **Wow pass** (see above): one shot, the 3D window, cinematic finish, physical play.
    Built 2026-10-30, waiting for review. Depth of field not done yet.
 2. **M2**: tunnel → globe with clickable countries, the liquid glass sandbox grid.
 3. **M3**: all pages, FAQ, SEO, blog from releases, Send to my Mac.

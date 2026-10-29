@@ -12,7 +12,6 @@ export const en = {
     source: 'Source on GitHub',
     scroll: 'Scroll',
   },
-  packet: 'youtube.com', // the request the page follows
   app: {
     title: 'Meet V2Mac.',
     icon: 'The V2Mac app icon',
