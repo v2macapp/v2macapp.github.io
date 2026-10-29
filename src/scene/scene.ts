@@ -36,7 +36,7 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
   let world: World;
   let pipeline: THREE.RenderPipeline | null = null;
   const onPreset = new Set<(p: Preset) => void>();
-  const app = await buildApp(preset);
+  const app = await buildApp();
   scene.add(app.root);
   const appAt = new THREE.Vector3();
 
@@ -44,7 +44,6 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
     preset = p;
     if (world) { world.dispose(); scene.remove(world.root); camera.remove(world.stars); }
     world = buildWorld(p);
-    app.setPreset(p);
     scene.add(world.root);
     camera.add(world.stars);
     renderer.setPixelRatio(Math.min(devicePixelRatio, CONFIG[p].dpr));

@@ -1,8 +1,7 @@
 // Chapter 2's app as a 3D object: the main screenshot cut into its layers, plus the other windows.
 // The page's scroll timeline writes `AppProgress`; `update` turns it into transforms each frame.
 import * as THREE from 'three/webgpu';
-import { abs, color, dot, float, length, materialColor, max, mix, normalView, positionViewDirection, pow, smoothstep, step, texture, uniform, uv, vec2 } from 'three/tsl';
-import type { Preset } from './presets';
+import { abs, color, float, length, materialColor, max, mix, pow, smoothstep, step, texture, uniform, uv, vec2, vec3 } from 'three/tsl';
 
 export type AppProgress = { build: number; sub: number; mag: number; rules: number; conns: number; dim: number };
 
@@ -18,7 +17,7 @@ const LAYERS: { r: [number, number, number, number]; z: number }[] = [
   { r: [265, 712, 866, 64], z: 1.9 }, // the glass connection bar
 ];
 // Delay column, Frankfurt row → London row, for the magnifier (main.webp pixels).
-const MAG_X = 840, MAG_Y0 = 170, MAG_Y1 = 384, MAG_R = 110;
+const MAG_X = 795, MAG_Y0 = 170, MAG_Y1 = 384, MAG_R = 110, ZOOM = 1.8;
 
 /** Window-local place of a main.webp pixel: x right, y up, the window 1 wide, centered on 0. */
 const local = (px: number, py: number) => new THREE.Vector2(px / W - 0.5, (0.5 - py / H) * AH);
@@ -50,18 +49,35 @@ async function load(src: string) {
   return t;
 }
 
-const rim = pow(float(1).sub(abs(dot(normalView, positionViewDirection))), 4);
-function lensMaterial(preset: Preset) {
-  const m = preset === 'ultra' || preset === 'high'
-    ? new THREE.MeshPhysicalNodeMaterial({ roughness: 0, transmission: 1, thickness: 0.35, ior: 1.7, dispersion: preset === 'ultra' ? 3 : 0, clearcoat: 1 })
-    : new THREE.MeshPhysicalNodeMaterial({ color: 0x9ccaff, roughness: 0.05, transparent: true, opacity: 0.18, clearcoat: 1 });
-  m.emissiveNode = color(0xbfe0ff).mul(rim.mul(1.6));
-  return m;
+const lensAt = uniform(new THREE.Vector2()); // the main.webp uv under the magnifier's center
+
+/** The magnifier: a disc that draws the screenshot under it enlarged, bent and split into colours at
+ *  the rim like liquid glass. Drawn from the texture, not three's transmission, which only reflected. */
+function buildLens(main: THREE.Texture) {
+  const p = uv().sub(0.5).mul(2); // -1..1 across the disc
+  const r = length(p);
+  const at = (fringe: number) => lensAt.add(
+    p.mul(vec2(MAG_R / W, MAG_R / H)).div(ZOOM).mul(pow(r, 6).mul(1.6).add(1)).mul(pow(r, 4).mul(fringe).add(1)),
+  );
+  const m = new THREE.MeshBasicNodeMaterial({ transparent: true, toneMapped: false });
+  const rgb = vec3(texture(main, at(-0.05)).r, texture(main, at(0)).g, texture(main, at(0.05)).b);
+  const edge = smoothstep(0.86, 0.99, r).mul(0.45);
+  const gleam = smoothstep(0.5, 0, length(p.sub(vec2(-0.35, 0.45)))).mul(0.18);
+  m.colorNode = rgb.mul(1.06).add(color(0xbfe0ff).mul(edge.add(gleam)));
+  m.opacityNode = smoothstep(1, 0.98, r);
+  const lens = new THREE.Mesh(new THREE.CircleGeometry(MAG_R / W, 96), m);
+
+  const s = new THREE.MeshBasicNodeMaterial({ color: 0x000000, transparent: true, depthWrite: false });
+  s.opacityNode = smoothstep(1, 0.6, length(uv().sub(0.5)).mul(2)).mul(0.5);
+  const shadow = new THREE.Mesh(new THREE.CircleGeometry((MAG_R / W) * 1.15, 48), s);
+  shadow.position.set(0, -0.006, -0.01);
+  lens.add(shadow);
+  return lens;
 }
 
 const apart = uniform(1); // 1 = exploded: the back shows holes where the layers were
 
-export async function buildApp(preset: Preset) {
+export async function buildApp() {
   const [main, sub, rules, conns] = await Promise.all(
     ['/app/main.webp', '/app/add-subscription.webp', '/app/rules.webp', '/app/connections.webp'].map(load),
   );
@@ -102,9 +118,7 @@ export async function buildApp(preset: Preset) {
   const ruleEditor = over(rules, 0.3, -0.12, 0.54); // left of the HTML place: the 3D window has no dimmed shrink to make room
   const connWindow = over(conns, 0.02, -0.06, 0.96);
 
-  // The magnifier: a flattened sphere of liquid glass hovering over the Delay column.
-  const lens = new THREE.Mesh(new THREE.SphereGeometry(MAG_R / W, 48, 24), lensMaterial(preset));
-  lens.scale.z = 0.5;
+  const lens = buildLens(main);
   lens.visible = false;
   tilt.add(lens);
 
@@ -136,13 +150,11 @@ export async function buildApp(preset: Preset) {
 
       // The magnifier comes in over Frankfurt, slides down to London and leaves.
       lens.visible = on > 0.01;
-      const at = local(MAG_X, THREE.MathUtils.lerp(MAG_Y0, MAG_Y1, THREE.MathUtils.smoothstep(p.mag, 0.15, 0.85)));
-      lens.position.set(at.x, at.y, 0.06);
-      lens.scale.set(on, on, 0.5 * on);
-    },
-    setPreset(p: Preset) {
-      (lens.material as THREE.Material).dispose();
-      lens.material = lensMaterial(p);
+      const y = THREE.MathUtils.lerp(MAG_Y0, MAG_Y1, THREE.MathUtils.smoothstep(p.mag, 0.15, 0.85));
+      const at = local(MAG_X, y);
+      lens.position.set(at.x, at.y, 0.03);
+      lens.scale.setScalar(on);
+      lensAt.value.set(MAG_X / W, 1 - y / H);
     },
   };
 }
