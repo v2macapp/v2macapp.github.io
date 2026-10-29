@@ -5,14 +5,15 @@ export type Choice = Preset | 'auto';
 
 export const CONFIG: Record<Preset, {
   particles: number;
+  stars: number;
   glass: 'dispersion' | 'refraction' | 'fake' | 'flat';
   bloom: number; // resolution scale, 0 = off
   dpr: number;
 }> = {
-  ultra: { particles: 200_000, glass: 'dispersion', bloom: 1, dpr: 2 },
-  high: { particles: 100_000, glass: 'refraction', bloom: 1, dpr: 2 },
-  medium: { particles: 40_000, glass: 'fake', bloom: 0.5, dpr: 1.5 },
-  low: { particles: 12_000, glass: 'flat', bloom: 0, dpr: 1 },
+  ultra: { particles: 200_000, stars: 3000, glass: 'dispersion', bloom: 1, dpr: 2 },
+  high: { particles: 100_000, stars: 3000, glass: 'refraction', bloom: 1, dpr: 2 },
+  medium: { particles: 40_000, stars: 2000, glass: 'fake', bloom: 0.5, dpr: 1.5 },
+  low: { particles: 12_000, stars: 1200, glass: 'flat', bloom: 0, dpr: 1 },
 };
 
 const KEY = 'graphics';

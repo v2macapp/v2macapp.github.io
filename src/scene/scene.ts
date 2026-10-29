@@ -5,14 +5,12 @@ import { color, length, mix, pass, screenUV, smoothstep, vec2 } from 'three/tsl'
 import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { CONFIG, FpsWatcher, PRESETS, startPreset, type Choice, type Preset } from './presets';
-import { U, V_HEIGHT, buildWorld, type World } from './world';
+import { DIST, FOV, STAR_DIST, U, V_HEIGHT, buildWorld, type World } from './world';
 
 export type Progress = { burst: number; title: number; out: number };
 /** An element and the pinned section it sits in: its place on screen is taken as when that section is pinned. */
 export type Pinned = { el: HTMLElement; section: HTMLElement };
 
-const FOV = 40;
-const DIST = 10; // the camera of chapters 2 and 3, straight at the z = 0 plane
 
 export async function startScene(canvas: HTMLCanvasElement, choice: Choice, progress: Progress, titles: Pinned[], icon: Pinned) {
   const renderer = new THREE.WebGPURenderer({
@@ -27,6 +25,7 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
   scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
   scene.environmentIntensity = 0.6;
   const camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 100);
+  scene.add(camera); // the stars hang on it
 
   let preset: Preset = choice === 'auto' ? startPreset(webgpu) : choice;
   let auto = choice === 'auto';
@@ -38,10 +37,10 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
 
   function apply(p: Preset) {
     preset = p;
-    world?.dispose();
-    if (world) scene.remove(world.root);
+    if (world) { world.dispose(); scene.remove(world.root); camera.remove(world.stars); }
     world = buildWorld(p);
     scene.add(world.root);
+    camera.add(world.stars);
     renderer.setPixelRatio(Math.min(devicePixelRatio, CONFIG[p].dpr));
     pipeline?.dispose();
     pipeline = null;
@@ -98,20 +97,25 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
     renderer.setSize(innerWidth, innerHeight, false);
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
+    U.aspect.value = camera.aspect;
+    U.px.value = (2 * Math.tan(THREE.MathUtils.degToRad(FOV / 2)) * STAR_DIST) / innerHeight;
     layout();
   }
   addEventListener('resize', resize);
   document.fonts?.ready.then(layout);
 
-  // Cursor (or finger) on the z = 0 plane parts the particles; it and phone tilt aim the V.
+  // The cursor (or a finger) is a small black hole that bends the stars and titles; it and phone tilt aim the V.
   const aim = new THREE.Vector2(), aimNow = new THREE.Vector2();
-  const ray = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), hit = new THREE.Vector3();
+  let lensTarget = 0;
   addEventListener('pointermove', (e) => {
     aim.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
-    ray.setFromCamera(aim, camera);
-    if (ray.ray.intersectPlane(plane, hit)) U.cursor.value.copy(hit);
+    U.cursor.value.copy(aim);
+    lensTarget = 0.15;
   });
-  document.addEventListener('pointerleave', () => U.cursor.value.set(99, 99, 0));
+  const lensOff = () => { lensTarget = 0; };
+  document.addEventListener('pointerleave', lensOff);
+  addEventListener('pointerup', (e) => e.pointerType === 'touch' && lensOff());
+  addEventListener('pointercancel', lensOff);
   addEventListener('deviceorientation', (e) => {
     if (e.gamma == null || e.beta == null) return;
     aim.set(THREE.MathUtils.clamp(e.gamma / 30, -1, 1), THREE.MathUtils.clamp((45 - e.beta) / 30, -1, 1));
@@ -135,6 +139,7 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
     U.burst.value = progress.burst;
     U.title.value = progress.title;
     U.out.value = progress.out;
+    U.lens.value += (lensTarget - U.lens.value) * 0.08;
     const b = THREE.MathUtils.smoothstep(progress.burst, 0, 1);
 
     // The V tilts toward the cursor, then flies into the menu bar icon as its particles leave.

@@ -2,8 +2,8 @@
 // uniforms, so a preset change only rebuilds this and keeps the story's state.
 import * as THREE from 'three/webgpu';
 import {
-  abs, clamp, color, cos, dot, float, instancedBufferAttribute, length, max, mix, normalView,
-  positionViewDirection, pow, sin, smoothstep, time, uniform, uv, vec3, vec4,
+  abs, clamp, color, cos, dot, float, instancedBufferAttribute, length, min, mix, normalView,
+  positionViewDirection, pow, sin, smoothstep, sqrt, step, time, uniform, uv, vec2, vec3, vec4,
 } from 'three/tsl';
 import { CONFIG, type Preset } from './presets';
 
@@ -11,13 +11,20 @@ export const U = {
   burst: uniform(0), // 0 = glass V, 1 = the V's particles form chapter 2's title
   title: uniform(0), // 0 = chapter 2's title, 1 = chapter 3's
   out: uniform(0), // 1 = particles faded out (past the last title)
-  cursor: uniform(new THREE.Vector3(99, 99, 0)), // on the z = 0 plane
+  cursor: uniform(new THREE.Vector2(9, 9)), // in NDC
+  lens: uniform(0), // Einstein radius of the cursor's black hole, in screen units (screen height = 2)
+  aspect: uniform(1),
+  px: uniform(0.01), // one CSS pixel at the stars' distance
   titleAlpha: uniform(0.3),
 };
 
+export const FOV = 40;
+export const DIST = 10; // the camera of chapters 2 and 3, straight at the z = 0 plane
+const TAN = Math.tan(THREE.MathUtils.degToRad(FOV / 2));
+export const STAR_DIST = 50;
+
 const BLUE = 0x0a84ff;
 const PALE = 0xbfe0ff;
-const AMBIENT = 0.15; // share of particles that are background dust, never part of the V
 
 // The two bars of the logo, traced from logo-mark-glass.jpg (corners TL, TR, BR, BL).
 const S = 1.3;
@@ -38,14 +45,16 @@ export function buildWorld(preset: Preset) {
   const root = new THREE.Group();
   const v = buildV(cfg.glass);
   const particles = buildParticles(cfg.particles);
+  const stars = buildStars(cfg.stars);
   root.add(v, particles.sprite);
   return {
     root,
     v,
+    stars, // the scene hangs these on the camera, so scrolling never moves them
     setTitle: particles.setTitle,
     dispose() {
       // Sprites share one geometry across three.js; disposing it breaks every sprite.
-      root.traverse((o: any) => { if (!o.isSprite) o.geometry?.dispose(); o.material?.dispose(); });
+      for (const o of [root, stars]) o.traverse((o: any) => { if (!o.isSprite) o.geometry?.dispose(); o.material?.dispose(); });
     },
   };
 }
@@ -104,15 +113,14 @@ function randomOnV(out: THREE.Vector3) {
 }
 
 function buildParticles(count: number) {
-  const titled = Math.round(count * (1 - AMBIENT)); // particles [0, titled) come from the V
+  const titled = count;
   const start = new Float32Array(count * 3);
   const seed = new Float32Array(count * 4);
   const p = new THREE.Vector3();
   for (let i = 0; i < count; i++) {
-    if (i < titled) randomOnV(p);
-    else p.set((Math.random() - 0.5) * 34, (Math.random() - 0.5) * 18, -14 + Math.random() * 12);
+    randomOnV(p);
     p.toArray(start, i * 3);
-    seed.set([Math.random(), Math.random(), 0.008 + Math.random() * 0.02, i < titled ? 1 : 0], i * 4);
+    seed.set([Math.random(), Math.random(), 0.008 + Math.random() * 0.02, 0], i * 4);
   }
   const startAttr = new THREE.InstancedBufferAttribute(start, 3);
   const titles = [new Float32Array(start), new Float32Array(start)].map((a) => new THREE.InstancedBufferAttribute(a, 3));
@@ -125,17 +133,18 @@ function buildParticles(count: number) {
   const swirl = vec3(sin(s.y.mul(6.28).add(e1.mul(4)).add(e2.mul(5))), cos(s.y.mul(9.1).add(e1.mul(3))), sin(s.y.mul(4.7)))
     .mul(moving.mul(2.5));
   const drift = vec3(sin(time.mul(0.4).add(s.y.mul(40))), cos(time.mul(0.3).add(s.y.mul(30))), 0)
-    .mul(mix(0.04, 0.006, s.w)); // title particles barely move, so the words stay sharp
+    .mul(0.006); // barely moving, so the words stay sharp
   const pos = mix(
     mix(instancedBufferAttribute(startAttr), instancedBufferAttribute(titles[0]), e1),
     instancedBufferAttribute(titles[1]), e2,
   ).add(swirl).add(drift);
 
   const material = new THREE.SpriteNodeMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
-  material.positionNode = partAroundCursor(pos);
+  // Titles sit on the z = 0 plane, DIST in front of the camera: bend them around the cursor too.
+  material.positionNode = vec3(lensed(pos.xy.div(DIST * TAN), float(0)).at.mul(DIST * TAN), pos.z);
   material.scaleNode = s.z;
   const glow = smoothstep(0.5, 0, length(uv().sub(0.5)));
-  const alpha = mix(float(0.35), U.titleAlpha.mul(e1).mul(float(1).sub(U.out)), s.w);
+  const alpha = U.titleAlpha.mul(e1).mul(float(1).sub(U.out));
   material.colorNode = vec4(mix(color(BLUE), color(PALE), s.y).mul(1.4), glow.mul(alpha));
   const sprite = new THREE.Sprite(material);
   sprite.count = count;
@@ -157,8 +166,59 @@ function buildParticles(count: number) {
   return { sprite, setTitle };
 }
 
-function partAroundCursor(p: any) {
-  const d = p.xy.sub(U.cursor.xy);
-  const f = max(float(1).sub(length(d).div(1.3)), 0);
-  return vec3(p.xy.add(d.div(length(d).add(0.001)).mul(f.mul(f).mul(0.8))), p.z);
+/** A point-mass gravitational lens at the cursor, in screen units (screen height = 2). Every point
+ *  has two images: the outer one (`inner` = 0) pushed out past the Einstein ring and brightened, and a
+ *  faint mirrored one inside it (`inner` = 1). Returns the image's place and its magnification. */
+function lensed(q: any, inner: any) {
+  const c = vec2(U.cursor.x.mul(U.aspect), U.cursor.y);
+  const d = q.sub(c);
+  const r = length(d).add(1e-4);
+  const e = U.lens.add(1e-4);
+  const root = sqrt(r.mul(r).add(e.mul(e).mul(4)));
+  const at = c.add(d.div(r).mul(mix(r.add(root), r.sub(root), inner).mul(0.5)));
+  const u = r.div(e);
+  const mu = u.mul(u).add(2).div(u.mul(2).mul(sqrt(u.mul(u).add(4))));
+  return { at, mag: abs(mu.add(mix(0.5, -0.5, inner))) };
+}
+
+/** A night sky: mostly faint stars, a few bright ones, white, blue-white and a few warm. */
+function buildStars(count: number) {
+  const n = count * 2; // each star twice: its outer and its inner image
+  const at = new Float32Array(n * 2), seed = new Float32Array(n * 4), inner = new Float32Array(n);
+  for (let i = 0; i < count; i++) {
+    const x = (Math.random() - 0.5) * 2.3, y = (Math.random() - 0.5) * 2.3; // a little past the edges, for the lens to pull in
+    const sd = [0.06 + 0.94 * Math.pow(Math.random(), 6), Math.random() * 6.28, Math.random() < 0.3 ? 0.35 : 0.08, Math.random()];
+    for (const k of [0, 1]) {
+      at.set([x, y], (i * 2 + k) * 2);
+      seed.set(sd, (i * 2 + k) * 4);
+      inner[i * 2 + k] = k;
+    }
+  }
+  const p = instancedBufferAttribute(new THREE.InstancedBufferAttribute(at, 2));
+  const s = instancedBufferAttribute(new THREE.InstancedBufferAttribute(seed, 4));
+  const img = instancedBufferAttribute(new THREE.InstancedBufferAttribute(inner, 1));
+  const l = lensed(vec2(p.x.mul(U.aspect), p.y), img);
+
+  const material = new THREE.SpriteNodeMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+  material.positionNode = vec3(l.at.mul(STAR_DIST * TAN), -STAR_DIST);
+  material.scaleNode = U.px.mul(s.x.mul(2.4).add(1.3));
+  const twinkle = sin(time.mul(s.w.mul(3).add(1.2)).add(s.y)).mul(s.z).add(1);
+  const tint = mix(mix(color(0xe4ecff), color(0xaecbff), step(0.6, s.w)), color(0xffdcb4), step(0.88, s.w));
+  const light = s.x.mul(min(l.mag, 6)).mul(twinkle);
+  const glow = smoothstep(0.5, 0.1, length(uv().sub(0.5)));
+  material.colorNode = vec4(tint.mul(light.mul(1.6).max(1)), glow.mul(clamp(light, 0, 1)));
+  const sprite = new THREE.Sprite(material);
+  sprite.count = n;
+  sprite.frustumCulled = false;
+
+  // The black hole's shadow: a dark disc inside the Einstein ring, drawn under the stars.
+  const shadow = new THREE.SpriteNodeMaterial({ transparent: true, depthWrite: false });
+  shadow.positionNode = vec3(vec2(U.cursor.x.mul(U.aspect), U.cursor.y).mul(STAR_DIST * TAN), -STAR_DIST);
+  shadow.scaleNode = U.lens.mul(STAR_DIST * TAN * 1.3);
+  shadow.colorNode = vec4(0, 0, 0, smoothstep(0.5, 0.3, length(uv().sub(0.5))).mul(0.9));
+  const hole = new THREE.Sprite(shadow);
+  hole.renderOrder = -1;
+  hole.frustumCulled = false;
+  sprite.add(hole);
+  return sprite;
 }

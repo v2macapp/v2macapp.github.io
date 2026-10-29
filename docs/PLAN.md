@@ -36,7 +36,10 @@ readers, and the page without 3D); with the 3D on it is drawn by the particles i
    nothing leaks (fail-closed). Orange BETA badge, link to `/sandbox`.
 
 Then FAQ (FAQPage markup), a NoLeaker section (shield + drop), footer.
-Cursor physics everywhere: particles part around the cursor, the V tilts toward it; phones use tilt.
+The cursor is a small black hole: real point-mass lensing in screen space bends the stars and the
+particle titles around it (Einstein ring, a faint inner image of each star, a dark shadow). The V tilts
+toward it; phones use tilt. The stars are a real-looking sky (mostly faint, few bright, white, blue-white
+and warm, slight twinkle) fixed to the camera, so scrolling never moves them.
 
 References the user liked: Apple AirPods Pro and MacBook Pro pages, oryzo.ai, raycast.com (chapter 2);
 the Codrops square lens effect (3); Shopify Editions Spring 2026 and the Codrops "Gommage" text
