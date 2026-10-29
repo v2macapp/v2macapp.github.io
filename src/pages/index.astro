@@ -3,6 +3,8 @@ import '@fontsource-variable/geist';
 import '@fontsource-variable/geist-mono';
 import { en as t, DOWNLOAD_URL, REPO_URL } from '../strings';
 import { PRESETS } from '../scene/presets';
+import AppWindow from '../components/AppWindow.astro';
+import Lens from '../components/Lens.astro';
 ---
 <!doctype html>
 <html lang="en">
@@ -34,30 +36,15 @@ import { PRESETS } from '../scene/presets';
       <span class="scroll" aria-hidden="true">{t.hero.scroll}</span>
     </section>
 
-    <section class="chapter wall">
-      <div class="copy">
-        <h2>{t.wall.title}</h2>
-        <p class="lede">{t.wall.lede}</p>
+    <section class="stage app">
+      <h2 class="ptitle">{t.app.title}</h2>
+      <AppWindow />
+    </section>
 
-        <div class="bar glass" data-state="idle">
-          <button class="power" type="button" aria-label={t.wall.connect} aria-pressed="false">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v8M7.05 6.3a7.5 7.5 0 1 0 9.9 0" /></svg>
-          </button>
-          <div class="who">
-            <strong>{t.wall.server}</strong>
-            <span class="line">{t.wall.protocols[0].line}</span>
-          </div>
-          <div class="status" aria-live="polite">{t.wall.idle}</div>
-        </div>
-
-        <p class="chips-label">{t.wall.protocolsLabel}</p>
-        <div class="chips" role="group" aria-label={t.wall.protocolsLabel}>
-          {t.wall.protocols.map((p, i) => (
-            <button class="chip glass" type="button" data-i={i} aria-pressed={i === 0 ? 'true' : 'false'}>{p.name}</button>
-          ))}
-        </div>
-        <p class="what">{t.wall.protocols[0].what}</p>
-      </div>
+    <section class="stage see">
+      <h2 class="ptitle">{t.see.title}</h2>
+      <p class="lede">{t.see.lede}</p>
+      <Lens />
     </section>
   </main>
 
@@ -72,66 +59,155 @@ import { PRESETS } from '../scene/presets';
   <div id="fps" hidden></div>
 
   <script>
+    import { gsap } from 'gsap';
+    import { ScrollTrigger } from 'gsap/ScrollTrigger';
+    import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
     import { en as t } from '../strings';
-    import { savedChoice, saveChoice, type Choice } from '../scene/presets';
-    import type { Stage } from '../scene/scene';
+    import { savedChoice, saveChoice, reducedMotion, type Choice } from '../scene/presets';
+    import type { Progress, Stage } from '../scene/scene';
 
-    const $ = <T extends Element>(s: string) => document.querySelector(s) as T;
-    const bar = $<HTMLElement>('.bar');
-    const power = $<HTMLButtonElement>('.power');
-    const status = $<HTMLElement>('.status');
-    const line = $<HTMLElement>('.line');
-    const what = $<HTMLElement>('.what');
-    const chips = [...document.querySelectorAll<HTMLButtonElement>('.chip')];
+    gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin);
+    const $ = <T extends Element = HTMLElement>(s: string) => document.querySelector(s) as T;
+    const $$ = <T extends Element = HTMLElement>(s: string) => [...document.querySelectorAll<T>(s)];
 
-    let stage: Stage | null = null;
+    // ---- Scroll: one timeline per chapter; the 3D reads `progress`.
+    const progress: Progress = { burst: 0, title: 0, out: 0 };
+    const scrub = 0.6;
+
+    gsap.to(progress, { burst: 1, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub } });
+    gsap.to('.hero .copy, .hero .scroll', { opacity: 0, y: -60, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: '60% top', scrub: true } });
+
+    // Chapter 2: the window assembles from floating glass layers, then four beats.
+    const layers = $$('.app .layer:not(.rules)');
+    const beats = $$('.app .beat');
+    gsap.set(beats.slice(1), { opacity: 0 });
+    gsap.set('.app .rules', { opacity: 0, y: 30, scale: 0.95 });
+    gsap.set('.app .srv', { opacity: 0, x: -16 });
+    const app = gsap.timeline({ defaults: { ease: 'power2.out' }, scrollTrigger: { trigger: '.app', start: 'top top', end: '+=350%', pin: true, scrub } });
+    app.from('.app .win', { opacity: 0, scale: 0.9, rotateX: 22, transformPerspective: 1400, duration: 1 })
+      .from(layers, {
+        opacity: 0, z: (i) => 300 - i * 120, y: (i) => (i - 1.5) * 90, rotateX: 18, transformPerspective: 1000,
+        stagger: 0.12, duration: 1,
+      }, '<')
+      .from(beats[0], { opacity: 0, y: 12, duration: 0.4 }, '<0.6');
+
+    // Beat 1: subscriptions
+    app.to('.app .side .sub', { backgroundColor: 'rgba(10,132,255,0.45)', duration: 0.3 })
+      .to('.app .srv', { opacity: 1, x: 0, stagger: 0.06, duration: 0.5 }, '<')
+      .to({}, { duration: 0.6 });
+    // Beat 2: delay test, every server counted up at once
+    const ms = $$('.app .ms');
+    const count = { v: 0 };
+    const showMs = () => ms.forEach((el) => {
+      const target = Number(el.dataset.ms);
+      el.classList.toggle('ok', count.v > 0 && target > 0);
+      el.classList.toggle('bad', count.v >= 1 && !target);
+      el.textContent = count.v === 0 ? '—' : target ? `${Math.round(target * count.v)} ms` : count.v >= 1 ? el.dataset.timeout! : '…';
+    });
+    step(1).to(count, { v: 1, duration: 0.8, ease: 'none', onUpdate: showMs }, '<').to({}, { duration: 0.5 });
+    // Beat 3: rules
+    step(2).to('.app .rules', { opacity: 1, y: 0, scale: 1, duration: 0.6 }, '<').to({}, { duration: 0.6 });
+    // Beat 4: TUN
+    step(3).to('.app .knob', { x: 14, duration: 0.4 }, '<')
+      .to('.app .toggle', { backgroundColor: '#30d158', duration: 0.4 }, '<')
+      .to({}, { duration: 0.8 });
+
+    /** Cross-fade the caption to beat i and return the timeline for chaining. */
+    function step(i: number) {
+      return app.to(beats[i - 1], { opacity: 0, y: -10, duration: 0.3 })
+        .fromTo(beats[i], { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.3 });
+    }
+
+    // Chapter 3: the title re-forms, the stage pins while you play with the lens.
+    gsap.to(progress, { title: 1, ease: 'none', scrollTrigger: { trigger: '.see', start: 'top bottom', end: 'top top', scrub } });
+    const seePin = ScrollTrigger.create({ trigger: '.see', start: 'top top', end: '+=100%', pin: true });
+    // The particle title can't scroll with the page, so it fades as soon as the stage unpins.
+    gsap.to(progress, { out: 1, ease: 'none', scrollTrigger: { start: () => seePin.end, end: () => seePin.end + innerHeight * 0.08, scrub: true } });
+
+    // ---- The lens follows the pointer; until then it wanders on its own.
+    const stream = $('.stream');
+    const lens = { x: 0, y: 0 };
+    const place = () => { stream.style.setProperty('--x', `${lens.x}px`); stream.style.setProperty('--y', `${lens.y}px`); };
+    const followX = gsap.quickTo(lens, 'x', { duration: 0.35, ease: 'power3', onUpdate: place });
+    const followY = gsap.quickTo(lens, 'y', { duration: 0.35, ease: 'power3', onUpdate: place });
+    lens.x = stream.clientWidth / 2;
+    lens.y = stream.clientHeight / 2;
+    place();
+    const wander = gsap.timeline({ repeat: -1, yoyo: true, defaults: { duration: 2.4, ease: 'sine.inOut', onUpdate: place } })
+      .to(lens, { x: () => stream.clientWidth * 0.3, y: () => stream.clientHeight * 0.3 })
+      .to(lens, { x: () => stream.clientWidth * 0.7, y: () => stream.clientHeight * 0.7 })
+      .to(lens, { x: () => stream.clientWidth * 0.55, y: () => stream.clientHeight * 0.25 });
+    if (reducedMotion()) wander.pause();
+    stream.addEventListener('pointermove', (e) => {
+      wander.kill();
+      const r = stream.getBoundingClientRect();
+      followX(e.clientX - r.left);
+      followY(e.clientY - r.top);
+    });
+
+    // ---- Connect: what the lens reads scrambles into what the protocol shows.
+    const bar = $('.see .bar');
+    const power = $<HTMLButtonElement>('.see .power');
+    const status = $('.see .status');
+    const line = $('.see .line');
+    const what = $('.see .what');
+    const chips = $$<HTMLButtonElement>('.see .chip');
+    const seen = $$('.see .seen');
     let connected = false;
-    let style = 0;
+    let proto = 0;
     let run = 0; // the latest click wins
 
-    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
-    const shatter = (to: number, s: number) => stage?.shatterTo(to, s) ?? wait(s * 300);
+    const bytes = () => Array.from({ length: 6 }, () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0')).join(' ');
+    function scramble() {
+      const p = t.see.protocols[proto];
+      seen.forEach((el) => gsap.to(el, {
+        duration: 0.9,
+        delay: Math.random() * 0.3,
+        scrambleText: { text: connected ? p.shows || bytes() : el.dataset.real!, chars: '0123456789abcdef.-', speed: 0.6 },
+      }));
+      what.textContent = connected ? p.what : t.see.off;
+    }
 
     function show(state: 'idle' | 'connecting' | 'connected') {
       bar.dataset.state = state;
       power.setAttribute('aria-pressed', String(state !== 'idle'));
-      power.setAttribute('aria-label', state === 'idle' ? t.wall.connect : t.wall.disconnect);
-      status.textContent = state === 'idle' ? t.wall.idle
-        : state === 'connecting' ? t.wall.connecting
-        : `${t.wall.connected} · ${t.wall.delay}`;
+      power.setAttribute('aria-label', state === 'idle' ? t.see.connect : t.see.disconnect);
+      status.textContent = state === 'idle' ? t.see.idle
+        : state === 'connecting' ? t.see.connecting
+        : `${t.see.connected} · ${t.see.delay}`;
     }
 
     async function connect() {
       const me = ++run;
-      if (connected) await shatter(0, 0.5); // let the wall close before the next protocol breaks it
+      show('connecting');
+      await new Promise((r) => setTimeout(r, 450));
       if (me !== run) return;
       connected = true;
-      stage?.setStyle(style);
-      show('connecting');
-      shatter(1, 1.8);
-      await wait(450);
-      if (me === run) show('connected');
+      show('connected');
+      stream.classList.add('connected');
+      scramble();
     }
 
     function disconnect() {
       run++;
       connected = false;
       show('idle');
-      shatter(0, 1.2);
+      stream.classList.remove('connected');
+      scramble();
     }
 
     power.addEventListener('click', () => (connected ? disconnect() : connect()));
     chips.forEach((chip, i) => chip.addEventListener('click', () => {
-      style = i;
+      proto = i;
       chips.forEach((c, j) => c.setAttribute('aria-pressed', String(i === j)));
-      line.textContent = t.wall.protocols[i].line;
-      what.textContent = t.wall.protocols[i].what;
-      connect();
+      line.textContent = t.see.protocols[i].line;
+      if (connected) scramble(); else connect();
     }));
 
-    // Graphics switch
+    // ---- Graphics switch
+    let stage: Stage | null = null;
     let choice: Choice = savedChoice();
-    const choiceButtons = [...document.querySelectorAll<HTMLButtonElement>('[data-choice]')];
+    const choiceButtons = $$<HTMLButtonElement>('[data-choice]');
     function markChoice() {
       for (const b of choiceButtons) {
         const c = b.dataset.choice as Choice;
@@ -147,15 +223,18 @@ import { PRESETS } from '../scene/presets';
     }));
     markChoice();
 
-    // The 3D loads after the content has painted.
+    // ---- The 3D loads after the content has painted.
     async function load3D() {
       try {
         const { startScene } = await import('../scene/scene');
-        stage = await startScene($<HTMLCanvasElement>('#stage'), choice);
+        const pinned = (sel: string) => ({ el: $(`${sel} .ptitle`), section: $(sel) });
+        stage = await startScene($<HTMLCanvasElement>('#stage'), choice, progress,
+          [pinned('.app'), pinned('.see')], { el: $('.app .mb-icon'), section: $('.app') });
+        ScrollTrigger.addEventListener('refresh', stage.layout);
         stage.onPreset.add(markChoice);
         markChoice();
         if (new URLSearchParams(location.search).has('fps')) {
-          const fps = $<HTMLElement>('#fps');
+          const fps = $('#fps');
           fps.hidden = false;
           setInterval(() => {
             fps.textContent = `${Math.round(stage!.fps)} FPS · ${stage!.preset} · ${stage!.webgpu ? 'WebGPU' : 'WebGL 2'}`;
@@ -191,6 +270,7 @@ import { PRESETS } from '../scene/presets';
     color: var(--text);
     background: radial-gradient(ellipse at 50% 40%, #0b1a36, #02050c 70%) fixed;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
   .poster, #stage {
@@ -221,14 +301,27 @@ import { PRESETS } from '../scene/presets';
     padding: 0 16px 8svh;
     text-align: center;
   }
-  .copy { max-width: 640px; text-shadow: 0 2px 24px rgba(2, 5, 12, 0.9); }
+  .stage {
+    height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5svh 16px 3svh;
+    text-align: center;
+    overflow: hidden;
+  }
+  .copy { max-width: 640px; }
+  .copy, .stage > p { text-shadow: 0 2px 24px rgba(2, 5, 12, 0.9); }
 
   h1, h2 { margin: 0; font-weight: 700; letter-spacing: -0.03em; }
   h1 { font-size: clamp(48px, 9vw, 88px); }
-  h2 { font-size: clamp(36px, 6vw, 60px); }
+  h2 { font-size: clamp(34px, 7vw, 68px); white-space: nowrap; line-height: 1.15; }
+  /* With the 3D on, the particles draw the titles; the text stays for search engines and screen readers. */
+  .live .ptitle { color: transparent; }
   .tagline { font-size: clamp(20px, 2.6vw, 26px); margin: 8px 0 0; font-weight: 600; }
   .lede { color: var(--dim); font-size: 17px; line-height: 1.5; margin: 12px auto 0; max-width: 34em; }
   .meta { color: var(--dim); font-size: 13px; margin: 14px 0 0; }
+  .app h2 { margin-bottom: 3svh; }
 
   .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
   .button {
@@ -246,61 +339,6 @@ import { PRESETS } from '../scene/presets';
   .button.primary { background: var(--blue); border-color: rgba(255, 255, 255, 0.25); box-shadow: 0 8px 32px rgba(10, 132, 255, 0.45); }
   .button:hover { filter: brightness(1.12); }
   .scroll { margin-top: 5svh; color: var(--dim); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; }
-
-  /* Liquid Glass, as in the app */
-  .glass {
-    background: linear-gradient(180deg, rgba(40, 52, 78, 0.55), rgba(12, 18, 32, 0.6));
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 10px 40px rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(24px) saturate(170%);
-    -webkit-backdrop-filter: blur(24px) saturate(170%);
-  }
-
-  .bar {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin: 28px auto 0;
-    padding: 9px 20px 9px 9px;
-    border-radius: 999px;
-    max-width: 520px;
-    text-align: left;
-  }
-  .power {
-    flex: none;
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--dim);
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-    transition: background 0.3s, color 0.3s, box-shadow 0.3s;
-  }
-  .power svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
-  .power:hover { color: var(--text); }
-  .bar:not([data-state='idle']) .power { background: var(--blue); color: #fff; box-shadow: 0 0 24px rgba(10, 132, 255, 0.7); }
-  .bar[data-state='connecting'] .power { animation: pulse 0.9s ease-in-out infinite; }
-  @keyframes pulse { 50% { box-shadow: 0 0 6px rgba(10, 132, 255, 0.4); } }
-  .who { display: flex; flex-direction: column; min-width: 0; flex: 1; }
-  .who strong { font-size: 15px; }
-  .line { color: var(--dim); font-size: 12px; font-family: var(--mono); }
-  .status { font-size: 14px; color: var(--dim); white-space: nowrap; font-variant-numeric: tabular-nums; }
-  .bar[data-state='connected'] .status { color: var(--green); }
-
-  .chips-label { color: var(--dim); font-size: 13px; margin: 28px 0 10px; }
-  .chips { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-  .chip {
-    color: var(--text);
-    font: 600 14px var(--font);
-    padding: 9px 16px;
-    border-radius: 999px;
-    cursor: pointer;
-  }
-  .chip[aria-pressed='true'] { background: rgba(10, 132, 255, 0.35); border-color: rgba(10, 132, 255, 0.8); }
-  .what { color: var(--dim); font-size: 15px; min-height: 3em; margin: 14px auto 0; max-width: 30em; }
 
   button:focus-visible, a:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
 
@@ -329,6 +367,7 @@ import { PRESETS } from '../scene/presets';
     position: fixed;
     top: 10px;
     left: 10px;
+    z-index: 10;
     font: 12px var(--mono);
     background: rgba(0, 0, 0, 0.6);
     padding: 4px 8px;

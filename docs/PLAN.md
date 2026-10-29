@@ -94,6 +94,7 @@ liquid glass grid (5).
 1. **M1**: Astro + three setup, presets and FPS watcher, chapter 1, particle titles, chapter 2 (the
    app) and chapter 3 (the lens). The user reviews it in the browser. A first M1 with a glass wall
    was built and dropped on 2026-10-30.
+   Built 2026-10-30, waiting for review (`npm run dev`, `?fps` shows the counter, `?webgl` forces WebGL 2).
 2. **M2**: tunnel → globe with clickable countries, the liquid glass sandbox grid.
 3. **M3**: all pages, FAQ, SEO, blog from releases, Send to my Mac.
 4. **M4**: `/noleaker` with the leak test.

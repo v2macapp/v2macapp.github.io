@@ -6,15 +6,13 @@ export type Choice = Preset | 'auto';
 export const CONFIG: Record<Preset, {
   particles: number;
   glass: 'dispersion' | 'refraction' | 'fake' | 'flat';
-  shards: number; // grid cells per side of the wall
-  spin: boolean; // false: the wall cracks flat instead of tumbling
   bloom: number; // resolution scale, 0 = off
   dpr: number;
 }> = {
-  ultra: { particles: 200_000, glass: 'dispersion', shards: 16, spin: true, bloom: 1, dpr: 2 },
-  high: { particles: 100_000, glass: 'refraction', shards: 16, spin: true, bloom: 1, dpr: 2 },
-  medium: { particles: 40_000, glass: 'fake', shards: 9, spin: true, bloom: 0.5, dpr: 1.5 },
-  low: { particles: 12_000, glass: 'flat', shards: 6, spin: false, bloom: 0, dpr: 1 },
+  ultra: { particles: 200_000, glass: 'dispersion', bloom: 1, dpr: 2 },
+  high: { particles: 100_000, glass: 'refraction', bloom: 1, dpr: 2 },
+  medium: { particles: 40_000, glass: 'fake', bloom: 0.5, dpr: 1.5 },
+  low: { particles: 12_000, glass: 'flat', bloom: 0, dpr: 1 },
 };
 
 const KEY = 'graphics';
