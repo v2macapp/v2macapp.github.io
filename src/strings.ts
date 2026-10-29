@@ -14,28 +14,19 @@ export const en = {
   },
   app: {
     title: 'Meet V2Mac.',
-    menu: ['File', 'Edit', 'View', 'Window', 'Help'],
-    sidebar: { all: 'All', favorites: 'Favorites', custom: 'Custom Configs', subscriptions: 'Subscriptions' },
-    columns: ['Name', 'Type', 'Delay', 'Speed'],
-    connect: 'Connect',
-    connected: 'Connected',
-    timeout: 'timeout',
-    tun: 'TUN',
-    mode: 'Global',
-    rules: {
-      title: 'Rules',
-      items: [
-        { what: 'YouTube', action: 'Proxy' },
-        { what: 'Your bank', action: 'Direct' },
-        { what: 'Ad trackers', action: 'Block' },
-      ],
-    },
+    icon: 'The V2Mac app icon',
     beats: [
-      'Paste a subscription link. Every server appears, grouped and ready.',
-      'Test every server at once and see the fastest in green.',
-      'Rules send each site and app the right way: Proxy, Direct or Block.',
-      'Turn on TUN and the whole Mac goes through it, every app included.',
+      { title: 'Paste one link.', text: 'Add your subscription and every server appears, grouped and ready.' },
+      { title: 'Fastest in green.', text: 'Test every server at once and see delay and speed side by side.' },
+      { title: 'Your rules.', text: 'Send each app and site the way you want: Proxy, Direct or Block.' },
+      { title: 'Nothing hidden.', text: 'See every connection, the app that made it and the rule that sent it. Turn on TUN and the whole Mac goes through.' },
     ],
+    shots: {
+      main: 'The V2Mac main window: servers from a subscription with their delay and speed',
+      subscription: 'The Add Subscription sheet',
+      rules: 'The Rule Editor with Proxy, Direct and Block rules',
+      connections: 'The Connections window: each app, its target and the rule that sent it',
+    },
   },
   see: {
     title: 'What they see.',
@@ -64,18 +55,6 @@ export const en = {
     tracking: 'This site tracks nothing.',
   },
 };
-
-// Made-up demo servers, as in the app's demo data.
-export const servers = [
-  { flag: '🇩🇪', name: 'Frankfurt 01', type: 'vless · raw · reality', ms: 86, speed: '4.8 MB/s' },
-  { flag: '🇳🇱', name: 'Amsterdam 02', type: 'vless · ws · tls', ms: 112, speed: '9.2 MB/s' },
-  { flag: '🇫🇮', name: 'Helsinki 01', type: 'vless · raw · reality', ms: 143, speed: '13.6 MB/s' },
-  { flag: '🇹🇷', name: 'Istanbul 03', type: 'vless · ws · tls', ms: 61, speed: '7.3 MB/s' },
-  { flag: '🇦🇪', name: 'Dubai 01', type: 'hysteria2 · udp', ms: 204, speed: '11.7 MB/s' },
-  { flag: '🇸🇪', name: 'Stockholm 01', type: 'trojan · ws · tls', ms: 0, speed: '—' },
-  { flag: '🇺🇸', name: 'New York 02', type: 'vless · ws · tls', ms: 267, speed: '9.8 MB/s' },
-  { flag: '🇬🇧', name: 'London 01', type: 'shadowsocks', ms: 98, speed: '14.2 MB/s' },
-];
 
 // shortcut: links to the releases page until M5 uploads V2Mac.dmg to every release.
 export const DOWNLOAD_URL = 'https://github.com/v2macapp/v2mac/releases/latest';

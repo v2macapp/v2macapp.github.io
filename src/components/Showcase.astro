@@ -1,0 +1,81 @@
+---
+// Chapter 2's stage: the real app, from the README screenshots (demo data, no real servers).
+// index.astro's pinned timeline moves the windows and crossfades the beats.
+import { en } from '../strings';
+const t = en.app;
+---
+<div class="showcase">
+  <div class="side">
+    <div class="appicon">
+      <img src="/app/icon.webp" alt={t.icon} width="128" height="128" />
+      <span class="vmark"></span>
+    </div>
+    <div class="beats">
+      {t.beats.map((b) => (
+        <article class="beat"><h3>{b.title}</h3><p>{b.text}</p></article>
+      ))}
+    </div>
+    <div class="dots" aria-hidden="true">{t.beats.map(() => <span></span>)}</div>
+  </div>
+
+  <div class="windows">
+    <div class="w main"><img src="/app/main.webp" alt={t.shots.main} width="1440" height="787" loading="lazy" /></div>
+    <img class="w sub" src="/app/add-subscription.webp" alt={t.shots.subscription} width="920" height="490" loading="lazy" />
+    <img class="w rules" src="/app/rules.webp" alt={t.shots.rules} width="1100" height="1052" loading="lazy" />
+    <img class="w conns" src="/app/connections.webp" alt={t.shots.connections} width="1440" height="933" loading="lazy" />
+  </div>
+</div>
+
+<style>
+  .showcase {
+    flex: 1;
+    min-height: 0;
+    width: min(1280px, 100%);
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) 2.2fr;
+    align-items: center;
+    gap: clamp(24px, 4vw, 64px);
+    text-align: left;
+    text-shadow: none;
+  }
+  .side { display: flex; flex-direction: column; gap: 28px; }
+  .appicon { position: relative; width: 88px; height: 88px; }
+  .appicon img { width: 100%; height: 100%; border-radius: 22.5%; box-shadow: 0 12px 40px rgba(10, 132, 255, 0.35); }
+  /* where the glass V lands: the V inside the icon */
+  .vmark { position: absolute; left: 20%; right: 20%; top: 20.5%; height: 58%; }
+
+  .beats { position: relative; min-height: 9em; }
+  .beat { position: absolute; inset: 0 0 auto; }
+  .beat + .beat { opacity: 0; } /* the timeline takes over; without it only the first shows */
+  .beat h3 { margin: 0; font-size: clamp(26px, 3vw, 40px); letter-spacing: -0.02em; }
+  .beat p { margin: 12px 0 0; color: var(--dim); font-size: 17px; line-height: 1.5; max-width: 24em; }
+
+  .dots { display: flex; gap: 8px; }
+  .dots span { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.25); }
+  .dots span.on { background: var(--text); }
+
+  .windows { position: relative; aspect-ratio: 1440 / 787; perspective: 1600px; }
+  .w {
+    position: absolute;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 40px 90px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+  .main { inset: 0; width: 100%; overflow: hidden; } /* the camera zooms inside the window's frame */
+  .main img { display: block; width: 100%; height: auto; transform-origin: 62% 33%; }
+  .sub { width: 50%; left: 25%; top: 7%; }
+  .rules { width: 54%; right: 0; top: -12%; }
+  .conns { width: 96%; left: 2%; top: -6%; }
+
+  @media (max-width: 800px) {
+    .showcase { grid-template-columns: 1fr; align-content: space-evenly; gap: 18px; }
+    /* larger than the screen: the phone shows the left of the window, the camera crops the rest */
+    .windows { width: 150%; }
+    .side { flex-direction: row; align-items: flex-start; gap: 16px; }
+    .appicon { width: 56px; height: 56px; flex: none; }
+    .beats { flex: 1; min-height: 7.5em; }
+    .beat h3 { font-size: 24px; }
+    .beat p { font-size: 15px; margin-top: 6px; }
+    .dots { display: none; }
+  }
+</style>

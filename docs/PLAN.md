@@ -21,9 +21,11 @@ title, which re-forms into chapter 3's, and so on. The real heading stays in the
 readers, and the page without 3D); with the 3D on it is drawn by the particles instead.
 
 1. **Glass V**: the logo as real refractive glass (dispersion on Ultra), Download button.
-2. **The app**: the V shrinks into the menu bar icon and the V2Mac window assembles from floating
-   glass layers (Apple's take-apart product pages). Pinned; four scroll beats each light one feature:
-   subscriptions, delay test, rules (Proxy / Direct / Block), TUN.
+2. **The app**: the glass V lands in the real app icon and the real main window rises (README
+   screenshots, demo data only). Pinned; Apple-style beats with a big caption on the left while the
+   camera moves across real windows: Add Subscription sheet, zoom into Delay and Speed, the Rule
+   Editor slides in, the Connections window comes up (and TUN in its caption). A hand-built HTML copy
+   of the window looked fake and was dropped on 2026-10-30.
 3. **What they see**: your requests flow past as glass pills; drag the observer's lens over them.
    Off, it reads your real sites. Press Connect and they scramble into what the protocol shows:
    REALITY a visit to microsoft.com, Hysteria2 QUIC on UDP 443, Trojan HTTPS to your server's domain,
@@ -89,8 +91,8 @@ liquid glass grid (5).
 ## Stack
 - Astro (static output), three.js `WebGPURenderer` with TSL shaders, automatic WebGL 2
   fallback (test it: Firefox on Linux has shown a black canvas). The 3D is one lazy island.
-- GSAP (free, plugins included): ScrollTrigger pins chapters and scrubs one timeline per chapter,
-  ScrambleText for the lens. It also drives the HTML parts, so the page works without the 3D.
+- GSAP (free, plugins included): ScrollSmoother glides wheel and trackpad scrolling (touch stays
+  native), ScrollTrigger pins chapters and scrubs one timeline per chapter, ScrambleText for the lens. It also drives the HTML parts, so the page works without the 3D.
 - Repo `v2macapp/v2macapp.github.io`, deployed by GitHub Actions to Pages.
 
 ## Milestones

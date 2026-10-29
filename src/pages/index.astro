@@ -3,7 +3,7 @@ import '@fontsource-variable/geist';
 import '@fontsource-variable/geist-mono';
 import { en as t, DOWNLOAD_URL, REPO_URL } from '../strings';
 import { PRESETS } from '../scene/presets';
-import AppWindow from '../components/AppWindow.astro';
+import Showcase from '../components/Showcase.astro';
 import Lens from '../components/Lens.astro';
 ---
 <!doctype html>
@@ -21,6 +21,7 @@ import Lens from '../components/Lens.astro';
   <img class="poster" src="/poster.jpg" alt="" aria-hidden="true" />
   <canvas id="stage" aria-hidden="true"></canvas>
 
+  <div id="smooth-wrapper"><div id="smooth-content">
   <main>
     <section class="chapter hero">
       <div class="copy">
@@ -38,7 +39,7 @@ import Lens from '../components/Lens.astro';
 
     <section class="stage app">
       <h2 class="ptitle">{t.app.title}</h2>
-      <AppWindow />
+      <Showcase />
     </section>
 
     <section class="stage see">
@@ -56,66 +57,68 @@ import Lens from '../components/Lens.astro';
     </div>
     <p>{t.footer.tracking}</p>
   </footer>
+  </div></div>
   <div id="fps" hidden></div>
 
   <script>
     import { gsap } from 'gsap';
     import { ScrollTrigger } from 'gsap/ScrollTrigger';
     import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+    import { ScrollSmoother } from 'gsap/ScrollSmoother';
     import { en as t } from '../strings';
     import { savedChoice, saveChoice, reducedMotion, type Choice } from '../scene/presets';
     import type { Progress, Stage } from '../scene/scene';
 
-    gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin);
+    gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin, ScrollSmoother);
     const $ = <T extends Element = HTMLElement>(s: string) => document.querySelector(s) as T;
     const $$ = <T extends Element = HTMLElement>(s: string) => [...document.querySelectorAll<T>(s)];
 
     // ---- Scroll: one timeline per chapter; the 3D reads `progress`.
     const progress: Progress = { burst: 0, title: 0, out: 0 };
     const scrub = 0.6;
+    // Wheel and trackpad scrolling glide; touch keeps the phone's own scrolling.
+    ScrollSmoother.create({ wrapper: '#smooth-wrapper', content: '#smooth-content', smooth: reducedMotion() ? 0 : 1.2, smoothTouch: false });
 
     gsap.to(progress, { burst: 1, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub } });
     gsap.to('.hero .copy, .hero .scroll', { opacity: 0, y: -60, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: '60% top', scrub: true } });
 
-    // Chapter 2: the window assembles from floating glass layers, then four beats.
-    const layers = $$('.app .layer:not(.rules)');
+    // Chapter 2: the real window rises as the V lands in the app icon, then the camera moves across
+    // the app one beat at a time.
     const beats = $$('.app .beat');
-    gsap.set(beats.slice(1), { opacity: 0 });
-    gsap.set('.app .rules', { opacity: 0, y: 30, scale: 0.95 });
-    gsap.set('.app .srv', { opacity: 0, x: -16 });
-    const app = gsap.timeline({ defaults: { ease: 'power2.out' }, scrollTrigger: { trigger: '.app', start: 'top top', end: '+=350%', pin: true, scrub } });
-    app.from('.app .win', { opacity: 0, scale: 0.9, rotateX: 22, transformPerspective: 1400, duration: 1 })
-      .from(layers, {
-        opacity: 0, z: (i) => 300 - i * 120, y: (i) => (i - 1.5) * 90, rotateX: 18, transformPerspective: 1000,
-        stagger: 0.12, duration: 1,
-      }, '<')
-      .from(beats[0], { opacity: 0, y: 12, duration: 0.4 }, '<0.6');
+    const dots = $$('.app .dots span');
+    dots[0]?.classList.add('on');
+    gsap.fromTo('.app .windows', { y: 160, rotateX: 26, opacity: 0, scale: 0.9, transformPerspective: 1600 },
+      { y: 0, rotateX: 0, opacity: 1, scale: 1, ease: 'power2.out', scrollTrigger: { trigger: '.app', start: 'top 85%', end: 'top top', scrub } });
+    gsap.fromTo('.app .appicon img', { opacity: 0, scale: 0.6 },
+      { opacity: 1, scale: 1, scrollTrigger: { trigger: '.app', start: 'top 15%', end: 'top top', scrub } });
+    gsap.set('.app .rules, .app .conns, .app .sub', { opacity: 0 });
 
-    // Beat 1: subscriptions
-    app.to('.app .side .sub', { backgroundColor: 'rgba(10,132,255,0.45)', duration: 0.3 })
-      .to('.app .srv', { opacity: 1, x: 0, stagger: 0.06, duration: 0.5 }, '<')
-      .to({}, { duration: 0.6 });
-    // Beat 2: delay test, every server counted up at once
-    const ms = $$('.app .ms');
-    const count = { v: 0 };
-    const showMs = () => ms.forEach((el) => {
-      const target = Number(el.dataset.ms);
-      el.classList.toggle('ok', count.v > 0 && target > 0);
-      el.classList.toggle('bad', count.v >= 1 && !target);
-      el.textContent = count.v === 0 ? '—' : target ? `${Math.round(target * count.v)} ms` : count.v >= 1 ? el.dataset.timeout! : '…';
-    });
-    step(1).to(count, { v: 1, duration: 0.8, ease: 'none', onUpdate: showMs }, '<').to({}, { duration: 0.5 });
-    // Beat 3: rules
-    step(2).to('.app .rules', { opacity: 1, y: 0, scale: 1, duration: 0.6 }, '<').to({}, { duration: 0.6 });
-    // Beat 4: TUN
-    step(3).to('.app .knob', { x: 14, duration: 0.4 }, '<')
-      .to('.app .toggle', { backgroundColor: '#30d158', duration: 0.4 }, '<')
+    const app = gsap.timeline({ defaults: { ease: 'power2.inOut' }, scrollTrigger: { trigger: '.app', start: 'top top', end: '+=400%', pin: true, scrub } });
+    // 1: the Add Subscription sheet drops over the window, then leaves the servers it added
+    app.fromTo('.app .sub', { y: -40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 })
+      .to({}, { duration: 0.8 })
+      .to('.app .sub', { y: -40, opacity: 0, duration: 0.5 });
+    // 2: close in on the Delay and Speed columns
+    beat(1).to('.app .main img', { scale: 1.9, duration: 1 }, '<')
       .to({}, { duration: 0.8 });
+    // 3: the Rule Editor slides in front
+    beat(2).to('.app .main img', { scale: 1, duration: 0.8 }, '<')
+      .to('.app .main', { xPercent: -8, scale: 0.92, filter: 'brightness(0.35)', duration: 0.8 }, '<') // dimmed, still opaque
+      .fromTo('.app .rules', { xPercent: 40, rotateY: -24, opacity: 0, transformPerspective: 1600 }, { xPercent: 0, rotateY: 0, opacity: 1, duration: 0.8 }, '<0.2')
+      .to({}, { duration: 0.8 });
+    // 4: the Connections window comes up
+    beat(3).to('.app .rules', { xPercent: 30, opacity: 0, duration: 0.6 }, '<')
+      .fromTo('.app .conns', { yPercent: 25, opacity: 0, scale: 0.94 }, { yPercent: 0, opacity: 1, scale: 1, duration: 0.8 }, '<0.2')
+      .to({}, { duration: 1 });
 
-    /** Cross-fade the caption to beat i and return the timeline for chaining. */
-    function step(i: number) {
-      return app.to(beats[i - 1], { opacity: 0, y: -10, duration: 0.3 })
-        .fromTo(beats[i], { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.3 });
+    /** Cross-fade the caption and dot to beat i; returns the timeline for chaining. */
+    function beat(i: number) {
+      return app.to(beats[i - 1], { opacity: 0, y: -14, duration: 0.4 })
+        .fromTo(beats[i], { opacity: 0, y: 14 }, {
+          opacity: 1, y: 0, duration: 0.4,
+          onStart: () => dots.forEach((d, j) => d.classList.toggle('on', j === i)),
+          onReverseComplete: () => dots.forEach((d, j) => d.classList.toggle('on', j === i - 1)),
+        });
     }
 
     // Chapter 3: the title re-forms, the stage pins while you play with the lens.
@@ -229,7 +232,7 @@ import Lens from '../components/Lens.astro';
         const { startScene } = await import('../scene/scene');
         const pinned = (sel: string) => ({ el: $(`${sel} .ptitle`), section: $(sel) });
         stage = await startScene($<HTMLCanvasElement>('#stage'), choice, progress,
-          [pinned('.app'), pinned('.see')], { el: $('.app .mb-icon'), section: $('.app') });
+          [pinned('.app'), pinned('.see')], { el: $('.app .vmark'), section: $('.app') });
         ScrollTrigger.addEventListener('refresh', stage.layout);
         stage.onPreset.add(markChoice);
         markChoice();
