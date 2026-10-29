@@ -95,14 +95,15 @@ function buildV(glass: (typeof CONFIG)[Preset]['glass']) {
     ([x, y, z]) => new THREE.Vector3(x * S, y * S, z),
   );
   const dotGeo = new THREE.SphereGeometry(0.045, 16, 12);
-  const dotMat = new THREE.MeshBasicNodeMaterial({ color: new THREE.Color(PALE).multiplyScalar(3), transparent: true });
+  const dotMat = new THREE.MeshBasicNodeMaterial({ color: new THREE.Color(PALE).multiplyScalar(3) });
   for (const p of dots) group.add(new THREE.Mesh(dotGeo, dotMat).translateX(p.x).translateY(p.y).translateZ(p.z));
   group.add(new THREE.LineSegments(
     new THREE.BufferGeometry().setFromPoints([dots[0], dots[2], dots[1], dots[2]]),
-    new THREE.LineBasicNodeMaterial({ color: new THREE.Color(BLUE).multiplyScalar(2), transparent: true }),
+    new THREE.LineBasicNodeMaterial({ color: new THREE.Color(BLUE).multiplyScalar(2) }),
   ));
   group.userData.material = material;
-  group.userData.glow = [dotMat, group.children.at(-1)!.material]; // and fades the nodes, which would blow up to fill the screen
+  // Opaque, so the glass refracts them; the scene shrinks them away before they blow up to fill the screen.
+  group.userData.glow = group.children.slice(BARS.length);
   return group;
 }
 

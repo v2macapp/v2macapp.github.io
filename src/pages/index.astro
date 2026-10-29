@@ -226,6 +226,18 @@ import Lens from '../components/Lens.astro';
       if (connected) scramble(); else connect();
     }));
 
+    // ---- Buttons and chips lean toward the cursor and spring back.
+    if (!reducedMotion()) for (const el of $$('.button, .chip, .power')) {
+      const x = gsap.quickTo(el, 'x', { duration: 0.4, ease: 'power3' });
+      const y = gsap.quickTo(el, 'y', { duration: 0.4, ease: 'power3' });
+      el.addEventListener('pointermove', (e) => {
+        const r = el.getBoundingClientRect();
+        x((e.clientX - r.left - r.width / 2) * 0.3);
+        y((e.clientY - r.top - r.height / 2) * 0.4);
+      });
+      el.addEventListener('pointerleave', () => gsap.to(el, { x: 0, y: 0, duration: 0.8, ease: 'elastic.out(1, 0.4)' }));
+    }
+
     // ---- Graphics switch
     let stage: Stage | null = null;
     let choice: Choice = savedChoice();
@@ -310,6 +322,8 @@ import Lens from '../components/Lens.astro';
     transition: opacity 0.8s;
   }
   .live .poster { opacity: 0; }
+  .live .hero { cursor: grab; } /* the V can be thrown */
+  .grabbing, .grabbing * { cursor: grabbing !important; user-select: none; }
   #stage { opacity: 0; transition: opacity 0.8s; }
   .live #stage { opacity: 1; }
 

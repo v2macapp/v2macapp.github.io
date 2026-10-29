@@ -145,6 +145,24 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
     addEventListener('touchend', () => D.requestPermission().catch(() => {}), { once: true });
   }
 
+  // Drag the V with a mouse and throw it: it spins on, slows and settles on a whole turn.
+  const spin = new THREE.Vector2(), spinV = new THREE.Vector2(), last = new THREE.Vector2();
+  let dragging = false;
+  addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'touch' || progress.burst > 0.05 || (e.target as Element).closest('a, button')) return;
+    dragging = true;
+    last.set(e.clientX, e.clientY);
+    document.documentElement.classList.add('grabbing');
+  });
+  addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    spinV.set((e.clientY - last.y) / innerHeight * 4, (e.clientX - last.x) / innerWidth * 6);
+    spin.add(spinV);
+    last.set(e.clientX, e.clientY);
+  });
+  addEventListener('pointerup', () => { dragging = false; document.documentElement.classList.remove('grabbing'); });
+  const TAU = Math.PI * 2;
+
   const watcher = new FpsWatcher((p) => apply(p));
   const eye0 = new THREE.Vector3(0, 0, DIST), eye1 = new THREE.Vector3(0, 0, DIST);
   const look0 = new THREE.Vector3(0, -1.7, 0), look1 = new THREE.Vector3();
@@ -170,7 +188,13 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
     // The V tilts toward the cursor; scrolling brings it at the camera, which passes through the
     // glass and sees the app window refracted in it (the liquid glass zoom).
     aimNow.lerp(aim, 0.08);
-    world.v.rotation.set(-aimNow.y * 0.3 * (1 - b), aimNow.x * 0.45 * (1 - b), 0);
+    if (!dragging) {
+      for (const k of ['x', 'y'] as const) {
+        spinV[k] = (spinV[k] + (Math.round(spin[k] / TAU) * TAU - spin[k]) * 0.015) * 0.94;
+        spin[k] += spinV[k];
+      }
+    }
+    world.v.rotation.set(spin.x - aimNow.y * 0.3 * (1 - b), spin.y + aimNow.x * 0.45 * (1 - b), 0);
     const k = 0.985 * Math.pow(progress.burst, 1.6);
     world.v.position.copy(eye).multiplyScalar(k);
     world.v.visible = k < 0.97;
@@ -180,11 +204,13 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
     const glass = world.v.userData.material;
     glass.specularIntensity = glass.clearcoat = 1 - THREE.MathUtils.smoothstep(progress.burst, 0.05, 0.3);
     glass.thickness = 0.6 * (1 - 0.95 * b);
-    for (const m of world.v.userData.glow) m.opacity = 1 - THREE.MathUtils.smoothstep(progress.burst, 0.05, 0.35);
+    const nodes = 1 - THREE.MathUtils.smoothstep(progress.burst, 0.05, 0.3);
+    for (const o of world.v.userData.glow) { o.visible = nodes > 0; if (o.isMesh) o.scale.setScalar(nodes); }
 
     // The window rides with its section until the section pins.
     const top = frame.section.getBoundingClientRect().top;
     app.root.position.copy(appAt).setY(appAt.y - (top / innerHeight) * 2 * halfH);
+    app.root.visible = progress.build > 0.01; // its exploded corner would peek into the hero
     app.update(progress, aimNow);
 
     // The packet: from stop to stop along an arc, wherever those places are right now.

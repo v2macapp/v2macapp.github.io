@@ -120,6 +120,7 @@ liquid glass grid (5).
    was built and dropped on 2026-10-30.
    Built 2026-10-30, waiting for review (`npm run dev`, `?fps` shows the counter, `?webgl` forces WebGL 2).
 1b. **Wow pass** (see above): one shot, the 3D window, the packet, cinematic finish, physical play.
+   Built 2026-10-30, waiting for review. Depth of field not done yet.
 2. **M2**: tunnel → globe with clickable countries, the liquid glass sandbox grid.
 3. **M3**: all pages, FAQ, SEO, blog from releases, Send to my Mac.
 4. **M4**: `/noleaker` with the leak test.
