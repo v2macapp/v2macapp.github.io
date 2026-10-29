@@ -1,18 +1,26 @@
 // The one lazy 3D island: renderer, camera, cursor and tilt, presets. The page's ScrollTriggers
 // write `progress`; the page's DOM says where the titles and the menu bar icon sit.
 import * as THREE from 'three/webgpu';
-import { color, length, mix, pass, screenUV, smoothstep, vec2 } from 'three/tsl';
+import { color, length, mix, pass, screenUV, smoothstep, vec2, vec4 } from 'three/tsl';
 import { bloom } from 'three/addons/tsl/display/BloomNode.js';
+import { chromaticAberration } from 'three/addons/tsl/display/ChromaticAberrationNode.js';
+import { film } from 'three/addons/tsl/display/FilmNode.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { CONFIG, FpsWatcher, PRESETS, startPreset, type Choice, type Preset } from './presets';
-import { DIST, FOV, STAR_DIST, U, V_HEIGHT, buildWorld, type World } from './world';
+import { DIST, FOV, STAR_DIST, U, V_NODE, buildWorld, type World } from './world';
+import { POWER, ROW, buildApp, type AppProgress } from './app';
+import { buildPacket } from './packet';
 
-export type Progress = { burst: number; title: number; out: number };
+/** `packet`: 0 on the V, 1 on the Frankfurt row, 2 on the power button, 3 under the lens, 4 gone down. */
+export type Progress = { burst: number; title: number; out: number; packet: number } & AppProgress;
 /** An element and the pinned section it sits in: its place on screen is taken as when that section is pinned. */
 export type Pinned = { el: HTMLElement; section: HTMLElement };
 
 
-export async function startScene(canvas: HTMLCanvasElement, choice: Choice, progress: Progress, titles: Pinned[], icon: Pinned) {
+/** `frame`: where the HTML puts the app window in chapter 2; the 3D window follows it.
+ *  `stream`: chapter 3's traffic, where the packet passes the lens; `label`: the packet's name tag. */
+export async function startScene(canvas: HTMLCanvasElement, choice: Choice, progress: Progress, titles: Pinned[], frame: Pinned,
+  stream: HTMLElement, label: HTMLElement) {
   const renderer = new THREE.WebGPURenderer({
     canvas, antialias: true, forceWebGL: new URLSearchParams(location.search).has('webgl'),
   });
@@ -32,13 +40,19 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
   let world: World;
   let pipeline: THREE.RenderPipeline | null = null;
   const onPreset = new Set<(p: Preset) => void>();
-  const iconAt = new THREE.Vector3();
-  let iconScale = 0.1;
+  const app = await buildApp(preset);
+  scene.add(app.root);
+  const appAt = new THREE.Vector3();
+  const packet = buildPacket();
+  scene.add(packet.sprite);
+  const stops = [0, 1, 2, 3, 4].map(() => new THREE.Vector3());
+  const head = new THREE.Vector3(), ctrl = new THREE.Vector3(), onScreen = new THREE.Vector3();
 
   function apply(p: Preset) {
     preset = p;
     if (world) { world.dispose(); scene.remove(world.root); camera.remove(world.stars); }
     world = buildWorld(p);
+    app.setPreset(p);
     scene.add(world.root);
     camera.add(world.stars);
     renderer.setPixelRatio(Math.min(devicePixelRatio, CONFIG[p].dpr));
@@ -46,9 +60,14 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
     pipeline = null;
     if (CONFIG[p].bloom) {
       const out = pass(scene, camera).getTextureNode('output');
-      const glow = bloom(out, 0.6, 0.4, 0.35);
+      const glow = bloom(out, 0.6, 0.4, 0.85); // high threshold: the screenshots' white text stays crisp
       glow.setResolutionScale(CONFIG[p].bloom);
-      pipeline = new THREE.RenderPipeline(renderer, out.add(glow));
+      // The camera look: colour fringes toward the edges (High and up), grain and a vignette.
+      let img: any = out.add(glow);
+      if (p === 'ultra' || p === 'high') img = chromaticAberration(img, 0.08, vec2(0.5, 0.5));
+      img = film(img, 0.18);
+      const edge = smoothstep(0.35, 0.95, length(screenUV.sub(0.5).mul(vec2(1.2, 1))));
+      pipeline = new THREE.RenderPipeline(renderer, vec4(img.rgb.mul(edge.mul(-0.45).add(1)), 1));
     }
     resize();
     onPreset.forEach((f) => f(p));
@@ -87,10 +106,10 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
 
   function layout() {
     titles.forEach((t, i) => { const { pts, cell } = sampleTitle(t); world.setTitle(i, pts, cell); });
-    const r = pinnedRect(icon);
+    const r = pinnedRect(frame);
     const [x, y] = toWorld(r.left + r.width / 2, r.top + r.height / 2);
-    iconAt.set(x, y, 0);
-    iconScale = ((r.height / innerHeight) * 2 * halfH) / V_HEIGHT;
+    appAt.set(x, y, 0);
+    app.root.scale.setScalar((r.width / innerHeight) * 2 * halfH);
   }
 
   function resize() {
@@ -142,18 +161,52 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
     U.lens.value += (lensTarget - U.lens.value) * 0.08;
     const b = THREE.MathUtils.smoothstep(progress.burst, 0, 1);
 
-    // The V tilts toward the cursor, then flies into the menu bar icon as its particles leave.
-    aimNow.lerp(aim, 0.08);
-    world.v.rotation.set(-aimNow.y * 0.3 * (1 - b), aimNow.x * 0.45 * (1 - b), 0);
-    world.v.position.copy(iconAt).multiplyScalar(b);
-    world.v.scale.setScalar(THREE.MathUtils.lerp(1, iconScale, b));
-    world.v.visible = progress.burst < 0.98; // the HTML icon takes over
-
     const fit = Math.max(1, 1.1 / camera.aspect) * (1 - b) + b; // pull back on portrait screens in chapter 1
     eye.lerpVectors(eye0, eye1, b).multiplyScalar(fit);
     look.lerpVectors(look0, look1, b).multiplyScalar(fit);
     camera.position.copy(eye);
     camera.lookAt(look);
+
+    // The V tilts toward the cursor; scrolling brings it at the camera, which passes through the
+    // glass and sees the app window refracted in it (the liquid glass zoom).
+    aimNow.lerp(aim, 0.08);
+    world.v.rotation.set(-aimNow.y * 0.3 * (1 - b), aimNow.x * 0.45 * (1 - b), 0);
+    const k = 0.985 * Math.pow(progress.burst, 1.6);
+    world.v.position.copy(eye).multiplyScalar(k);
+    world.v.visible = k < 0.97;
+    U.vGlow.value = 1 - 0.75 * THREE.MathUtils.smoothstep(progress.burst, 0.05, 0.4);
+    // Up close the room light's reflection would fill the screen with a white cloud, and thick glass
+    // would smear the window: the glass thins and stops reflecting as the camera passes through.
+    const glass = world.v.userData.material;
+    glass.specularIntensity = glass.clearcoat = 1 - THREE.MathUtils.smoothstep(progress.burst, 0.05, 0.3);
+    glass.thickness = 0.6 * (1 - 0.95 * b);
+    for (const m of world.v.userData.glow) m.opacity = 1 - THREE.MathUtils.smoothstep(progress.burst, 0.05, 0.35);
+
+    // The window rides with its section until the section pins.
+    const top = frame.section.getBoundingClientRect().top;
+    app.root.position.copy(appAt).setY(appAt.y - (top / innerHeight) * 2 * halfH);
+    app.update(progress, aimNow);
+
+    // The packet: from stop to stop along an arc, wherever those places are right now.
+    world.v.updateMatrixWorld();
+    world.v.localToWorld(stops[0].copy(V_NODE));
+    app.worldOf(...ROW, 0.03, stops[1]);
+    app.worldOf(...POWER, 0.03, stops[2]);
+    const sr = stream.getBoundingClientRect();
+    const [sx, sy] = toWorld(sr.left + sr.width / 2, sr.top + sr.height / 2);
+    stops[3].set(sx, sy, 0);
+    stops[4].set(sx, -halfH * 1.6, 0);
+    const t = THREE.MathUtils.clamp(progress.packet, 0, 3.999), i = Math.floor(t);
+    const f = THREE.MathUtils.smootherstep(t - i, 0, 1);
+    ctrl.lerpVectors(stops[i], stops[i + 1], 0.5);
+    ctrl.y += stops[i].distanceTo(stops[i + 1]) * 0.3;
+    ctrl.z += 1.5;
+    head.copy(stops[i]).multiplyScalar((1 - f) ** 2).addScaledVector(ctrl, 2 * f * (1 - f)).addScaledVector(stops[i + 1], f * f);
+    packet.move(head);
+    camera.updateMatrixWorld();
+    onScreen.copy(head).project(camera);
+    label.style.transform = `translate(${(onScreen.x + 1) / 2 * innerWidth}px, ${(1 - onScreen.y) / 2 * innerHeight}px)`;
+    label.classList.toggle('on', progress.packet > 0.03 && progress.packet < 3.9);
 
     if (pipeline) pipeline.render(); else renderer.render(scene, camera);
     if (!started) { started = true; document.documentElement.classList.add('live'); }

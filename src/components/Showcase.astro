@@ -8,7 +8,6 @@ const t = en.app;
   <div class="side">
     <div class="appicon">
       <img src="/app/icon.webp" alt={t.icon} width="128" height="128" />
-      <span class="vmark"></span>
     </div>
     <div class="beats">
       {t.beats.map((b) => (
@@ -18,12 +17,12 @@ const t = en.app;
     <div class="dots" aria-hidden="true">{t.beats.map(() => <span></span>)}</div>
   </div>
 
-  <div class="windows">
+  <div class="frame"><div class="windows">
     <div class="w main"><img src="/app/main.webp" alt={t.shots.main} width="1440" height="787" loading="lazy" /></div>
     <img class="w sub" src="/app/add-subscription.webp" alt={t.shots.subscription} width="920" height="490" loading="lazy" />
     <img class="w rules" src="/app/rules.webp" alt={t.shots.rules} width="1100" height="1052" loading="lazy" />
     <img class="w conns" src="/app/connections.webp" alt={t.shots.connections} width="1440" height="933" loading="lazy" />
-  </div>
+  </div></div>
 </div>
 
 <style>
@@ -41,8 +40,6 @@ const t = en.app;
   .side { display: flex; flex-direction: column; gap: 28px; }
   .appicon { position: relative; width: 88px; height: 88px; }
   .appicon img { width: 100%; height: 100%; border-radius: 22.5%; box-shadow: 0 12px 40px rgba(10, 132, 255, 0.35); }
-  /* where the glass V lands: the V inside the icon */
-  .vmark { position: absolute; left: 20%; right: 20%; top: 20.5%; height: 58%; }
 
   .beats { position: relative; min-height: 9em; }
   .beat { position: absolute; inset: 0 0 auto; }
@@ -54,6 +51,8 @@ const t = en.app;
   .dots span { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.25); }
   .dots span.on { background: var(--text); }
 
+  /* the 3D window follows .frame, which is never transformed; with the 3D on the images only serve screen readers */
+  :global(.live) .windows { visibility: hidden; }
   .windows { position: relative; aspect-ratio: 1440 / 787; perspective: 1600px; }
   .w {
     position: absolute;
@@ -70,7 +69,7 @@ const t = en.app;
   @media (max-width: 800px) {
     .showcase { grid-template-columns: 1fr; align-content: space-evenly; gap: 18px; }
     /* larger than the screen: the phone shows the left of the window, the camera crops the rest */
-    .windows { width: 150%; }
+    .frame { width: 150%; }
     .side { flex-direction: row; align-items: flex-start; gap: 16px; }
     .appicon { width: 56px; height: 56px; flex: none; }
     .beats { flex: 1; min-height: 7.5em; }

@@ -16,6 +16,7 @@ export const U = {
   aspect: uniform(1),
   px: uniform(0.01), // one CSS pixel at the stars' distance
   titleAlpha: uniform(0.3),
+  vGlow: uniform(1), // the V's edge glow; faded as the camera passes through, where it would bloom into a white cloud
 };
 
 export const FOV = 40;
@@ -28,13 +29,13 @@ const PALE = 0xbfe0ff;
 
 // The two bars of the logo, traced from logo-mark-glass.jpg (corners TL, TR, BR, BL).
 const S = 1.3;
-export const V_HEIGHT = 2 * S;
 const BARS = [
   [[-1.14, 1], [-0.52, 1], [0.58, -1], [-0.04, -1]],
   [[0.51, 1], [1.14, 1], [0.05, -1], [-0.58, -1]],
 ].map((bar) => bar.map(([x, y]) => new THREE.Vector2(x * S, y * S)));
 const BAR_Z = [-0.3, 0];
 const BAR_DEPTH = 0.22;
+export const V_NODE = new THREE.Vector3(0, -0.54 * S, -0.04); // the logo's bottom node, where the packet starts
 
 const fresnel = pow(float(1).sub(abs(dot(normalView, positionViewDirection))), 3);
 
@@ -68,16 +69,18 @@ function buildV(glass: (typeof CONFIG)[Preset]['glass']) {
       dispersion: glass === 'dispersion' ? 6 : 0, attenuationColor: new THREE.Color(0x0a5cff),
       attenuationDistance: 1.2, clearcoat: 1,
     });
-    m.emissiveNode = color(BLUE).mul(fresnel.mul(2.2).add(0.08));
+    m.emissiveNode = color(BLUE).mul(fresnel.mul(2.2).add(0.08)).mul(U.vGlow);
     material = m;
   } else if (glass === 'fake') {
     const m = new THREE.MeshPhysicalNodeMaterial({
       color: 0x1f6fe0, metalness: 0, roughness: 0.08, clearcoat: 1, transparent: true, opacity: 0.7,
     });
-    m.emissiveNode = color(BLUE).mul(fresnel.mul(2.4).add(0.12));
+    m.emissiveNode = color(BLUE).mul(fresnel.mul(2.4).add(0.12)).mul(U.vGlow);
     material = m;
   } else {
-    material = new THREE.MeshBasicNodeMaterial({ color: BLUE, transparent: true, opacity: 0.85 });
+    const m = new THREE.MeshBasicNodeMaterial({ color: BLUE, transparent: true });
+    m.opacityNode = U.vGlow.mul(0.6).add(0.25); // see-through as the camera passes
+    material = m;
   }
 
   BARS.forEach((corners, i) => {
@@ -92,12 +95,14 @@ function buildV(glass: (typeof CONFIG)[Preset]['glass']) {
     ([x, y, z]) => new THREE.Vector3(x * S, y * S, z),
   );
   const dotGeo = new THREE.SphereGeometry(0.045, 16, 12);
-  const dotMat = new THREE.MeshBasicNodeMaterial({ color: new THREE.Color(PALE).multiplyScalar(3) });
+  const dotMat = new THREE.MeshBasicNodeMaterial({ color: new THREE.Color(PALE).multiplyScalar(3), transparent: true });
   for (const p of dots) group.add(new THREE.Mesh(dotGeo, dotMat).translateX(p.x).translateY(p.y).translateZ(p.z));
   group.add(new THREE.LineSegments(
     new THREE.BufferGeometry().setFromPoints([dots[0], dots[2], dots[1], dots[2]]),
-    new THREE.LineBasicNodeMaterial({ color: new THREE.Color(BLUE).multiplyScalar(2) }),
+    new THREE.LineBasicNodeMaterial({ color: new THREE.Color(BLUE).multiplyScalar(2), transparent: true }),
   ));
+  group.userData.material = material;
+  group.userData.glow = [dotMat, group.children.at(-1)!.material]; // and fades the nodes, which would blow up to fill the screen
   return group;
 }
 
@@ -139,7 +144,7 @@ function buildParticles(count: number) {
     instancedBufferAttribute(titles[1]), e2,
   ).add(swirl).add(drift);
 
-  const material = new THREE.SpriteNodeMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+  const material = new THREE.SpriteNodeMaterial({ transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending });
   // Titles sit on the z = 0 plane, DIST in front of the camera: bend them around the cursor too.
   material.positionNode = vec3(lensed(pos.xy.div(DIST * TAN), float(0)).at.mul(DIST * TAN), pos.z);
   material.scaleNode = s.z;
@@ -149,6 +154,7 @@ function buildParticles(count: number) {
   const sprite = new THREE.Sprite(material);
   sprite.count = count;
   sprite.frustumCulled = false;
+  sprite.renderOrder = 5; // after the glass, so the V's transmission doesn't blur them into a white blob
 
   /** Points of title `i` on the z = 0 plane (x, y pairs); `cell` is their spacing. */
   function setTitle(i: number, pts: Float32Array, cell: number) {
