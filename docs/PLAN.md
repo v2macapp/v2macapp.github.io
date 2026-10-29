@@ -71,6 +71,7 @@ Cursor physics everywhere: particles part around the cursor, the V tilts toward 
 ## Milestones
 1. **M1**: Astro + three setup, presets and FPS watcher, chapters 1 and 2 (glass V, burst,
    Connect shatters the wall, protocol chips, cursor physics). The user reviews it in the browser.
+   Built 2026-10-30, waiting for review (`npm run dev`, `?fps` shows the counter, `?webgl` forces WebGL 2).
 2. **M2**: globe with clickable countries, sandbox capsules.
 3. **M3**: all pages, FAQ, SEO, blog from releases, Send to my Mac.
 4. **M4**: `/noleaker` with the leak test.
