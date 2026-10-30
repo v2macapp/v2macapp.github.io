@@ -121,5 +121,10 @@ liquid glass grid (5).
    Built 2026-10-30, waiting for review. Countries: `scripts/globe.mjs` bakes `public/globe/` from
    Natural Earth (world-atlas, dev only). The sandbox row is HTML glass cards (drag, cut a server).
 3. **M3**: all pages, FAQ, SEO, blog from releases, Send to my Mac.
+   Notes from 2026-10-30 (not started): facts for the comparison pages, checked on GitHub: v2rayN runs on
+   Windows, Linux and macOS (Intel and Apple Silicon), Xray and sing-box cores, GPL-3.0. V2RayX was archived
+   on 2024-01-12, uses v2ray-core, GPL-3.0. NoLeaker's repo is `v2macapp/noleaker` (the app README and wiki
+   still link LordVersA). FAQ source: `../wiki/Troubleshooting-and-FAQ.md`; `/sandbox` source: `../wiki/Sandbox.md`.
+   Release notes can be rendered at build time with Astro's own `@astrojs/markdown-satteri`.
 4. **M4**: `/noleaker` with the leak test.
 5. **M5**: release CI hook (`V2Mac.dmg`, rebuild), publish.
