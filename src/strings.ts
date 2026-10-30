@@ -47,6 +47,38 @@ export const en = {
       { name: 'Shadowsocks', line: 'shadowsocks · 2022-blake3', what: 'Encrypted bytes with no pattern to match. They see noise.', shows: '' }, // random bytes per pill
     ],
   },
+  globe: {
+    title: 'Route the world.',
+    lede: 'Pick a rule, then click countries to send their sites through your server, straight out, or nowhere. Drag to turn the globe.',
+    brush: 'Rule to paint',
+    rules: {
+      proxy: { name: 'Proxy', help: 'Through your server' },
+      direct: { name: 'Direct', help: 'Straight out, no server' },
+      block: { name: 'Block', help: 'Never leaves your Mac' },
+    },
+    idle: 'Click a country.',
+    unset: 'Proxy (default)',
+    reset: 'Reset',
+  },
+  sandbox: {
+    title: 'Secure Sandbox.',
+    beta: 'Beta',
+    lede: 'Run apps in their own mini VMs, each one a real app on your Mac with its own exit. If its server goes down, it is cut off. Nothing leaks.',
+    drag: 'Drag the row. Cut a server to see what happens.',
+    cut: 'Cut server',
+    restore: 'Restore',
+    down: 'Server down · blocked',
+    sealed: 'Blocked · 0 bytes leaked',
+    more: 'About the sandbox',
+    vms: [
+      { app: 'Firefox', vm: 'Work', flag: '🇩🇪', city: 'Frankfurt 01', delay: '86 ms', hue: 211 },
+      { app: 'Chromium', vm: 'Shopping', flag: '🇳🇱', city: 'Amsterdam 02', delay: '112 ms', hue: 145 },
+      { app: 'Terminal', vm: 'Dev', flag: '🇫🇮', city: 'Helsinki 01', delay: '143 ms', hue: 32 },
+      { app: 'Firefox', vm: 'Travel', flag: '🇹🇷', city: 'Istanbul 03', delay: '61 ms', hue: 330 },
+      { app: 'Chromium', vm: 'Research', flag: '🇬🇧', city: 'London 01', delay: '98 ms', hue: 265 },
+      { app: 'SSH', vm: 'Servers', flag: '🇦🇪', city: 'Dubai 01', delay: '204 ms', hue: 190 },
+    ],
+  },
   sites: ['youtube.com', 'telegram.org', 'instagram.com', 'x.com', 'wikipedia.org', 'github.com', 'whatsapp.net', 'chatgpt.com', 'reddit.com', 'spotify.com', 'news.bbc.co.uk', 'discord.com'],
   footer: {
     graphics: 'Graphics',

@@ -118,6 +118,8 @@ liquid glass grid (5).
 1b. **Wow pass** (see above): one shot, the 3D window, cinematic finish, physical play.
    Built 2026-10-30, waiting for review. Depth of field not done yet.
 2. **M2**: tunnel → globe with clickable countries, the liquid glass sandbox grid.
+   Built 2026-10-30, waiting for review. Countries: `scripts/globe.mjs` bakes `public/globe/` from
+   Natural Earth (world-atlas, dev only). The sandbox row is HTML glass cards (drag, cut a server).
 3. **M3**: all pages, FAQ, SEO, blog from releases, Send to my Mac.
 4. **M4**: `/noleaker` with the leak test.
 5. **M5**: release CI hook (`V2Mac.dmg`, rebuild), publish.

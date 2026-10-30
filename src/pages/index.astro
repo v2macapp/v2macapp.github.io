@@ -5,6 +5,8 @@ import { en as t, DOWNLOAD_URL, REPO_URL } from '../strings';
 import { PRESETS } from '../scene/presets';
 import Showcase from '../components/Showcase.astro';
 import Lens from '../components/Lens.astro';
+import Globe from '../components/Globe.astro';
+import Sandbox from '../components/Sandbox.astro';
 ---
 <!doctype html>
 <html lang="en">
@@ -47,6 +49,16 @@ import Lens from '../components/Lens.astro';
       <p class="lede">{t.see.lede}</p>
       <Lens />
     </section>
+
+    <section class="stage globe">
+      <h2 class="ptitle">{t.globe.title}</h2>
+      <Globe />
+    </section>
+
+    <section class="stage sandbox">
+      <h2 class="ptitle">{t.sandbox.title}</h2>
+      <Sandbox />
+    </section>
   </main>
 
   <footer>
@@ -65,16 +77,19 @@ import Lens from '../components/Lens.astro';
     import { ScrollTrigger } from 'gsap/ScrollTrigger';
     import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
     import { ScrollSmoother } from 'gsap/ScrollSmoother';
+    import { Draggable } from 'gsap/Draggable';
+    import { InertiaPlugin } from 'gsap/InertiaPlugin';
     import { en as t } from '../strings';
     import { savedChoice, saveChoice, reducedMotion, type Choice } from '../scene/presets';
     import type { Progress, Stage } from '../scene/scene';
+    import type { Rule } from '../scene/globe';
 
-    gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin, ScrollSmoother);
+    gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin, ScrollSmoother, Draggable, InertiaPlugin);
     const $ = <T extends Element = HTMLElement>(s: string) => document.querySelector(s) as T;
     const $$ = <T extends Element = HTMLElement>(s: string) => [...document.querySelectorAll<T>(s)];
 
     // ---- Scroll: one timeline per chapter; the 3D reads `progress`.
-    const progress: Progress = { burst: 0, title: 0, out: 0, build: 0, sub: 0, mag: 0, rules: 0, conns: 0, dim: 0 };
+    const progress: Progress = { burst: 0, title: 0, out: 0, tunnel: 0, build: 0, sub: 0, mag: 0, rules: 0, conns: 0, dim: 0 };
     const scrub = 0.6;
     // Wheel and trackpad scrolling glide; touch keeps the phone's own scrolling.
     ScrollSmoother.create({ wrapper: '#smooth-wrapper', content: '#smooth-content', smooth: reducedMotion() ? 0 : 1.2, smoothTouch: false });
@@ -135,9 +150,20 @@ import Lens from '../components/Lens.astro';
     gsap.to(progress, { title: 1, ease: 'none', scrollTrigger: { trigger: '.see', start: 'top bottom', end: 'top top', scrub } });
     // The window explodes again as it leaves.
     gsap.fromTo(progress, { build: 1 }, { build: 0, ease: 'none', immediateRender: false, scrollTrigger: { trigger: '.see', start: 'top bottom', end: 'top top', scrub } });
-    const seePin = ScrollTrigger.create({ trigger: '.see', start: 'top top', end: '+=100%', pin: true });
-    // The particle title can't scroll with the page, so it fades as soon as the stage unpins.
-    gsap.to(progress, { out: 1, ease: 'none', scrollTrigger: { start: () => seePin.end, end: () => seePin.end + innerHeight * 0.08, scrub: true } });
+    ScrollTrigger.create({ trigger: '.see', start: 'top top', end: '+=100%', pin: true });
+
+    // Chapter 4: the camera flies through the tunnel while the next title forms; the globe stage pins.
+    const next = (title: number, sel: string) => gsap.fromTo(progress, { title: title - 1 }, {
+      title, ease: 'none', immediateRender: false, scrollTrigger: { trigger: sel, start: 'top bottom', end: 'top top', scrub },
+    });
+    next(2, '.globe');
+    gsap.to(progress, { tunnel: 1, ease: 'none', scrollTrigger: { trigger: '.globe', start: 'top bottom', end: 'top top', scrub } });
+    ScrollTrigger.create({ trigger: '.globe', start: 'top top', end: '+=120%', pin: true });
+
+    // Chapter 5: the sandbox title; the particle title can't scroll with the page, so it fades as the stage unpins.
+    next(3, '.sandbox');
+    const lastPin = ScrollTrigger.create({ trigger: '.sandbox', start: 'top top', end: '+=80%', pin: true });
+    gsap.to(progress, { out: 1, ease: 'none', scrollTrigger: { start: () => lastPin.end, end: () => lastPin.end + innerHeight * 0.08, scrub: true } });
 
     // ---- The lens follows the pointer; until then it wanders on its own.
     const stream = $('.stream');
@@ -219,6 +245,85 @@ import Lens from '../components/Lens.astro';
       if (connected) scramble(); else connect();
     }));
 
+    // ---- Chapter 4: paint countries with the chosen rule; drag to turn the globe.
+    let brush: Rule = 'direct';
+    const brushes = $$<HTMLButtonElement>('.globe .brush button');
+    brushes.forEach((b) => b.addEventListener('click', () => {
+      brush = b.dataset.rule as Rule;
+      brushes.forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+    }));
+    const spot = $('.globe .spot');
+    const picked = $('.globe .picked');
+    const painted = new Set<number>();
+    const say = (i: number) => {
+      if (!stage || i < 0) return;
+      const r = stage.globe.rule(i);
+      picked.textContent = `${stage.globe.names[i]} · ${r ? t.globe.rules[r].name : t.globe.unset}`;
+    };
+    let down: { x: number; y: number; moved: boolean } | null = null;
+    spot.addEventListener('pointerdown', (e) => { down = { x: e.clientX, y: e.clientY, moved: false }; spot.setPointerCapture(e.pointerId); });
+    spot.addEventListener('pointermove', (e) => {
+      if (!stage) return;
+      if (down) {
+        const dx = e.clientX - down.x, dy = e.clientY - down.y;
+        if (down.moved || Math.hypot(dx, dy) > 5) {
+          down.moved = true;
+          stage.globe.drag(dx / innerWidth, dy / innerHeight);
+          down.x = e.clientX;
+          down.y = e.clientY;
+        }
+        return;
+      }
+      const i = stage.countryAt(e.clientX, e.clientY);
+      stage.globe.hover(i);
+      if (i >= 0) say(i);
+    });
+    spot.addEventListener('pointerup', (e) => {
+      stage?.globe.release();
+      const click = down && !down.moved;
+      down = null;
+      if (!stage || !click) return;
+      const i = stage.countryAt(e.clientX, e.clientY);
+      if (i < 0) return;
+      const same = stage.globe.rule(i) === brush;
+      stage.globe.setRule(i, same ? null : brush); // clicking again with the same rule clears it
+      if (same) painted.delete(i); else painted.add(i);
+      say(i);
+    });
+    spot.addEventListener('pointerleave', () => stage?.globe.hover(-1));
+    $('.globe .reset').addEventListener('click', () => {
+      painted.forEach((i) => stage?.globe.setRule(i, null));
+      painted.clear();
+      picked.textContent = t.globe.idle;
+    });
+
+    // ---- Chapter 5: the row of mini VMs is thrown with inertia; the cards lean with its speed.
+    const cards = $('.sandbox .cards');
+    const vms = $$('.sandbox .vm');
+    const lean = vms.map((el) => gsap.quickTo(el, 'skewX', { duration: 0.5, ease: 'power3' }));
+    const shine = () => {
+      const v = InertiaPlugin.getVelocity(cards, 'x') || 0;
+      lean.forEach((f) => f(reducedMotion() ? 0 : gsap.utils.clamp(-8, 8, -v / 250)));
+      const x = gsap.getProperty(cards, 'x') as number;
+      vms.forEach((el) => el.style.setProperty('--sheen', `${45 + (x / innerWidth) * 40}%`));
+    };
+    Draggable.create(cards, {
+      type: 'x', bounds: '.sandbox .rail', inertia: true, edgeResistance: 0.8,
+      onDrag: shine, onThrowUpdate: shine, onThrowComplete: () => lean.forEach((f) => f(0)), onRelease: shine,
+    });
+    // Cut a server: the mini VM seals instead of falling back to your real connection.
+    vms.forEach((vm) => {
+      const cut = vm.querySelector<HTMLButtonElement>('.cut')!;
+      const city = vm.querySelector<HTMLElement>('.city')!;
+      cut.addEventListener('click', () => {
+        const sealed = vm.classList.toggle('sealed');
+        cut.setAttribute('aria-pressed', String(sealed));
+        cut.textContent = sealed ? t.sandbox.restore : t.sandbox.cut;
+        city.textContent = sealed ? t.sandbox.down : city.dataset.up!;
+        if (sealed && !reducedMotion()) gsap.fromTo(vm, { x: -6 }, { x: 0, duration: 0.5, ease: 'elastic.out(1.2, 0.3)' });
+      });
+    });
+
     // ---- Buttons and chips lean toward the cursor and spring back.
     if (!reducedMotion()) for (const el of $$('.button, .chip, .power')) {
       const x = gsap.quickTo(el, 'x', { duration: 0.4, ease: 'power3' });
@@ -256,7 +361,8 @@ import Lens from '../components/Lens.astro';
         const { startScene } = await import('../scene/scene');
         const pinned = (sel: string) => ({ el: $(`${sel} .ptitle`), section: $(sel) });
         stage = await startScene($<HTMLCanvasElement>('#stage'), choice, progress,
-          [pinned('.app'), pinned('.see')], { el: $('.app .frame'), section: $('.app') });
+          [pinned('.app'), pinned('.see'), pinned('.globe'), pinned('.sandbox')], { el: $('.app .frame'), section: $('.app') },
+          { el: $('.globe .spot'), section: $('.globe') });
         ScrollTrigger.addEventListener('refresh', stage.layout);
         stage.onPreset.add(markChoice);
         markChoice();
