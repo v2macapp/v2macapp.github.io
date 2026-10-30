@@ -9,7 +9,7 @@ import { CONFIG, type Preset } from './presets';
 
 export const U = {
   burst: uniform(0), // 0 = glass V, 1 = the V's particles form chapter 2's title
-  title: uniform(0), // 0 = chapter 2's title, 1 = chapter 3's
+  title: uniform(0), // which title the particles draw: 0 = chapter 2's … TITLES - 1 = the last chapter's
   out: uniform(0), // 1 = particles faded out (past the last title)
   cursor: uniform(new THREE.Vector2(9, 9)), // in NDC
   lens: uniform(0), // Einstein radius of the cursor's black hole, in screen units (screen height = 2)
@@ -19,6 +19,7 @@ export const U = {
   vGlow: uniform(1), // the V's edge glow; faded as the camera passes through, where it would bloom into a white cloud
 };
 
+export const TITLES = 4; // chapters 2 to 5
 export const FOV = 40;
 export const DIST = 10; // the camera of chapters 2 and 3, straight at the z = 0 plane
 const TAN = Math.tan(THREE.MathUtils.degToRad(FOV / 2));
@@ -128,28 +129,28 @@ function buildParticles(count: number) {
     seed.set([Math.random(), Math.random(), 0.008 + Math.random() * 0.02, 0], i * 4);
   }
   const startAttr = new THREE.InstancedBufferAttribute(start, 3);
-  const titles = [new Float32Array(start), new Float32Array(start)].map((a) => new THREE.InstancedBufferAttribute(a, 3));
+  const titles = Array.from({ length: TITLES }, () => new THREE.InstancedBufferAttribute(new Float32Array(start), 3));
   U.titleAlpha.value = Math.min(0.9, 9000 / titled);
 
   const s = instancedBufferAttribute(new THREE.InstancedBufferAttribute(seed, 4));
   const step = (k: any) => smoothstep(0, 1, clamp(k.mul(1.5).sub(s.x.mul(0.5)), 0, 1)); // staggered 0 → 1
-  const e1 = step(U.burst), e2 = step(U.title);
-  const moving = e1.mul(float(1).sub(e1)).add(e2.mul(float(1).sub(e2)));
-  const swirl = vec3(sin(s.y.mul(6.28).add(e1.mul(4)).add(e2.mul(5))), cos(s.y.mul(9.1).add(e1.mul(3))), sin(s.y.mul(4.7)))
+  // e[0]: the V → the first title; e[i]: title i - 1 → title i.
+  const e = [step(U.burst), ...titles.slice(1).map((_, i) => step(clamp(U.title.sub(i), 0, 1)))];
+  const moving = e.reduce((a: any, k) => a.add(k.mul(float(1).sub(k))), float(0));
+  const turn = e.reduce((a: any, k, i) => a.add(k.mul(4 + i)), float(0));
+  const swirl = vec3(sin(s.y.mul(6.28).add(turn)), cos(s.y.mul(9.1).add(turn.mul(0.7))), sin(s.y.mul(4.7)))
     .mul(moving.mul(2.5));
   const drift = vec3(sin(time.mul(0.4).add(s.y.mul(40))), cos(time.mul(0.3).add(s.y.mul(30))), 0)
     .mul(0.006); // barely moving, so the words stay sharp
-  const pos = mix(
-    mix(instancedBufferAttribute(startAttr), instancedBufferAttribute(titles[0]), e1),
-    instancedBufferAttribute(titles[1]), e2,
-  ).add(swirl).add(drift);
+  const pos = titles.reduce((a: any, t, i) => mix(a, instancedBufferAttribute(t), e[i]), instancedBufferAttribute(startAttr))
+    .add(swirl).add(drift);
 
   const material = new THREE.SpriteNodeMaterial({ transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending });
   // Titles sit on the z = 0 plane, DIST in front of the camera: bend them around the cursor too.
   material.positionNode = vec3(lensed(pos.xy.div(DIST * TAN), float(0)).at.mul(DIST * TAN), pos.z);
   material.scaleNode = s.z;
   const glow = smoothstep(0.5, 0, length(uv().sub(0.5)));
-  const alpha = U.titleAlpha.mul(e1).mul(float(1).sub(U.out));
+  const alpha = U.titleAlpha.mul(e[0]).mul(float(1).sub(U.out));
   material.colorNode = vec4(mix(color(BLUE), color(PALE), s.y).mul(1.4), glow.mul(alpha));
   const sprite = new THREE.Sprite(material);
   sprite.count = count;
