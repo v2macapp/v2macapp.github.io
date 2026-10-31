@@ -1,36 +1,106 @@
 ---
-// Chapter 4's stage: a draggable row of glass mini VM cards; cut a card's server and it seals.
-// index.astro makes the row draggable and wires the Cut buttons.
+// Chapter 4's stage: the Secure Sandbox told one idea per scroll beat. index.astro's pinned timeline
+// moves the scene; the last beat hands the Cut buttons to the visitor. Demo names only, no real servers.
 import { en } from '../strings';
 const s = en.sandbox;
+const ROW = [17, 50, 83]; // each room's middle, % of the scene's height
 ---
-<p class="badge"><span>{s.beta}</span></p>
-<p class="lede">{s.lede}</p>
-<div class="rail">
-  <div class="cards">
-    {s.vms.map((v) => (
-      <article class="vm" style={`--hue:${v.hue}`}>
+<div class="sbx">
+  <div class="side">
+    <p class="badge"><span>{s.beta}</span></p>
+    <div class="beats">
+      {s.beats.map((b) => <article class="beat"><h3>{b.title}</h3><p>{b.text}</p></article>)}
+    </div>
+    <div class="dots" aria-hidden="true">{s.beats.map(() => <span></span>)}</div>
+    <a class="button more" href="/sandbox">{s.more}</a>
+  </div>
+
+  <div class="scene"><div class="world">
+    <svg class="links" viewBox="0 0 1000 700" preserveAspectRatio="none" aria-hidden="true">
+      {ROW.map((y, i) => {
+        const d = `M620 ${y * 7} H760`;
+        return (
+          <g class="route" style={`--hue:${s.vms[i].hue}`}>
+            <path class="line" d={d} pathLength="1" vector-effect="non-scaling-stroke" />
+            <g class="packets">
+              {[0, 0.5, 1].map((b) => (
+                <circle r="5"><animateMotion dur="1.5s" begin={`${b}s`} repeatCount="indefinite" path={d} /></circle>
+              ))}
+            </g>
+          </g>
+        );
+      })}
+    </svg>
+
+    {s.vms.map((v, i) => (
+      <article class={`room r${i}`} style={`--hue:${v.hue}; top:${ROW[i] - 15}%`}>
+        <div class="pane"></div>
         <div class="win">
           <div class="bar"><i></i><i></i><i></i><span>{v.app} — {v.vm}</span></div>
-          <div class="page" aria-hidden="true"><b></b><b></b><b class="short"></b><b></b><b class="short"></b></div>
-          <div class="seal" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z" /></svg>
-            {s.sealed}
+          <div class={`body ${v.kind}`} aria-hidden="true">
+            {v.kind === 'web' && <><p class="url">{v.url}</p><b class="hero"></b><b></b><b class="short"></b></>}
+            {v.kind === 'shop' && <><p class="url">{v.url}</p><div class="tiles"><b></b><b></b><b></b><b></b></div></>}
+            {v.kind === 'term' && v.term!.map((l) => <p class:list={{ cmd: l.startsWith('$') }}>{l}</p>)}
           </div>
+          <div class="seal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z" /></svg>{s.sealed}</div>
         </div>
-        <footer>
-          <span class="exit"><span class="flag">{v.flag}</span><span class="city" data-up={`${v.city} · ${v.delay}`}>{v.city} · {v.delay}</span></span>
-          <button type="button" class="cut" aria-pressed="false">{s.cut}</button>
-        </footer>
       </article>
     ))}
-  </div>
+
+    {s.vms.map((v, i) => (
+      <div class="exit" style={`top:${ROW[i]}%`}>
+        <p><span>{v.flag}</span> <span class="city" data-up={v.city}>{v.city}</span></p>
+        <small class="state" data-up={v.delay}>{v.delay}</small>
+        <button type="button" class="cut" aria-pressed="false">{s.cut}</button>
+      </div>
+    ))}
+
+    <aside class="sees">
+      <h4>{s.sees.title}</h4>
+      <ul>{s.sees.yes.map((x) => <li class="yes">{x}</li>)}</ul>
+      <h4>{s.sees.notTitle}</h4>
+      <ul>{s.sees.no.map((x) => <li class="no">{x}</li>)}</ul>
+    </aside>
+
+    <aside class="notice"><strong>{s.notice.title}</strong><span>{s.notice.text}</span></aside>
+
+    <aside class="sheet">
+      <h4>{s.sheet.title}</h4>
+      <p>{s.sheet.lede}</p>
+      <ul>{s.sheet.items.map((x) => <li>{x}</li>)}</ul>
+      <div class="acts"><span>{s.sheet.cancel}</span><span>{s.sheet.without}</span><span class="go">{s.sheet.allow}</span></div>
+    </aside>
+
+    <div class="desk">
+      <p class="path">{s.desk}</p>
+      <div class="macwin" style={`--hue:${s.vms[0].hue}`}>
+        <div class="bar"><i></i><i></i><i></i><span>{s.vms[0].app} — {s.vms[0].vm}</span></div>
+        <div class="body web" aria-hidden="true"><p class="url">{s.vms[0].url}</p><b class="hero"></b><b></b><b></b><b class="short"></b></div>
+      </div>
+      <div class="dock">
+        <figure><img src="/app/icon.webp" alt="" width="128" height="128" /><figcaption>V2Mac</figcaption></figure>
+        {s.vms.map((v) => (
+          <figure style={`--hue:${v.hue}`}><span class="ico">{v.app[0]}</span><figcaption>{v.app}<br />{v.vm}</figcaption></figure>
+        ))}
+      </div>
+    </div>
+  </div></div>
 </div>
-<p class="hint">{s.drag}</p>
-<a class="button more" href="/sandbox">{s.more}</a>
 
 <style>
-  .badge { margin: 4px 0 0; }
+  .sbx {
+    flex: 1;
+    min-height: 0;
+    width: min(1280px, 100%);
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) 2.2fr;
+    align-items: center;
+    gap: clamp(24px, 4vw, 64px);
+    text-align: left;
+    text-shadow: none;
+  }
+  .side { display: flex; flex-direction: column; align-items: flex-start; gap: 22px; }
+  .badge { margin: 0; }
   .badge span {
     display: inline-block;
     padding: 3px 10px;
@@ -42,77 +112,162 @@ const s = en.sandbox;
     background: var(--orange);
     box-shadow: 0 0 20px rgba(255, 159, 10, 0.5);
   }
-  .rail { width: 100vw; overflow: hidden; padding: 28px 0; flex: 1; min-height: 0; display: flex; align-items: center; }
-  .cards { display: flex; gap: 24px; padding: 0 max(16px, calc(50vw - 560px)); cursor: grab; }
-  .vm {
-    --tint: hsl(var(--hue) 90% 60%);
-    flex: none;
-    width: clamp(240px, 26vw, 320px);
-    border-radius: 22px;
-    padding: 10px;
-    text-align: left;
-    /* liquid glass: a tinted frosted pane with a moving sheen */
+  .beats { position: relative; width: 100%; min-height: 12em; }
+  .beat { position: absolute; inset: 0 0 auto; }
+  .beat + .beat { opacity: 0; } /* the timeline takes over */
+  .beat h3 { margin: 0; font-size: clamp(26px, 3vw, 40px); letter-spacing: -0.02em; line-height: 1.1; }
+  .beat p { margin: 12px 0 0; color: var(--dim); font-size: 17px; line-height: 1.5; max-width: 24em; }
+  .dots { display: flex; gap: 8px; }
+  .dots span { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.25); }
+  .dots span.on { background: var(--text); }
+
+  .scene { container-type: inline-size; width: min(100%, calc((100svh - 22svh) * 10 / 7)); justify-self: center; }
+  .world { position: relative; aspect-ratio: 10 / 7; font-size: 1.75cqw; }
+
+  .links { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .line { fill: none; stroke: hsl(var(--hue) 90% 65%); stroke-width: 2; stroke-dasharray: 1; transition: stroke 0.3s; filter: drop-shadow(0 0 4px hsl(var(--hue) 90% 60%)); }
+  .packets circle { fill: hsl(var(--hue) 100% 88%); }
+  .route.down .line { stroke: var(--red); stroke-dasharray: 0.08 0.1 !important; stroke-dashoffset: 0 !important; filter: none; }
+  .route.down .packets { display: none; }
+  @media (prefers-reduced-motion: reduce) { .packets { display: none; } }
+
+  .room { position: absolute; left: 0; width: 62%; height: 30%; }
+  .pane {
+    position: absolute;
+    inset: -3.5% -1.6%;
+    border-radius: 1.5em;
     background:
-      linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.14) var(--sheen, 45%), transparent 60%),
-      linear-gradient(160deg, hsl(var(--hue) 80% 55% / 0.22), rgba(255, 255, 255, 0.04));
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(18px) saturate(1.4);
-    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+      linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.1) 46%, transparent 60%),
+      linear-gradient(160deg, hsl(var(--hue) 80% 55% / 0.28), hsl(var(--hue) 80% 40% / 0.06));
+    border: 1px solid hsl(var(--hue) 90% 75% / 0.45);
+    box-shadow: 0 1.6em 3.4em rgba(0, 0, 0, 0.5), 0 0 2.6em hsl(var(--hue) 90% 55% / 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
     transition: border-color 0.3s, box-shadow 0.3s;
   }
-  .win { position: relative; border-radius: 14px; overflow: hidden; background: rgba(8, 12, 22, 0.8); }
-  .bar { display: flex; align-items: center; gap: 6px; padding: 9px 10px; font-size: 12px; color: var(--dim); }
-  .bar i { width: 9px; height: 9px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); }
-  .bar i:first-child { background: #ff5f57; }
-  .bar span { margin-left: 6px; color: var(--text); font-weight: 600; white-space: nowrap; }
-  .page { display: grid; gap: 8px; padding: 12px 14px 18px; }
-  .page b {
-    height: 10px;
-    border-radius: 5px;
-    background: linear-gradient(90deg, hsl(var(--hue) 70% 50% / 0.35), hsl(var(--hue) 90% 70% / 0.7), hsl(var(--hue) 70% 50% / 0.35));
-    background-size: 200% 100%;
-    animation: live 2.4s linear infinite; /* the app is running */
-  }
-  .page b:first-child { height: 46px; border-radius: 8px; }
-  .page b.short { width: 60%; }
-  @keyframes live { to { background-position: -200% 0; } }
+  .win { position: absolute; inset: 0; display: flex; flex-direction: column; border-radius: 0.9em; overflow: hidden; background: #0b101c; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1); }
+  .bar { display: flex; align-items: center; gap: 0.4em; padding: 0.55em 0.75em; background: rgba(255, 255, 255, 0.05); }
+  .bar i { width: 0.62em; height: 0.62em; border-radius: 50%; background: #ff5f57; }
+  .bar i:nth-child(2) { background: #febc2e; }
+  .bar i:nth-child(3) { background: #28c840; }
+  .bar span { margin-left: 0.5em; font-weight: 600; font-size: 0.9em; white-space: nowrap; }
+  .body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 0.5em; padding: 0.7em 0.9em; }
+  .body p { margin: 0; }
+  .url { font: 0.76em var(--mono); color: var(--dim); background: rgba(255, 255, 255, 0.07); border-radius: 0.6em; padding: 0.25em 0.8em; }
+  .body b { display: block; height: 0.6em; border-radius: 0.3em; background: hsl(var(--hue) 80% 62% / 0.5); }
+  .body b.hero { flex: 1; min-height: 0; height: auto; background: linear-gradient(100deg, hsl(var(--hue) 80% 40% / 0.8), hsl(var(--hue) 90% 68% / 0.7)); }
+  .body b.short { width: 60%; opacity: 0.6; }
+  .tiles { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5em; }
+  .tiles b { height: auto; background: linear-gradient(170deg, hsl(var(--hue) 70% 58% / 0.75), hsl(var(--hue) 60% 30% / 0.6)); }
+  .term { font: 0.84em/1.45 var(--mono); gap: 0; color: hsl(var(--hue) 90% 76%); }
+  .term .cmd { color: var(--text); }
   .seal {
     position: absolute;
-    inset: 34px 0 0;
+    inset: 0;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    font-size: 13px;
+    gap: 0.6em;
     font-weight: 600;
     color: #ffd7d4;
-    background: rgba(60, 8, 8, 0.55);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(60, 8, 8, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     opacity: 0;
     transition: opacity 0.35s;
   }
-  .seal svg { width: 26px; height: 26px; fill: none; stroke: var(--red); stroke-width: 2; }
-  footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 4px 2px; font-size: 13px; }
-  .exit { display: flex; align-items: center; gap: 6px; min-width: 0; white-space: nowrap; }
-  .city { color: var(--green); font-family: var(--mono); font-size: 12px; overflow: hidden; text-overflow: ellipsis; }
-  .cut {
-    flex: none;
-    font: inherit;
-    font-size: 12px;
-    color: var(--text);
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 999px;
-    padding: 5px 10px;
-    cursor: pointer;
+  .seal svg { width: 1.6em; height: 1.6em; fill: none; stroke: var(--red); stroke-width: 2; }
+  .room.sealed .seal { opacity: 1; }
+  .room.sealed .pane { border-color: var(--red); box-shadow: 0 0 0 1px var(--red), 0 0 3em rgba(255, 69, 58, 0.45); }
+
+  .exit {
+    position: absolute;
+    left: 76%;
+    width: 24%;
+    transform: translateY(-50%);
+    padding: 0.6em 0.8em;
+    border-radius: 0.9em;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
   }
-  .vm.sealed { border-color: rgba(255, 69, 58, 0.7); box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--red), 0 0 40px rgba(255, 69, 58, 0.35); }
-  .vm.sealed .seal { opacity: 1; }
-  .vm.sealed .page b { animation-play-state: paused; filter: grayscale(1) brightness(0.6); }
-  .vm.sealed .city { color: var(--red); }
-  .hint { color: var(--dim); font-size: 13px; margin: 0 0 14px; }
-  .more { margin-bottom: 2svh; }
+  .exit p { margin: 0; font-weight: 600; font-size: 0.92em; white-space: nowrap; }
+  .state { display: block; margin-top: 0.15em; font: 0.8em var(--mono); color: var(--green); white-space: nowrap; }
+  .exit.down .state { color: var(--red); }
+  .cut { display: block; margin-top: 0.5em; font: inherit; font-size: 0.8em; color: var(--text); background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 999px; padding: 0.25em 0.8em; cursor: pointer; }
+
+  .sees, .sheet, .notice, .desk { position: absolute; visibility: hidden; }
+  .sees, .sheet, .notice {
+    background: rgba(20, 26, 42, 0.86);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 1.6em 3.6em rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  }
+  h4 { margin: 0; font-size: 0.78em; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
+  ul { list-style: none; margin: 0; padding: 0; }
+  .sees { left: 66%; top: 12%; width: 34%; padding: 1.1em; border-radius: 1.2em; }
+  .sees ul { margin: 0.5em 0 1em; display: grid; gap: 0.45em; font-size: 0.92em; }
+  .sees ul:last-child { margin-bottom: 0; }
+  .sees li { padding-left: 1.5em; position: relative; }
+  .sees li::before { position: absolute; left: 0; font-weight: 700; }
+  .yes::before { content: '✓'; color: var(--green); }
+  .no { color: var(--dim); }
+  .no::before { content: '✕'; color: var(--red); }
+
+  .notice { right: 0; top: 24.5%; width: 30%; padding: 0.8em 1em; border-radius: 1em; display: grid; gap: 0.2em; font-size: 0.92em; z-index: 2; }
+  .notice span { color: var(--dim); }
+
+  .sheet { left: 50%; top: 50%; width: 62%; margin-left: -31%; transform: translateY(-50%); padding: 1.4em; border-radius: 1.4em; z-index: 2; }
+  .sheet h4 { font-size: 1.15em; letter-spacing: 0; text-transform: none; color: var(--text); }
+  .sheet p { margin: 0.3em 0 0.8em; color: var(--dim); font-size: 0.92em; }
+  .sheet ul { display: grid; gap: 0.15em; }
+  .sheet li { padding: 0.5em 0.7em; border-radius: 0.6em; background: rgba(255, 255, 255, 0.06); font-size: 0.92em; }
+  .acts { display: flex; justify-content: flex-end; gap: 0.5em; margin-top: 1em; font-size: 0.82em; white-space: nowrap; }
+  .acts span { padding: 0.35em 0.8em; border-radius: 999px; background: rgba(255, 255, 255, 0.1); }
+  .acts .go { background: var(--blue); font-weight: 600; }
+
+  .desk { inset: 0; display: flex; flex-direction: column; align-items: center; gap: 1em; }
+  .path { order: 3; margin: 0; font: 0.9em var(--mono); color: var(--dim); }
+  .dock {
+    display: flex;
+    align-items: flex-end;
+    gap: 1.1em;
+    padding: 0.9em 1.3em 0.5em;
+    border-radius: 1.8em;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2em 4em rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    backdrop-filter: blur(24px) saturate(1.5);
+    -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  }
+  .dock img, .ico { width: 5em; height: 5em; border-radius: 22.5%; display: block; }
+  .ico {
+    display: grid;
+    place-items: center;
+    font-size: 1.5em;
+    width: 3.33em;
+    height: 3.33em;
+    font-weight: 700;
+    background: linear-gradient(160deg, hsl(var(--hue) 90% 62%), hsl(var(--hue) 85% 34%));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 0.8em 1.8em hsl(var(--hue) 90% 45% / 0.5);
+  }
+  figure { margin: 0; width: 5em; text-align: center; }
+  figcaption { margin-top: 0.4em; min-height: 2.5em; font-size: 0.8em; line-height: 1.25; color: var(--dim); }
+  .macwin { flex: 1; min-height: 0; width: 72%; display: flex; flex-direction: column; border-radius: 1em; overflow: hidden; background: #0b101c; box-shadow: 0 2em 5em rgba(0, 0, 0, 0.6), 0 0 3em hsl(var(--hue) 90% 55% / 0.3), 0 0 0 1px rgba(255, 255, 255, 0.14); }
+
+  .more { padding: 10px 18px; font-size: 14px; }
+
+  @media (max-width: 800px) {
+    .sbx { grid-template-columns: 1fr; grid-template-rows: auto 1fr; gap: 12px; align-items: start; }
+    .side { gap: 10px; }
+    .badge { display: none; }
+    .beats { min-height: 8.6em; }
+    .beat h3 { font-size: 24px; }
+    .beat p { font-size: 15px; margin-top: 6px; }
+    .dots { display: none; }
+    .world { aspect-ratio: 1; font-size: 2.3cqw; }
+    .more { position: absolute; bottom: 3svh; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+  }
 </style>

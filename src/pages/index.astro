@@ -71,13 +71,11 @@ import Sandbox from '../components/Sandbox.astro';
     import { ScrollTrigger } from 'gsap/ScrollTrigger';
     import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
     import { ScrollSmoother } from 'gsap/ScrollSmoother';
-    import { Draggable } from 'gsap/Draggable';
-    import { InertiaPlugin } from 'gsap/InertiaPlugin';
     import { en as t } from '../strings';
     import { savedChoice, saveChoice, reducedMotion, type Choice } from '../scene/presets';
     import type { Progress, Stage } from '../scene/scene';
 
-    gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin, ScrollSmoother, Draggable, InertiaPlugin);
+    gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin, ScrollSmoother);
     const $ = <T extends Element = HTMLElement>(s: string) => document.querySelector(s) as T;
     const $$ = <T extends Element = HTMLElement>(s: string) => [...document.querySelectorAll<T>(s)];
 
@@ -150,7 +148,96 @@ import Sandbox from '../components/Sandbox.astro';
       title, ease: 'none', immediateRender: false, scrollTrigger: { trigger: sel, start: 'top bottom', end: 'top top', scrub },
     });
     next(2, '.sandbox');
-    const lastPin = ScrollTrigger.create({ trigger: '.sandbox', start: 'top top', end: '+=80%', pin: true });
+    // One idea per beat, like chapter 2. Beat 3 cuts Frankfurt on its own; the last beat hands the Cut buttons over.
+    const sbBeats = $$('.sandbox .beat'), sbDots = $$('.sandbox .dots span');
+    sbDots[0]?.classList.add('on');
+    const rooms = $$('.sandbox .room'), exits = $$('.sandbox .exit'), routes = $$('.sandbox .route');
+    /** Mini VM i with its server up or cut: the room seals, the line breaks. */
+    function setCut(i: number, down: boolean) {
+      const cut = exits[i].querySelector<HTMLButtonElement>('.cut')!, state = exits[i].querySelector<HTMLElement>('.state')!;
+      rooms[i].classList.toggle('sealed', down);
+      routes[i].classList.toggle('down', down);
+      exits[i].classList.toggle('down', down);
+      cut.setAttribute('aria-pressed', String(down));
+      cut.textContent = down ? t.sandbox.restore : t.sandbox.cut;
+      state.textContent = down ? t.sandbox.down : state.dataset.up!;
+    }
+    let scriptedCut = false, playing = false;
+    const sb = gsap.timeline({
+      defaults: { ease: 'power2.inOut' },
+      scrollTrigger: { trigger: '.sandbox', start: 'top top', end: '+=800%', pin: true, scrub },
+      onUpdate() { // only when the playhead crosses, so it never undoes the visitor's own clicks
+        const inside = sb.time() >= sb.labels.cut && sb.time() < sb.labels.ask;
+        if (inside !== scriptedCut) { scriptedCut = inside; setCut(0, inside); }
+        // Scrolling back out of the last beat clears the visitor's cuts, so the story replays clean.
+        const open = sb.time() >= sb.labels.try;
+        if (playing && !open) rooms.forEach((_, i) => setCut(i, i === 0 && inside));
+        playing = open;
+      },
+    });
+    const sbBeat = (i: number) => sb.to(sbBeats[i - 1], { opacity: 0, y: -14, duration: 0.4 })
+      .fromTo(sbBeats[i], { opacity: 0, y: 14 }, {
+        opacity: 1, y: 0, duration: 0.4,
+        onStart: () => sbDots.forEach((d, j) => d.classList.toggle('on', j === i)),
+        onReverseComplete: () => sbDots.forEach((d, j) => d.classList.toggle('on', j === i - 1)),
+      });
+    const hold = (d = 1) => sb.to({}, { duration: d });
+    const S = '.sandbox ';
+    const lines = S + '.line', packets = S + '.packets';
+    const net = [S + '.links', S + '.exit'];
+    // Start as one stack on your Mac; the panes and the exits aren't there yet.
+    gsap.set(rooms, { xPercent: 30, yPercent: (i: number) => [110, 0, -110][i], rotate: (i: number) => [-4, 2, 5][i], scale: 0.94 });
+    gsap.set(S + '.pane', { opacity: 0 });
+    gsap.set(lines, { strokeDashoffset: 1 });
+    gsap.set(packets, { opacity: 0 });
+    gsap.set(S + '.exit', { autoAlpha: 0, x: 24 });
+    gsap.set([S + '.cut', S + '.more'], { autoAlpha: 0 });
+
+    // 0: the stack comes apart, each window closes in its own glass room
+    sb.to(rooms, { xPercent: 0, yPercent: 0, rotate: 0, scale: 1, stagger: 0.08, duration: 1.1 })
+      .to(S + '.pane', { opacity: 1, duration: 0.6, stagger: 0.08 }, '-=0.5');
+    hold();
+    // 1: a line out of each room to its server
+    sbBeat(1).to(lines, { strokeDashoffset: 0, stagger: 0.15, duration: 0.7 }, '<')
+      .to(S + '.exit', { autoAlpha: 1, x: 0, stagger: 0.15, duration: 0.6 }, '<0.2')
+      .to(packets, { opacity: 1, duration: 0.3 });
+    hold();
+    // 2: closer on one room: what is inside, what isn't
+    sbBeat(2).to(net, { autoAlpha: 0, duration: 0.5 }, '<')
+      .to([rooms[1], rooms[2]], { autoAlpha: 0, duration: 0.5 }, '<')
+      .to(rooms[0], { yPercent: 110, scale: 1.04, duration: 0.8 }, '<')
+      .fromTo(S + '.sees', { autoAlpha: 0, x: 30 }, { autoAlpha: 1, x: 0, duration: 0.5 }, '<0.3')
+      .from(S + '.sees li', { autoAlpha: 0, x: 12, stagger: 0.08, duration: 0.3 }, '<0.2');
+    hold(1.2);
+    // 3: back to all three; Frankfurt dies, the others carry on
+    sbBeat(3).to(S + '.sees', { autoAlpha: 0, x: 30, duration: 0.4 }, '<')
+      .to(rooms[0], { yPercent: 0, scale: 1, duration: 0.7 }, '<')
+      .to([rooms[1], rooms[2]], { autoAlpha: 1, duration: 0.5 }, '<')
+      .to(net, { autoAlpha: 1, duration: 0.5 }, '<');
+    sb.addLabel('cut');
+    sb.fromTo(rooms[0], { x: -8 }, { x: 0, duration: 0.5, ease: 'elastic.out(1.2, 0.3)' })
+      .fromTo(S + '.notice', { autoAlpha: 0, y: -16 }, { autoAlpha: 1, y: 0, duration: 0.4 }, '<');
+    hold(1.2);
+    // 4: the install sheet
+    sbBeat(4).to(S + '.notice', { autoAlpha: 0, duration: 0.3 }, '<');
+    sb.addLabel('ask');
+    sb.to([...rooms, ...net], { autoAlpha: 0.14, duration: 0.5 }, '<')
+      .fromTo(S + '.sheet', { autoAlpha: 0, scale: 0.94, y: 20 }, { autoAlpha: 1, scale: 1, y: 0, duration: 0.5 }, '<0.1')
+      .from(S + '.sheet li', { autoAlpha: 0, x: -10, stagger: 0.08, duration: 0.3 }, '<0.2');
+    hold(1.2);
+    // 5: they're Mac apps: the rooms give way to the Dock
+    sbBeat(5).to(S + '.sheet', { autoAlpha: 0, y: -20, duration: 0.4 }, '<')
+      .to([...rooms, ...net], { autoAlpha: 0, duration: 0.4 }, '<')
+      .fromTo(S + '.desk', { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.6 }, '<0.2')
+      .from(S + '.dock > *', { y: 40, autoAlpha: 0, stagger: 0.1, duration: 0.5, ease: 'back.out(1.8)' }, '<0.1');
+    hold(1.2);
+    // 6: your turn
+    sb.addLabel('try');
+    sbBeat(6).to(S + '.desk', { autoAlpha: 0, y: 40, duration: 0.4 }, '<')
+      .to([...rooms, ...net], { autoAlpha: 1, duration: 0.5 }, '<0.2')
+      .to([S + '.cut', S + '.more'], { autoAlpha: 1, duration: 0.4 }, '<0.2');
+    hold(1.4);
+    const lastPin = sb.scrollTrigger!;
     gsap.to(progress, { out: 1, ease: 'none', scrollTrigger: { start: () => lastPin.end, end: () => lastPin.end + innerHeight * 0.08, scrub: true } });
 
     // ---- The lens follows the pointer; until then it wanders on its own.
@@ -233,32 +320,11 @@ import Sandbox from '../components/Sandbox.astro';
       if (connected) scramble(); else connect();
     }));
 
-    // ---- Chapter 4: the row of mini VMs is thrown with inertia; the cards lean with its speed.
-    const cards = $('.sandbox .cards');
-    const vms = $$('.sandbox .vm');
-    const lean = vms.map((el) => gsap.quickTo(el, 'skewX', { duration: 0.5, ease: 'power3' }));
-    const shine = () => {
-      const v = InertiaPlugin.getVelocity(cards, 'x') || 0;
-      lean.forEach((f) => f(reducedMotion() ? 0 : gsap.utils.clamp(-8, 8, -v / 250)));
-      const x = gsap.getProperty(cards, 'x') as number;
-      vms.forEach((el) => el.style.setProperty('--sheen', `${45 + (x / innerWidth) * 40}%`));
-    };
-    Draggable.create(cards, {
-      type: 'x', bounds: '.sandbox .rail', inertia: true, edgeResistance: 0.8,
-      onDrag: shine, onThrowUpdate: shine, onThrowComplete: () => lean.forEach((f) => f(0)), onRelease: shine,
-    });
-    // Cut a server: the mini VM seals instead of falling back to your real connection.
-    vms.forEach((vm) => {
-      const cut = vm.querySelector<HTMLButtonElement>('.cut')!;
-      const city = vm.querySelector<HTMLElement>('.city')!;
-      cut.addEventListener('click', () => {
-        const sealed = vm.classList.toggle('sealed');
-        cut.setAttribute('aria-pressed', String(sealed));
-        cut.textContent = sealed ? t.sandbox.restore : t.sandbox.cut;
-        city.textContent = sealed ? t.sandbox.down : city.dataset.up!;
-        if (sealed && !reducedMotion()) gsap.fromTo(vm, { x: -6 }, { x: 0, duration: 0.5, ease: 'elastic.out(1.2, 0.3)' });
-      });
-    });
+    // ---- Chapter 4: the visitor's own Cut buttons.
+    exits.forEach((e, i) => e.querySelector('.cut')!.addEventListener('click', () => {
+      setCut(i, !rooms[i].classList.contains('sealed'));
+      if (rooms[i].classList.contains('sealed') && !reducedMotion()) gsap.fromTo(rooms[i], { x: -8 }, { x: 0, duration: 0.5, ease: 'elastic.out(1.2, 0.3)' });
+    }));
 
     // ---- Buttons and chips lean toward the cursor and spring back.
     if (!reducedMotion()) for (const el of $$('.button, .chip, .power')) {

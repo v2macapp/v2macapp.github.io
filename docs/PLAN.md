@@ -33,9 +33,7 @@ readers, and the page without 3D); with the 3D on it is drawn by the particles i
    REALITY a visit to microsoft.com, Hysteria2 QUIC on UDP 443, Trojan HTTPS to your server's domain,
    Shadowsocks random bytes. The protocol chips change what the lens sees. Phones: the lens wanders
    until you drag it.
-4. **Secure Sandbox (Beta)**: a draggable liquid glass grid of mini VM cards, each with a live window
-   bending behind its glass, its own color and exit city. Cut a card's server: it turns red and seals,
-   nothing leaks (fail-closed). Orange BETA badge, link to `/sandbox`.
+4. **Secure Sandbox (Beta)**: pinned for seven beats, rebuilt 2026-10-31 because the card row didn't explain anything. A stack of windows comes apart into glass rooms; each gets a line to its own exit; one room up close (what it sees, what it can't); Frankfurt dies and the room seals while the others carry on; the install sheet; the Dock; then the visitor cuts servers. Orange BETA badge, link to `/sandbox`.
 
 **Backdrop behind every chapter** (the user, 2026-10-31): a slice of the real Earth low on the screen, turning, with data arcs between cities and a little 3D noise fog (`src/scene/earth.ts`, hung on the camera; half brightness past the hero). Textures from the three.js examples in `public/earth/`, 2.2 MB, loaded after the page paints.
 
@@ -66,12 +64,31 @@ dissolve (titles); explore.ownprimland.com and the anoni.net Tor flow (4); the C
 liquid glass grid (5).
 
 ## Other pages
-- `/sandbox`: Secure Sandbox (Beta), full page.
+- `/sandbox`: Secure Sandbox (Beta), full page. Plan below.
 - `/noleaker`: hero is a live leak test of the visitor's own browser (WebRTC, timezone vs IP country,
   language, QUIC); each leak is a drop the shield catches. Details to decide at M4 (which IP service
   allows browser access; no real DNS test without a DNS server). noleaker-flow is not on the site.
 - `/v2rayn-for-mac`, `/v2rayx-alternative`: honest comparison pages.
 - `/guides/vless-reality-mac`, `/guides/hysteria2-mac`; `/blog/` built from GitHub releases.
+
+## `/sandbox` page (draft plan, 2026-10-31, not built)
+The main page's chapter sells the idea in seven beats; this page answers "how does it work, and can I trust it?".
+Same world: Earth backdrop, particle title, pinned scroll scenes. Every claim comes from `../wiki/Sandbox.md` or `../sandbox/docs/PLAN.md`.
+
+1. **Hero**: "Secure Sandbox", Beta badge, one sentence, Download V2Mac. Real Sandbox window screenshot (none exists yet: needs demo-data captures from the Dev instance).
+2. **What you get**: a mini VM from Add (Empty, Templates, Clone) to an app in the Dock; the Exit picker with green, red "Not connected" and "No exit (blocked)".
+3. **Fail-closed, in depth**: the scroll scene takes one packet from app to server, cuts the server and shows where it stops. Its own connection: keeps working when V2Mac is disconnected, on another server or in TUN mode.
+4. **What's inside, what isn't**: place and time zone of the exit, home folder, Shared folder if allowed; never your Mac's files, network or other mini VMs.
+5. **Permissions**: the install sheet, then the Allow, Don't Allow, Always Allow prompt; clipboard directions; Shared files marked as downloaded so macOS checks them.
+6. **Keep or throw away**: Disposable, Clone, Wipe Data.
+7. **Trust**: the signed store, Verify Installation ("Verified" means unchanged, not "safe"), withdrawn apps, the sandbox download pinned to each V2Mac release.
+8. **Apps and developers**: Chromium and Firefox plugins, plugin template, store submission. Only list apps once they're in the store.
+9. **Cost and limits**: nothing downloads until first use, the size, memory limit, stops 5 minutes after the last app closes, Remove Sandbox. Beta caveats, honestly.
+10. **FAQ** (FAQPage markup) and Download.
+
+SEO: own title and description, targets "run apps through a VPN server on Mac", "per-app VPN Mac", "app isolation macOS". Each claim needs a check against the released sandbox version before publishing.
+
+Open, for the user: real screenshots or rebuilt UI; the size and memory numbers to state; whether it ships with the first site launch.
 
 ## Loading and devices
 - Content first: text, Download button and a poster image paint at once (~40 KB); the 3D loads after.
