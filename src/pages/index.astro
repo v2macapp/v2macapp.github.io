@@ -67,7 +67,7 @@ import Sandbox from '../components/Sandbox.astro';
       <button type="button" data-choice="auto">{t.footer.auto}</button>
       {PRESETS.map((p) => <button type="button" data-choice={p}>{t.footer.presets[p]}</button>)}
     </div>
-    <p>{t.footer.tracking}</p>
+    <p>{t.footer.tracking} {t.footer.credit}</p>
   </footer>
   </div></div>
   <div id="fps" hidden></div>

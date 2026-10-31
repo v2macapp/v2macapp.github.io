@@ -37,6 +37,8 @@ readers, and the page without 3D); with the 3D on it is drawn by the particles i
    bending behind its glass, its own color and exit city. Cut a card's server: it turns red and seals,
    nothing leaks (fail-closed). Orange BETA badge, link to `/sandbox`.
 
+**Backdrop behind every chapter** (the user, 2026-10-31): a slice of the real Earth low on the screen, turning, with data arcs between cities and a little 3D noise fog (`src/scene/earth.ts`, hung on the camera; half brightness past the hero). Textures from the three.js examples in `public/earth/`, 2.2 MB, loaded after the page paints.
+
 Then FAQ (FAQPage markup), a NoLeaker section (shield + drop), footer.
 The cursor is a small black hole: real point-mass lensing in screen space bends the stars and the
 particle titles around it (Einstein ring, a faint inner image of each star, a dark shadow). The V tilts

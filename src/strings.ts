@@ -85,6 +85,7 @@ export const en = {
     auto: 'Auto',
     presets: { ultra: 'Ultra', high: 'High', medium: 'Medium', low: 'Low' },
     tracking: 'This site tracks nothing.',
+    credit: 'Earth textures: Solar System Scope, CC BY 4.0.',
   },
 };
 

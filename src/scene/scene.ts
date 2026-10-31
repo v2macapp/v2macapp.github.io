@@ -10,6 +10,7 @@ import { CONFIG, FpsWatcher, PRESETS, startPreset, type Choice, type Preset } fr
 import { DIST, FOV, STAR_DIST, U, buildWorld, type World } from './world';
 import { buildApp, type AppProgress } from './app';
 import { buildGlobe } from './globe';
+import { buildEarth } from './earth';
 
 /** `tunnel`: 0 = chapter 4's tunnel still ahead, 1 = flown through, the globe in place. */
 export type Progress = { burst: number; title: number; out: number; tunnel: number } & AppProgress;
@@ -45,9 +46,12 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
   scene.add(globe.trip, globe.root);
   const globeAt = new THREE.Vector3();
   const GLOBE_D = DIST + 10; // the globe ends 10 behind the titles' plane
+  const earth = buildEarth();
+  camera.add(earth.object);
 
   function apply(p: Preset) {
     preset = p;
+    earth.setPreset(p);
     if (world) { world.dispose(); scene.remove(world.root); camera.remove(world.stars); }
     world = buildWorld(p);
     scene.add(world.root);
@@ -214,6 +218,7 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
     const top = frame.section.getBoundingClientRect().top;
     app.root.position.copy(appAt).setY(appAt.y - (top / innerHeight) * 2 * halfH);
     globe.update(progress.tunnel, now);
+    earth.update(now, b);
     const gTop = spot.section.getBoundingClientRect().top;
     globe.root.position.x = globeAt.x;
     globe.root.position.y = globeAt.y - (gTop / innerHeight) * 2 * halfH * (GLOBE_D / DIST);
