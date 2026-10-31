@@ -8,8 +8,9 @@ export const getStaticPaths = () => releases.map((r) => ({ params: { tag: r.tag_
 const { r } = Astro.props as { r: Release };
 const code = await renderNotes(r.body ?? '');
 const date = new Date(r.published_at).toLocaleDateString('en-GB', { dateStyle: 'long', timeZone: 'UTC' });
+const post = { '@context': 'https://schema.org', '@type': 'BlogPosting', headline: `${r.name} release notes`, datePublished: r.published_at, author: { '@type': 'Organization', name: 'V2Mac', url: 'https://v2macapp.github.io/' } };
 ---
-<Page title={`${r.name} release notes`} description={`What changed in ${r.name}, released on ${date}.`} ogType="article">
+<Page title={`${r.name} release notes`} description={`What changed in ${r.name}, released on ${date}.`} ogType="article" jsonld={[post]}>
   <header>
     <h1>{r.name}</h1>
     <p class="meta"><time datetime={r.published_at}>{date}</time></p>

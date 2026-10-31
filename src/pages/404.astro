@@ -1,0 +1,11 @@
+---
+import Page from '../layouts/Page.astro';
+import { en } from '../strings';
+const t = en.notFound;
+---
+<Page title={t.title} description={t.description}>
+  <header>
+    <h1>{t.heading}</h1>
+    <p class="lede">{t.text}</p>
+  </header>
+</Page>

@@ -10,8 +10,10 @@ import Showcase from '../components/Showcase.astro';
 import Lens from '../components/Lens.astro';
 import Sandbox from '../components/Sandbox.astro';
 const software = softwareApp(t.description);
+// Google reads the site name in search results from this.
+const website = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'V2Mac', url: 'https://v2macapp.github.io/' };
 ---
-<Base title={t.title} description={t.description} jsonld={[software, faqPage(t.faq)]} og="/og/home.jpg">
+<Base title={t.title} description={t.description} jsonld={[website, software, faqPage(t.faq)]} og="/og/home.jpg">
   <img class="poster" src="/poster.jpg" alt="" aria-hidden="true" />
   <canvas id="stage" aria-hidden="true"></canvas>
 

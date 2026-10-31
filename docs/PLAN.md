@@ -147,3 +147,4 @@ Built with rebuilt UI (no Sandbox screenshots exist yet), the Earth only (no par
    Built 2026-10-31. Search Console meta tag still needs the user's token. OG images: `scripts/make-og.sh`.
 4. **M4**: `/noleaker` with the leak test. Built 2026-10-31.
 5. **M5**: release CI hook (`V2Mac.dmg`, rebuild), publish. CI hook built 2026-10-31; it needs a `SITE_TOKEN` secret in the app repo. Until the next app release the button links the versioned DMG (`src/releases.ts`). Published 2026-10-31.
+- 2026-10-31 SEO pass: WebSite and BlogPosting markup, sitemap lastmod on release notes, 404 page. Docs live on the GitHub wiki, which is `x-robots-tag: none`, so they are not searchable.

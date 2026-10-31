@@ -1,6 +1,6 @@
 // Every visible string on the site, so fa, zh and ru can follow (plan: SEO).
 export const en = {
-  title: 'V2Mac: a native Xray client for macOS',
+  title: 'V2Mac: native Xray and V2Ray client for Mac',
   description:
     'Free, open-source Xray-core and V2Ray client for Mac. VLESS, REALITY, Hysteria2, Trojan and Shadowsocks in a native SwiftUI menu bar app for Apple Silicon.',
   hero: {
@@ -113,6 +113,7 @@ export const en = {
     cta: 'Test my browser',
   },
   nav: { home: 'V2Mac', sandbox: 'Sandbox', noleaker: 'NoLeaker', blog: 'Release notes' },
+  notFound: { title: 'Page not found | V2Mac', description: 'This page does not exist on the V2Mac site.', heading: 'Page not found', text: 'That page isn’t here. Try one of the links above.' },
   blog: {
     title: 'V2Mac release notes',
     description: 'What changed in each release of V2Mac, the native Xray client for macOS.',

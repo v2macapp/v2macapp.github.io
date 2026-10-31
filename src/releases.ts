@@ -29,6 +29,8 @@ export const softwareApp = (description: string) => ({
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
   name: 'V2Mac',
+  url: 'https://v2macapp.github.io/',
+  screenshot: 'https://v2macapp.github.io/app/main.webp',
   description,
   applicationCategory: 'UtilitiesApplication',
   operatingSystem: 'macOS 26 or later, Apple Silicon',
