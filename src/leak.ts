@@ -26,7 +26,22 @@ export function publicIps(candidates: string[]) {
   return [...ips];
 }
 
-/** WebRTC leaks when it shows an address that neither HTTP check saw (dual-stack Macs have one of each). */
+const family = (ip: string) => (ip.includes(':') ? 6 : 4);
+
+/** The addresses to trust, one per family (dual-stack Macs have one of each); the first source wins. */
+export function baseline(ips: (string | null | undefined)[]) {
+  const seen = new Map<number, string>();
+  for (const ip of ips) if (ip && !seen.has(family(ip))) seen.set(family(ip), ip);
+  return [...seen.values()];
+}
+
+/** Two sources saw different addresses of one family: one of the requests went around the proxy, or the proxy has several exits. */
+export const sourcesDisagree = (ips: (string | null | undefined)[]) => {
+  const known = baseline(ips);
+  return ips.some((ip) => ip && !known.includes(ip));
+};
+
+/** WebRTC leaks when it shows an address outside the baseline. */
 export const webrtcLeaks = (candidates: string[], known: string[]) => publicIps(candidates).filter((ip) => !known.includes(ip));
 
 /** A language like de-DE names a country; plain "fa" names none. */

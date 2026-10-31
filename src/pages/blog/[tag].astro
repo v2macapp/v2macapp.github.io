@@ -1,12 +1,12 @@
 ---
-import { createSatteriMarkdownProcessor } from '@astrojs/markdown-satteri';
+import { renderNotes } from '../../markdown';
 import Page from '../../layouts/Page.astro';
 import { en as t } from '../../strings';
 import { releases, type Release } from '../../releases';
 
 export const getStaticPaths = () => releases.map((r) => ({ params: { tag: r.tag_name }, props: { r } }));
 const { r } = Astro.props as { r: Release };
-const { code } = await (await createSatteriMarkdownProcessor({})).render(r.body ?? '');
+const code = await renderNotes(r.body ?? '');
 const date = new Date(r.published_at).toLocaleDateString('en-GB', { dateStyle: 'long', timeZone: 'UTC' });
 ---
 <Page title={`${r.name} release notes`} description={`What changed in ${r.name}, released on ${date}.`} ogType="article">

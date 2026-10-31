@@ -42,7 +42,7 @@ const software = {
 
 <script>
   import { en } from '../strings';
-  import { languageMatches, timezoneMatches, traceIp, usesQuic, webrtcLeaks, type Verdict } from '../leak';
+  import { baseline, languageMatches, sourcesDisagree, timezoneMatches, traceIp, usesQuic, webrtcLeaks, type Verdict } from '../leak';
   const t = en.noleakerPage, say = t.says;
   const button = document.querySelector<HTMLButtonElement>('#run')!;
   const results = document.querySelector<HTMLElement>('#results')!;
@@ -106,7 +106,8 @@ const software = {
     const trace = await getText('https://one.one.one.one/cdn-cgi/trace').then(() => getText('https://one.one.one.one/cdn-cgi/trace')).catch(() => null);
     const ipInfo = await lookup();
     const ice = await iceCandidates();
-    const known = [ipInfo?.ip, trace && traceIp(trace)].filter(Boolean) as string[];
+    const seen = [ipInfo?.ip, trace && traceIp(trace)];
+    const known = baseline(seen);
     const verdicts: Verdict[] = [];
     const judge = (row: string, v: Verdict, text: string) => { verdicts.push(v); show(row, v, text); };
 
@@ -134,6 +135,7 @@ const software = {
     else judge('language', 'hint', say.langHint(lang, ipInfo.country));
 
     if (!trace) judge('quic', 'unknown', say.quicFailed);
+    else if (usesQuic(trace) && sourcesDisagree(seen)) judge('quic', 'leak', say.quicLeak);
     else if (usesQuic(trace)) judge('quic', 'hint', say.quicUsed);
     else judge('quic', 'ok', say.quicNone);
 

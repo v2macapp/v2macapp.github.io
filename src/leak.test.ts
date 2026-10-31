@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { languageMatches, offsetMinutes, publicIps, timezoneMatches, traceIp, usesQuic, webrtcLeaks } from './leak.ts';
+import { baseline, languageMatches, sourcesDisagree, offsetMinutes, publicIps, timezoneMatches, traceIp, usesQuic, webrtcLeaks } from './leak.ts';
 
 const cand = (ip: string, type = 'srflx') => `candidate:1 1 udp 1 ${ip} 5000 typ ${type}`;
 
@@ -42,4 +42,14 @@ test('Cloudflare trace', () => {
   assert.ok(usesQuic(t));
   assert.ok(!usesQuic('http=http/2\n'));
   assert.equal(traceIp(t), '5.6.7.8');
+});
+
+test('a request that went around the proxy cannot vouch for the real address', () => {
+  const proxy = '5.6.7.8', real = '2.2.2.2', v6 = '2001:db8::1';
+  assert.deepEqual(baseline([proxy, real]), [proxy]);
+  assert.deepEqual(webrtcLeaks([cand(real)], baseline([proxy, real])), [real]);
+  assert.ok(sourcesDisagree([proxy, real]));
+  assert.ok(!sourcesDisagree([proxy, v6]));
+  assert.ok(!sourcesDisagree([proxy, proxy]));
+  assert.ok(!sourcesDisagree([null, proxy]));
 });

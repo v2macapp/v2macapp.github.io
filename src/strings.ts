@@ -226,6 +226,7 @@ export const en = {
       langOk: (lang: string) => `${lang} doesn’t point anywhere else.`,
       langHint: (lang: string, country: string) => `${lang} points to another country than your address (${country}). Many people have this, but it narrows you down.`,
       quicUsed: 'This browser used HTTP/3. QUIC runs on UDP, which a proxy may not carry, so it can go around it.',
+      quicLeak: 'This browser used HTTP/3 and that request came from another address than your other traffic. It went around the proxy.',
       quicNone: 'This browser did not use HTTP/3 here.',
       quicFailed: 'Cloudflare didn’t answer.',
       dns: 'A web page can’t test this without its own DNS server. NoLeaker’s built-in leak test can.',
