@@ -105,6 +105,9 @@ export function buildEarth() {
   root.add(axis);
 
   const clock = uniform(0), turn = uniform(0), bright = uniform(0);
+  // Presets fade the fog and haze in and out, so a change never pops.
+  const fogLevel = uniform(1), hazeLevel = uniform(1);
+  let fogWanted = 1, hazeWanted = 1;
   const loader = new THREE.TextureLoader();
   const load = (name: string, srgb: boolean) => loader.loadAsync(`/earth/earth_${name}_4096.jpg`).then((t) => {
     if (srgb) t.colorSpace = THREE.SRGBColorSpace;
@@ -155,7 +158,7 @@ export function buildEarth() {
   // Fog low over the ground: 3D noise sampled on the shell, so it has depth as the Earth turns under it.
   const fogNoise = mx_fractal_noise_float(positionLocal.mul(9).add(vec3(clock.mul(0.012), clock.mul(0.005), 0)), 4);
   const fog = new THREE.MeshBasicNodeMaterial({ transparent: true, depthWrite: false });
-  fog.colorNode = vec4(color(0xa9ccf5).mul(dot(normalLocal, SUN).max(0.04)).mul(bright), smoothstep(0, 0.55, fogNoise).mul(0.2));
+  fog.colorNode = vec4(color(0xa9ccf5).mul(dot(normalLocal, SUN).max(0.04)).mul(bright), smoothstep(0, 0.55, fogNoise).mul(0.2).mul(fogLevel));
   const fogMesh = new THREE.Mesh(globe, fog);
   fogMesh.scale.setScalar(1.012);
   fogMesh.renderOrder = 2;
@@ -164,7 +167,7 @@ export function buildEarth() {
   // Haze hanging in front of it all, thickest low on the screen, and always behind the page's content.
   const hazeNoise = mx_fractal_noise_float(vec3(screenUV.mul(vec2(5, 3)), clock.mul(0.025)), 3);
   const hazeM = new THREE.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
-  hazeM.colorNode = vec4(color(0x2b6fc4).mul(bright), smoothstep(-0.1, 0.6, hazeNoise).mul(oneMinus(smoothstep(0.1, 0.72, screenUV.y.oneMinus()))).mul(0.11));
+  hazeM.colorNode = vec4(color(0x2b6fc4).mul(bright), smoothstep(-0.1, 0.6, hazeNoise).mul(oneMinus(smoothstep(0.1, 0.72, screenUV.y.oneMinus()))).mul(0.11).mul(hazeLevel));
   const haze = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), hazeM);
   haze.position.z = -24;
   haze.renderOrder = -1;
@@ -174,20 +177,26 @@ export function buildEarth() {
   object.add(root, haze);
   const still = reducedMotion();
   const shown = { now: 0 };
+  let last = performance.now();
 
   return {
     object,
     setPreset(p: Preset) {
-      fogMesh.visible = p !== 'low';
-      haze.visible = p === 'ultra' || p === 'high';
+      fogWanted = p === 'low' ? 0 : 1;
+      hazeWanted = p === 'ultra' || p === 'high' ? 1 : 0;
     },
     /** `dim`: 0 = full brightness behind the hero, 1 = quietly behind the chapters' content. */
     update(now: number, dim: number) {
+      // Its own clock, adding at most 50 ms a frame: a stall (a preset change, a hidden tab) never makes it jump.
+      const ms = Math.min(now - last, 50);
+      last = now;
       if (!still) {
-        clock.value = now / 1000;
-        turn.value = now * 0.000022;
+        clock.value += ms / 1000;
+        turn.value += ms * 0.000022;
         spin.rotation.y = turn.value + 0.6;
       }
+      fogLevel.value += (fogWanted - fogLevel.value) * 0.02;
+      hazeLevel.value += (hazeWanted - hazeLevel.value) * 0.02;
       if (root.visible) shown.now = Math.min(1, shown.now + 0.012); // fade in once loaded
       bright.value = shown.now * (1 - 0.5 * dim);
     },

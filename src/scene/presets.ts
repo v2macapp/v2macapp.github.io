@@ -41,20 +41,26 @@ export function startPreset(webgpu: boolean): Preset {
   return isMobile() ? 'low' : 'medium';
 }
 
-/** Steps down below ~50 FPS for 2 s; steps back up after 8 s at full speed,
- *  but not into a preset that failed within the last minute. */
+/** Steps down below ~50 FPS for 2 s; steps back up after 8 s at full speed, but never into a preset
+ *  that failed: each change stalls a frame. Loading and the change's own stall aren't measured. */
 export class FpsWatcher {
   private frames = 0;
   private windowStart = 0;
   private goodSince = 0;
-  private failedAt = new Map<Preset, number>();
+  private failed = new Set<Preset>();
   fps = 60;
 
   constructor(private onChange: (p: Preset) => void) {}
 
+  private settle(now: number) {
+    this.frames = 0;
+    this.windowStart = this.goodSince = now + 1500;
+  }
+
   tick(now: number, current: Preset, auto: boolean) {
+    if (!this.windowStart) { this.settle(now + 1500); return; }
+    if (now < this.windowStart) return;
     this.frames++;
-    if (!this.windowStart) { this.windowStart = this.goodSince = now; return; }
     const span = now - this.windowStart;
     if (span < 2000) return;
     this.fps = (this.frames * 1000) / span;
@@ -65,14 +71,14 @@ export class FpsWatcher {
     if (this.fps < 50) {
       this.goodSince = now;
       if (i < PRESETS.length - 1) {
-        this.failedAt.set(current, now);
+        this.failed.add(current);
+        this.settle(now);
         this.onChange(PRESETS[i + 1]);
       }
     } else if (this.fps >= 57 && now - this.goodSince > 8000 && i > 0) {
-      const up = PRESETS[i - 1];
-      if (now - (this.failedAt.get(up) ?? -Infinity) > 60_000) {
-        this.goodSince = now;
-        this.onChange(up);
+      if (!this.failed.has(PRESETS[i - 1])) {
+        this.settle(now);
+        this.onChange(PRESETS[i - 1]);
       }
     } else if (this.fps < 57) {
       this.goodSince = now;

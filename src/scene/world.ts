@@ -190,11 +190,14 @@ function lensed(q: any, inner: any) {
 
 /** A night sky: mostly faint stars, a few bright ones, white, blue-white and a few warm. */
 function buildStars(count: number) {
+  // The same sky every time, so a preset change doesn't move the stars.
+  let state = 1;
+  const random = () => { state = (state + 0x6d2b79f5) | 0; let t = Math.imul(state ^ (state >>> 15), 1 | state); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
   const n = count * 2; // each star twice: its outer and its inner image
   const at = new Float32Array(n * 2), seed = new Float32Array(n * 4), inner = new Float32Array(n);
   for (let i = 0; i < count; i++) {
-    const x = (Math.random() - 0.5) * 2.3, y = (Math.random() - 0.5) * 2.3; // a little past the edges, for the lens to pull in
-    const sd = [0.06 + 0.94 * Math.pow(Math.random(), 6), Math.random() * 6.28, Math.random() < 0.3 ? 0.35 : 0.08, Math.random()];
+    const x = (random() - 0.5) * 2.3, y = (random() - 0.5) * 2.3; // a little past the edges, for the lens to pull in
+    const sd = [0.06 + 0.94 * Math.pow(random(), 6), random() * 6.28, random() < 0.3 ? 0.35 : 0.08, random()];
     for (const k of [0, 1]) {
       at.set([x, y], (i * 2 + k) * 2);
       seed.set(sd, (i * 2 + k) * 4);

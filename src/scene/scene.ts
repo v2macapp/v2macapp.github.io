@@ -122,15 +122,20 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
   // The cursor (or a finger) is a small black hole that bends the stars and titles; it and phone tilt aim the V.
   const aim = new THREE.Vector2(), aimNow = new THREE.Vector2();
   let lensTarget = 0;
-  addEventListener('pointermove', (e) => {
-    aim.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+  const lensAt = (x: number, y: number) => {
+    aim.set((x / innerWidth) * 2 - 1, -(y / innerHeight) * 2 + 1);
     U.cursor.value.copy(aim);
     lensTarget = 0.15;
-  });
+  };
   const lensOff = () => { lensTarget = 0; };
+  addEventListener('pointermove', (e) => { if (e.pointerType !== 'touch') lensAt(e.clientX, e.clientY); });
   document.addEventListener('pointerleave', lensOff);
-  addEventListener('pointerup', (e) => e.pointerType === 'touch' && lensOff());
-  addEventListener('pointercancel', lensOff);
+  // Touch events keep coming while the finger scrolls the page; pointer events stop when scrolling starts.
+  const touch = (e: TouchEvent) => lensAt(e.touches[0].clientX, e.touches[0].clientY);
+  addEventListener('touchstart', touch, { passive: true });
+  addEventListener('touchmove', touch, { passive: true });
+  addEventListener('touchend', (e) => { if (!e.touches.length) lensOff(); }, { passive: true });
+  addEventListener('touchcancel', lensOff, { passive: true });
   addEventListener('deviceorientation', (e) => {
     if (e.gamma == null || e.beta == null) return;
     aim.set(THREE.MathUtils.clamp(e.gamma / 30, -1, 1), THREE.MathUtils.clamp((45 - e.beta) / 30, -1, 1));

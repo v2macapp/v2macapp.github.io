@@ -104,8 +104,9 @@ Built with rebuilt UI (no Sandbox screenshots exist yet), the Earth only (no par
   the sandbox glass flat.
 
   Auto: a GPU check picks the start preset, then an FPS watcher steps down below ~50 FPS for 2 s
-  and back up with headroom. Reduced motion always gets Low. Footer switch
+  and back up with headroom, never into a preset that failed; loading and each change's stall aren't measured. Reduced motion always gets Low. Footer switch
   "Graphics: Auto · Ultra · High · Medium · Low", remembered in the browser; `?fps` shows a counter.
+- Touch: holding or dragging a finger, also while it scrolls, is the same black hole as the mouse cursor.
 - Phones: the main button becomes **Send to my Mac** (share sheet: AirDrop, Telegram, copy link).
 
 ## Download button

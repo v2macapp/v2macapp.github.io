@@ -72,6 +72,8 @@ const ogImage = new URL(og, Astro.site).href;
     overflow-x: hidden;
   }
 
+  /* Loading: pure black, so the poster's black background has no edge. */
+  html:has(.poster), body:has(.poster) { background: #000; }
   .poster, #stage {
     position: fixed;
     inset: 0;
@@ -140,6 +142,22 @@ const ogImage = new URL(og, Astro.site).href;
   .button.primary { background: var(--blue); border-color: rgba(255, 255, 255, 0.25); box-shadow: 0 8px 32px rgba(10, 132, 255, 0.45); }
   .button:hover { filter: brightness(1.12); }
   .scroll { margin-top: 5svh; color: var(--dim); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; }
+
+  /* Short or very narrow screens: the pinned chapters and the hero have to fit on one screen. */
+  @media (max-width: 800px), (max-height: 720px) {
+    .stage { padding-top: 3svh; padding-bottom: 2svh; }
+    .see .lede { font-size: 14px; margin-top: 4px; }
+  }
+  @media (max-height: 720px) { h2 { font-size: clamp(30px, 6svh, 44px); } }
+  @media (max-height: 620px) {
+    .see .lede, .hero .lede, .scroll { display: none; }
+    h1 { font-size: clamp(40px, 11svh, 60px); }
+    .tagline { font-size: 18px; margin-top: 2px; }
+    .actions { margin-top: 14px; }
+    .button { padding: 10px 18px; font-size: 14px; }
+    .meta { margin-top: 8px; font-size: 12px; }
+    .chapter { padding-bottom: 4svh; }
+  }
 
   button:focus-visible, a:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
 
