@@ -12,7 +12,9 @@ The website for V2Mac, the Secure Sandbox and NoLeaker. Decided with the user on
   (it may not be served as a web font) and others download Geist. Mono: SF Mono, then Geist Mono.
 - No sound.
 
-## Main page `/`: five chapters
+## Main page `/`: four chapters
+The "Route the world" chapter (tunnel and clickable dot globe) was built in M2 and removed on the user's request on 2026-10-31; the Earth backdrop stays.
+
 Rethought with the user on 2026-10-30 after the first M1 (a glass wall the packets break through) did
 not work. One main idea per chapter; GSAP ScrollTrigger pins each chapter and drives it with the scroll.
 
@@ -31,9 +33,7 @@ readers, and the page without 3D); with the 3D on it is drawn by the particles i
    REALITY a visit to microsoft.com, Hysteria2 QUIC on UDP 443, Trojan HTTPS to your server's domain,
    Shadowsocks random bytes. The protocol chips change what the lens sees. Phones: the lens wanders
    until you drag it.
-4. **Tunnel → globe**: scrolling flies the camera through a glass tunnel and out above the globe:
-   routes to servers; click a country to set Proxy / Direct / Block and the routes recolor.
-5. **Secure Sandbox (Beta)**: a draggable liquid glass grid of mini VM cards, each with a live window
+4. **Secure Sandbox (Beta)**: a draggable liquid glass grid of mini VM cards, each with a live window
    bending behind its glass, its own color and exit city. Cut a card's server: it turns red and seals,
    nothing leaks (fail-closed). Orange BETA badge, link to `/sandbox`.
 
@@ -85,7 +85,7 @@ liquid glass grid (5).
   | Low | 12k | flat glow | off |
 
   Particles move in the vertex shader on every preset (same on WebGPU and WebGL 2). Low also turns
-  the tunnel into a fade and the sandbox glass flat.
+  the sandbox glass flat.
 
   Auto: a GPU check picks the start preset, then an FPS watcher steps down below ~50 FPS for 2 s
   and back up with headroom. Reduced motion always gets Low. Footer switch
@@ -119,9 +119,8 @@ liquid glass grid (5).
    Built 2026-10-30, waiting for review (`npm run dev`, `?fps` shows the counter, `?webgl` forces WebGL 2).
 1b. **Wow pass** (see above): one shot, the 3D window, cinematic finish, physical play.
    Built 2026-10-30, waiting for review. Depth of field not done yet.
-2. **M2**: tunnel → globe with clickable countries, the liquid glass sandbox grid.
-   Built 2026-10-30, waiting for review. Countries: `scripts/globe.mjs` bakes `public/globe/` from
-   Natural Earth (world-atlas, dev only). The sandbox row is HTML glass cards (drag, cut a server).
+2. **M2**: the liquid glass sandbox grid (the tunnel and globe were removed on 2026-10-31).
+   Built 2026-10-30, waiting for review. The sandbox row is HTML glass cards (drag, cut a server).
 3. **M3**: all pages, FAQ, SEO, blog from releases, Send to my Mac.
    Notes from 2026-10-30 (not started): facts for the comparison pages, checked on GitHub: v2rayN runs on
    Windows, Linux and macOS (Intel and Apple Silicon), Xray and sing-box cores, GPL-3.0. V2RayX was archived

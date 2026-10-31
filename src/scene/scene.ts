@@ -9,17 +9,15 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { CONFIG, FpsWatcher, PRESETS, startPreset, type Choice, type Preset } from './presets';
 import { DIST, FOV, STAR_DIST, U, buildWorld, type World } from './world';
 import { buildApp, type AppProgress } from './app';
-import { buildGlobe } from './globe';
 import { buildEarth } from './earth';
 
-/** `tunnel`: 0 = chapter 4's tunnel still ahead, 1 = flown through, the globe in place. */
-export type Progress = { burst: number; title: number; out: number; tunnel: number } & AppProgress;
+export type Progress = { burst: number; title: number; out: number } & AppProgress;
 /** An element and the pinned section it sits in: its place on screen is taken as when that section is pinned. */
 export type Pinned = { el: HTMLElement; section: HTMLElement };
 
 
-/** `frame`: where the HTML puts the app window in chapter 2; the 3D window follows it. `spot`: the same for the globe. */
-export async function startScene(canvas: HTMLCanvasElement, choice: Choice, progress: Progress, titles: Pinned[], frame: Pinned, spot: Pinned) {
+/** `frame`: where the HTML puts the app window in chapter 2; the 3D window follows it. */
+export async function startScene(canvas: HTMLCanvasElement, choice: Choice, progress: Progress, titles: Pinned[], frame: Pinned) {
   const renderer = new THREE.WebGPURenderer({
     canvas, antialias: true, forceWebGL: new URLSearchParams(location.search).has('webgl'),
   });
@@ -42,10 +40,6 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
   const app = await buildApp();
   scene.add(app.root);
   const appAt = new THREE.Vector3();
-  const globe = await buildGlobe(preset);
-  scene.add(globe.trip, globe.root);
-  const globeAt = new THREE.Vector3();
-  const GLOBE_D = DIST + 10; // the globe ends 10 behind the titles' plane
   const earth = buildEarth();
   camera.add(earth.object);
 
@@ -112,11 +106,6 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
     const [x, y] = toWorld(r.left + r.width / 2, r.top + r.height / 2);
     appAt.set(x, y, 0);
     app.root.scale.setScalar((r.width / innerHeight) * 2 * halfH);
-    // The globe sits GLOBE_D from the camera, so screen pixels are GLOBE_D / DIST times larger there.
-    const g = pinnedRect(spot), k = GLOBE_D / DIST;
-    const [gx, gy] = toWorld(g.left + g.width / 2, g.top + g.height / 2);
-    globeAt.set(gx * k, gy * k, 0);
-    globe.root.scale.setScalar((Math.min(g.width, g.height) / innerHeight) * halfH * k * 0.78); // its glow and nearer side spill past the radius
   }
 
   function resize() {
@@ -217,11 +206,7 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
     // The window rides with its section until the section pins.
     const top = frame.section.getBoundingClientRect().top;
     app.root.position.copy(appAt).setY(appAt.y - (top / innerHeight) * 2 * halfH);
-    globe.update(progress.tunnel, now);
     earth.update(now, b);
-    const gTop = spot.section.getBoundingClientRect().top;
-    globe.root.position.x = globeAt.x;
-    globe.root.position.y = globeAt.y - (gTop / innerHeight) * 2 * halfH * (GLOBE_D / DIST);
     app.root.visible = progress.build > 0.01; // its exploded corner would peek into the hero
     app.update(progress, aimNow);
 
@@ -236,9 +221,6 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
     get fps() { return watcher.fps; },
     onPreset,
     layout,
-    globe,
-    /** The country under a point on screen, or -1. */
-    countryAt: (x: number, y: number) => globe.pick(new THREE.Vector2((x / innerWidth) * 2 - 1, -(y / innerHeight) * 2 + 1), camera),
     setChoice(c: Choice) {
       auto = c === 'auto';
       apply(auto ? startPreset(webgpu) : c);

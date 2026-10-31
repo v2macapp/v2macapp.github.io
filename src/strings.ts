@@ -47,19 +47,6 @@ export const en = {
       { name: 'Shadowsocks', line: 'shadowsocks · 2022-blake3', what: 'Encrypted bytes with no pattern to match. They see noise.', shows: '' }, // random bytes per pill
     ],
   },
-  globe: {
-    title: 'Route the world.',
-    lede: 'Pick a rule, then click countries to send their sites through your server, straight out, or nowhere. Drag to turn the globe.',
-    brush: 'Rule to paint',
-    rules: {
-      proxy: { name: 'Proxy', help: 'Through your server' },
-      direct: { name: 'Direct', help: 'Straight out, no server' },
-      block: { name: 'Block', help: 'Never leaves your Mac' },
-    },
-    idle: 'Click a country.',
-    unset: 'Proxy (default)',
-    reset: 'Reset',
-  },
   sandbox: {
     title: 'Secure Sandbox.',
     beta: 'Beta',

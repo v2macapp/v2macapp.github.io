@@ -19,7 +19,7 @@ export const U = {
   vGlow: uniform(1), // the V's edge glow; faded as the camera passes through, where it would bloom into a white cloud
 };
 
-export const TITLES = 4; // chapters 2 to 5
+export const TITLES = 3; // chapters 2 to 4
 export const FOV = 40;
 export const DIST = 10; // the camera of chapters 2 and 3, straight at the z = 0 plane
 const TAN = Math.tan(THREE.MathUtils.degToRad(FOV / 2));
