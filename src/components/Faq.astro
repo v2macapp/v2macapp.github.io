@@ -1,0 +1,12 @@
+---
+const { items } = Astro.props;
+---
+<div class="faq">
+  {items.map((i: { q: string; a: string }) => <details><summary>{i.q}</summary><p>{i.a}</p></details>)}
+</div>
+<style>
+  .faq { text-align: left; }
+  details { border-bottom: 1px solid rgba(255, 255, 255, 0.12); padding: 14px 4px; }
+  summary { cursor: pointer; font-weight: 600; font-size: 17px; }
+  p { color: var(--dim); line-height: 1.55; margin: 10px 0 0; }
+</style>

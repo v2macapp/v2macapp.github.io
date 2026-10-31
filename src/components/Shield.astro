@@ -1,0 +1,25 @@
+---
+// NoLeaker's shield with a drop falling onto it and spreading out (still when motion is reduced).
+---
+<div class="shield" aria-hidden="true">
+  <span class="drop"></span>
+  <svg viewBox="0 0 100 116" width="96" height="112">
+    <path d="M50 4c12 8 26 12 42 13v41c0 26-17 44-42 54C25 102 8 84 8 58V17c16-1 30-5 42-13Z" fill="rgba(10,132,255,.12)" stroke="#3f8cff" stroke-width="9" stroke-linejoin="round" />
+    <path d="M50 40c9 12 14 19 14 26a14 14 0 0 1-28 0c0-7 5-14 14-26Z" fill="#3f8cff" />
+  </svg>
+</div>
+<style>
+  .shield { position: relative; display: inline-block; padding-top: 44px; }
+  svg { display: block; }
+  .drop {
+    position: absolute; left: calc(50% - 6px); top: 0; width: 12px; height: 12px;
+    background: var(--red); border-radius: 0 50% 50% 50%; transform: rotate(45deg);
+    animation: fall 2.4s infinite cubic-bezier(0.5, 0, 1, 0.6);
+  }
+  @keyframes fall {
+    0% { top: 0; opacity: 0; }
+    15% { opacity: 1; }
+    42% { top: 40px; opacity: 1; scale: 1; }
+    52%, 100% { top: 40px; opacity: 0; scale: 2.4; }
+  }
+</style>

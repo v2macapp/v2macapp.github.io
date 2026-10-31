@@ -1,0 +1,40 @@
+---
+// The comparison pages and guides: same shape, text in strings.ts.
+import Page from '../layouts/Page.astro';
+import { en as t } from '../strings';
+import { DOWNLOAD_URL, downloadMeta } from '../releases';
+
+export const getStaticPaths = () => Object.entries(t.articles).map(([article, a]) => ({ params: { article }, props: { a, og: `/og/${article.split('/').pop()}.jpg` } }));
+const { a, og } = Astro.props as any;
+---
+<Page title={a.title} description={a.description} og={og} ogType="article">
+  <header>
+    <h1>{a.heading}</h1>
+    <p class="lede">{a.lede}</p>
+  </header>
+  {a.table && (
+    <section class="panel table">
+      <table>
+        <thead><tr>{a.table.head.map((h: string) => <th scope="col">{h}</th>)}</tr></thead>
+        <tbody>{a.table.rows.map((r: string[]) => <tr>{r.map((c) => <td>{c}</td>)}</tr>)}</tbody>
+      </table>
+    </section>
+  )}
+  {a.sections.map((s: any) => (
+    <section class="panel">
+      <h2>{s.h}</h2>
+      {s.body && <p set:html={s.body} />}
+      {s.code && <pre><code>{s.code}</code></pre>}
+      {s.list && <ul>{s.list.map((l: string) => <li>{l}</li>)}</ul>}
+    </section>
+  ))}
+  <section class="actions">
+    <a class="button primary download" href={DOWNLOAD_URL}>{t.hero.download}</a>
+    <a class="button" href="https://github.com/v2macapp/v2mac/wiki">{t.footer.links.docs}</a>
+  </section>
+  <p class="meta">{downloadMeta}</p>
+</Page>
+<style>
+  .table { overflow-x: auto; }
+  .actions { justify-content: flex-start; }
+</style>

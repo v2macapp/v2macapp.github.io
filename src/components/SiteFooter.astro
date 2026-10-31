@@ -1,0 +1,19 @@
+---
+import { en as t, REPO_URL, WIKI_URL } from '../strings';
+const l = t.footer.links;
+---
+<footer>
+  <nav class="links" aria-label="Site">
+    <a href="/sandbox/">{l.sandbox}</a>
+    <a href="/noleaker/">{l.noleaker}</a>
+    <a href="/blog/">{l.blog}</a>
+    <a href="/v2rayn-for-mac/">{l.v2rayn}</a>
+    <a href="/v2rayx-alternative/">{l.v2rayx}</a>
+    <a href="/guides/vless-reality-mac/">{l.reality}</a>
+    <a href="/guides/hysteria2-mac/">{l.hysteria}</a>
+    <a href={WIKI_URL}>{l.docs}</a>
+    <a href={REPO_URL}>{l.source}</a>
+  </nav>
+  <slot />
+  <p>{t.footer.tracking} {t.footer.credit}</p>
+</footer>

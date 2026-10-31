@@ -1,0 +1,19 @@
+---
+import Page from '../../layouts/Page.astro';
+import { en as t } from '../../strings';
+import { releases } from '../../releases';
+const date = (d: string) => new Date(d).toLocaleDateString('en-GB', { dateStyle: 'long', timeZone: 'UTC' });
+---
+<Page title={t.blog.title} description={t.blog.description}>
+  <header><h1>{t.blog.heading}</h1></header>
+  {releases.length === 0 && <p>{t.blog.empty}</p>}
+  <ul class="list">
+    {releases.map((r) => <li><a href={`/blog/${r.tag_name}/`}>{r.name}</a> <time datetime={r.published_at}>{date(r.published_at)}</time></li>)}
+  </ul>
+</Page>
+<style>
+  .list { list-style: none; padding: 0; margin: 28px 0 0; }
+  li { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+  a { font-weight: 600; text-decoration: none; }
+  time { color: var(--dim); font-size: 14px; }
+</style>

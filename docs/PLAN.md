@@ -66,12 +66,11 @@ liquid glass grid (5).
 ## Other pages
 - `/sandbox`: Secure Sandbox (Beta), full page. Plan below.
 - `/noleaker`: hero is a live leak test of the visitor's own browser (WebRTC, timezone vs IP country,
-  language, QUIC); each leak is a drop the shield catches. Details to decide at M4 (which IP service
-  allows browser access; no real DNS test without a DNS server). noleaker-flow is not on the site.
+  language, QUIC); each leak is a drop the shield catches. Runs only when the visitor presses the button, and says which services it asks: ipinfo.io, then ipwho.is (it answered 429 from a shared exit), Cloudflare's trace and STUN. Time zone compares UTC offsets. No DNS test: the row says so. noleaker-flow is not on the site.
 - `/v2rayn-for-mac`, `/v2rayx-alternative`: honest comparison pages.
 - `/guides/vless-reality-mac`, `/guides/hysteria2-mac`; `/blog/` built from GitHub releases.
 
-## `/sandbox` page (draft plan, 2026-10-31, not built)
+## `/sandbox` page (built 2026-10-31)
 The main page's chapter sells the idea in seven beats; this page answers "how does it work, and can I trust it?".
 Same world: Earth backdrop, particle title, pinned scroll scenes. Every claim comes from `../wiki/Sandbox.md` or `../sandbox/docs/PLAN.md`.
 
@@ -88,7 +87,7 @@ Same world: Earth backdrop, particle title, pinned scroll scenes. Every claim co
 
 SEO: own title and description, targets "run apps through a VPN server on Mac", "per-app VPN Mac", "app isolation macOS". Each claim needs a check against the released sandbox version before publishing.
 
-Open, for the user: real screenshots or rebuilt UI; the size and memory numbers to state; whether it ships with the first site launch.
+Built with rebuilt UI (no Sandbox screenshots exist yet), the Earth only (no particle title, no stars) and one pinned scene. It states no size or memory numbers: the first-run sheet shows the real ones. Later, if wanted: real screenshots from the Dev instance.
 
 ## Loading and devices
 - Content first: text, Download button and a poster image paint at once (~40 KB); the 3D loads after.
@@ -139,10 +138,11 @@ Open, for the user: real screenshots or rebuilt UI; the size and memory numbers 
 2. **M2**: the liquid glass sandbox grid (the tunnel and globe were removed on 2026-10-31).
    Built 2026-10-30, waiting for review. The sandbox row is HTML glass cards (drag, cut a server).
 3. **M3**: all pages, FAQ, SEO, blog from releases, Send to my Mac.
-   Notes from 2026-10-30 (not started): facts for the comparison pages, checked on GitHub: v2rayN runs on
+   Notes from 2026-10-30: facts for the comparison pages, checked on GitHub: v2rayN runs on
    Windows, Linux and macOS (Intel and Apple Silicon), Xray and sing-box cores, GPL-3.0. V2RayX was archived
    on 2024-01-12, uses v2ray-core, GPL-3.0. NoLeaker's repo is `v2macapp/noleaker` (the app README and wiki
    still link LordVersA). FAQ source: `../wiki/Troubleshooting-and-FAQ.md`; `/sandbox` source: `../wiki/Sandbox.md`.
    Release notes can be rendered at build time with Astro's own `@astrojs/markdown-satteri`.
-4. **M4**: `/noleaker` with the leak test.
-5. **M5**: release CI hook (`V2Mac.dmg`, rebuild), publish.
+   Built 2026-10-31. Search Console meta tag still needs the user's token. OG images: `scripts/make-og.sh`.
+4. **M4**: `/noleaker` with the leak test. Built 2026-10-31.
+5. **M5**: release CI hook (`V2Mac.dmg`, rebuild), publish. CI hook built 2026-10-31; it needs a `SITE_TOKEN` secret in the app repo. Until the next app release the button links the versioned DMG (`src/releases.ts`).
