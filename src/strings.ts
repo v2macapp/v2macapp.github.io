@@ -175,7 +175,7 @@ export const en = {
         ['A signed store', 'Apps come from the V2Mac store, whose index is signed.'],
         ['Verify Installation', 'Shows where an app came from (repository and commit), its permissions, and whether its files are unchanged. “Verified” means unchanged, not “safe”.'],
         ['Withdrawn apps', 'An app withdrawn from the store shows a warning sign and the reason. Its data is kept.'],
-        ['A pinned download', 'V2Mac accepts only the exact sandbox version it was released with, so a changed download is refused.'],
+        ['Signed updates', 'The sandbox updates on its own. V2Mac installs a version only if its pin is signed with V2Mac’s update key and the files match it, and never steps back to an older one.'],
       ],
     },
     apps: {
