@@ -1,17 +1,19 @@
 ---
-import { en as t, REPO_URL, WIKI_URL } from '../strings';
-const l = t.footer.links;
+import { REPO_URL } from '../strings';
+import { langOf, localize, strings } from '../i18n';
+const lang = langOf(Astro.url.pathname), t = await strings(lang), l = t.footer.links;
+const to = (p: string) => localize(lang, p);
 ---
 <footer>
   <nav class="links" aria-label="Site">
-    <a href="/sandbox/">{l.sandbox}</a>
-    <a href="/noleaker/">{l.noleaker}</a>
+    <a href={to('/sandbox/')}>{l.sandbox}</a>
+    <a href={to('/noleaker/')}>{l.noleaker}</a>
     <a href="/blog/">{l.blog}</a>
-    <a href="/v2rayn-for-mac/">{l.v2rayn}</a>
-    <a href="/v2rayx-alternative/">{l.v2rayx}</a>
-    <a href="/guides/vless-reality-mac/">{l.reality}</a>
-    <a href="/guides/hysteria2-mac/">{l.hysteria}</a>
-    <a href={WIKI_URL}>{l.docs}</a>
+    <a href={to('/v2rayn-for-mac/')}>{l.v2rayn}</a>
+    <a href={to('/v2rayx-alternative/')}>{l.v2rayx}</a>
+    <a href={to('/guides/vless-reality-mac/')}>{l.reality}</a>
+    <a href={to('/guides/hysteria2-mac/')}>{l.hysteria}</a>
+    <a href={to('/docs/')}>{l.docs}</a>
     <a href={REPO_URL}>{l.source}</a>
   </nav>
   <slot />

@@ -1,7 +1,8 @@
 ---
 // Chapter 4's stage: the Secure Sandbox told one idea per scroll beat. index.astro's pinned timeline
 // moves the scene; the last beat hands the Cut buttons to the visitor. Demo names only, no real servers.
-import { en } from '../strings';
+import { langOf, localize, strings } from '../i18n';
+const en = await strings(langOf(Astro.url.pathname));
 const s = en.sandbox;
 const ROW = [17, 50, 83]; // each room's middle, % of the scene's height
 ---
@@ -12,7 +13,7 @@ const ROW = [17, 50, 83]; // each room's middle, % of the scene's height
       {s.beats.map((b) => <article class="beat"><h3>{b.title}</h3><p>{b.text}</p></article>)}
     </div>
     <div class="dots" aria-hidden="true">{s.beats.map(() => <span></span>)}</div>
-    <a class="button more" href="/sandbox/">{s.more}</a>
+    <a class="button more" href={localize(langOf(Astro.url.pathname), '/sandbox/')}>{s.more}</a>
   </div>
 
   <div class="scene"><div class="world">
@@ -96,7 +97,7 @@ const ROW = [17, 50, 83]; // each room's middle, % of the scene's height
     grid-template-columns: minmax(240px, 1fr) 2.2fr;
     align-items: center;
     gap: clamp(24px, 4vw, 64px);
-    text-align: left;
+    text-align: start;
     text-shadow: none;
   }
   .side { display: flex; flex-direction: column; align-items: flex-start; gap: 22px; }
@@ -150,7 +151,7 @@ const ROW = [17, 50, 83]; // each room's middle, % of the scene's height
   .bar i { width: 0.62em; height: 0.62em; border-radius: 50%; background: #ff5f57; }
   .bar i:nth-child(2) { background: #febc2e; }
   .bar i:nth-child(3) { background: #28c840; }
-  .bar span { margin-left: 0.5em; font-weight: 600; font-size: 0.9em; white-space: nowrap; }
+  .bar span { margin-inline-start: 0.5em; font-weight: 600; font-size: 0.9em; white-space: nowrap; }
   .body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 0.5em; padding: 0.7em 0.9em; }
   .body p { margin: 0; }
   .url { font: 0.76em var(--mono); color: var(--dim); background: rgba(255, 255, 255, 0.07); border-radius: 0.6em; padding: 0.25em 0.8em; }
@@ -210,8 +211,8 @@ const ROW = [17, 50, 83]; // each room's middle, % of the scene's height
   .sees { left: 66%; top: 12%; width: 34%; padding: 1.1em; border-radius: 1.2em; }
   .sees ul { margin: 0.5em 0 1em; display: grid; gap: 0.45em; font-size: 0.92em; }
   .sees ul:last-child { margin-bottom: 0; }
-  .sees li { padding-left: 1.5em; position: relative; }
-  .sees li::before { position: absolute; left: 0; font-weight: 700; }
+  .sees li { padding-inline-start: 1.5em; position: relative; }
+  .sees li::before { position: absolute; inset-inline-start: 0; font-weight: 700; }
   .yes::before { content: '✓'; color: var(--green); }
   .no { color: var(--dim); }
   .no::before { content: '✕'; color: var(--red); }

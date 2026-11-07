@@ -23,7 +23,7 @@ const dmg = latest?.assets.find((a) => a.name === 'V2Mac.dmg') ?? latest?.assets
 // Releases before the stable V2Mac.dmg asset fall back to the versioned file.
 export const DOWNLOAD_URL = dmg?.browser_download_url ?? 'https://github.com/v2macapp/v2mac/releases/latest';
 export const VERSION = latest?.tag_name.replace(/^v/, '');
-export const downloadMeta = [VERSION && `Version ${VERSION}`, dmg && `${Math.round(dmg.size / 1e6)} MB`, 'macOS 26+', 'Apple Silicon'].filter(Boolean).join(' · ');
+export const downloadMeta = [VERSION && `v${VERSION}`, dmg && `${Math.round(dmg.size / 1e6)} MB`, 'macOS 26+', 'Apple Silicon'].filter(Boolean).join(' · ');
 
 export const softwareApp = (description: string) => ({
   '@context': 'https://schema.org',

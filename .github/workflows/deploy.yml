@@ -7,6 +7,9 @@ on:
   repository_dispatch:
     types: [release]
   workflow_dispatch:
+  # The docs come from the wiki, and a wiki edit sends no event here.
+  schedule:
+    - cron: '17 4 * * *'
 
 permissions:
   contents: read

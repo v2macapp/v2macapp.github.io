@@ -1,7 +1,8 @@
 ---
 // Chapter 3's stage: your requests flow past; the lens shows what an observer reads.
 // The inside layer repeats the outside one exactly (same lanes, same animation), clipped to the lens.
-import { en } from '../strings';
+import { langOf, strings } from '../i18n';
+const en = await strings(langOf(Astro.url.pathname));
 const s = en.see;
 const LANES = 5;
 const lanes = Array.from({ length: LANES }, (_, i) => {
@@ -114,7 +115,7 @@ const lanes = Array.from({ length: LANES }, (_, i) => {
     padding: 9px 20px 9px 9px;
     border-radius: 999px;
     width: min(520px, 100%);
-    text-align: left;
+    text-align: start;
     background: linear-gradient(180deg, rgba(40, 52, 78, 0.55), rgba(12, 18, 32, 0.6));
     border: 1px solid rgba(255, 255, 255, 0.14);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 10px 40px rgba(0, 0, 0, 0.45);

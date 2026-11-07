@@ -1,7 +1,8 @@
 ---
 // Chapter 2's stage: the real app, from the README screenshots (demo data, no real servers).
 // index.astro's pinned timeline moves the windows and crossfades the beats.
-import { en } from '../strings';
+import { langOf, strings } from '../i18n';
+const en = await strings(langOf(Astro.url.pathname));
 const t = en.app;
 ---
 <div class="showcase">
@@ -34,7 +35,7 @@ const t = en.app;
     grid-template-columns: minmax(240px, 1fr) 2.2fr;
     align-items: center;
     gap: clamp(24px, 4vw, 64px);
-    text-align: left;
+    text-align: start;
     text-shadow: none;
   }
   .side { display: flex; flex-direction: column; gap: 28px; }

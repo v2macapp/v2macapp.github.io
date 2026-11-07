@@ -1,0 +1,5 @@
+---
+import View from '../../views/NoleakerPage.astro';
+export const getStaticPaths = () => ['fa', 'zh', 'ru'].map((lang) => ({ params: { lang } }));
+---
+<View />

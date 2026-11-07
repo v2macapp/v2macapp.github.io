@@ -1,0 +1,15 @@
+---
+import { LANGS, LANG_NAME, HTML_LANG, langOf, localize, unlocalized } from '../i18n';
+const path = unlocalized(Astro.url.pathname), current = langOf(Astro.url.pathname);
+const translated = !path.startsWith('/blog/') && !path.startsWith('/404');
+---
+<nav class="langs" aria-label="Language">
+  {LANGS.map((l) => l === current
+    ? <span lang={HTML_LANG[l]} aria-current="true">{LANG_NAME[l]}</span>
+    : <a lang={HTML_LANG[l]} hreflang={HTML_LANG[l]} href={localize(l, translated ? path : '/')}>{LANG_NAME[l]}</a>)}
+</nav>
+<style>
+  .langs { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: var(--text); }
+  .langs a { color: var(--dim); text-decoration: none; }
+  .langs a:hover { color: var(--text); }
+</style>

@@ -2,13 +2,17 @@
 // Every page's shell: head with its SEO, the shared styles, and the phone's Send to my Mac.
 import '@fontsource-variable/geist';
 import '@fontsource-variable/geist-mono';
-import { en as t } from '../strings';
+import { LANGS, HTML_LANG, langOf, localize, strings, unlocalized } from '../i18n';
+const lang = langOf(Astro.url.pathname), t = await strings(lang);
+const path = unlocalized(Astro.url.pathname);
+// Release notes and the 404 page exist in English only.
+const translated = !path.startsWith('/blog/') && !path.startsWith('/404');
 const { title, description, jsonld = [], og = '/og/home.jpg', ogType = 'website' } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImage = new URL(og, Astro.site).href;
 ---
 <!doctype html>
-<html lang="en">
+<html lang={HTML_LANG[lang]} dir={lang === 'fa' ? 'rtl' : 'ltr'}>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -16,6 +20,8 @@ const ogImage = new URL(og, Astro.site).href;
   <title>{title}</title>
   <meta name="description" content={description} />
   <link rel="canonical" href={canonical} />
+  {translated && LANGS.map((l) => <link rel="alternate" hreflang={HTML_LANG[l]} href={new URL(localize(l, path), Astro.site).href} />)}
+  {translated && <link rel="alternate" hreflang="x-default" href={new URL(path, Astro.site).href} />}
   <link rel="icon" href="/app/icon.webp" type="image/webp" />
   <meta property="og:type" content={ogType} />
   <meta property="og:site_name" content="V2Mac" />
@@ -38,7 +44,7 @@ const ogImage = new URL(og, Astro.site).href;
         a.textContent = send!;
         a.addEventListener('click', async (e) => {
           e.preventDefault();
-          const url = location.origin + '/';
+          const url = location.href;
           if (navigator.share) { await navigator.share({ title, url }).catch(() => {}); return; } // cancelling is fine
           await navigator.clipboard?.writeText(url);
           a.textContent = copied!;
@@ -158,6 +164,11 @@ const ogImage = new URL(og, Astro.site).href;
     .meta { margin-top: 8px; font-size: 12px; }
     .chapter { padding-bottom: 4svh; }
   }
+
+  /* Persian letters join, so tracking would break the words apart. Code stays left to right. */
+  [lang='fa'] h1, [lang='fa'] h2, [lang='fa'] .page h2 { letter-spacing: 0; }
+  [dir='rtl'] pre { direction: ltr; text-align: left; }
+  [dir='rtl'] code { unicode-bidi: isolate; }
 
   button:focus-visible, a:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
 

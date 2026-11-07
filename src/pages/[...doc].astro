@@ -1,0 +1,26 @@
+---
+// The docs, from the wiki (src/docs.ts). Text in each language comes from that language's wiki page.
+import Page from '../layouts/Page.astro';
+import { docs, docsIn, type Doc } from '../docs';
+import { strings } from '../i18n';
+
+export const getStaticPaths = () => docs.map((d) => ({ params: { doc: d.path.slice(1, -1) }, props: { d } }));
+const { d } = Astro.props as { d: Doc };
+const t = (await strings(d.lang)).docs;
+const heading = d.slug ? d.heading : t.heading;
+---
+<Page title={d.slug ? `${heading} | ${t.heading}` : t.title} description={d.description || t.heading} ogType="article">
+  <nav class="panel toc" aria-label={t.heading}>
+    <ul>{docsIn(d.lang).map((o) => <li>{o === d ? <strong aria-current="page">{o.name}</strong> : <a href={o.path}>{o.name}</a>}</li>)}</ul>
+  </nav>
+  <article class="panel doc" set:html={d.html} />
+</Page>
+<style>
+  .toc ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  .toc li + li { margin: 0; }
+  .doc { margin-top: 28px; overflow-wrap: anywhere; overflow-x: auto; }
+  .doc :global(h1) { font-size: clamp(32px, 6vw, 48px); margin-bottom: 16px; }
+  .doc :global(h2) { margin-top: 32px; }
+  .doc :global(h3) { margin-top: 22px; }
+  .doc :global(img) { display: block; max-width: 100%; height: auto; margin: 20px auto; border-radius: 12px; }
+</style>

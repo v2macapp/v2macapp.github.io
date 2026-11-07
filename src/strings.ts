@@ -1,4 +1,4 @@
-// Every visible string on the site, so fa, zh and ru can follow (plan: SEO).
+// Every visible string on the site. Translations: strings.fa.ts, strings.zh.ts, strings.ru.ts.
 export const en = {
   title: 'V2Mac: native Xray and V2Ray client for Mac',
   description:
@@ -113,6 +113,7 @@ export const en = {
     cta: 'Test my browser',
   },
   nav: { home: 'V2Mac', sandbox: 'Sandbox', noleaker: 'NoLeaker', blog: 'Release notes' },
+  docs: { title: 'V2Mac documentation: install, connect and route on Mac', heading: 'V2Mac documentation' },
   notFound: { title: 'Page not found | V2Mac', description: 'This page does not exist on the V2Mac site.', heading: 'Page not found', text: 'That page isn’t here. Try one of the links above.' },
   blog: {
     title: 'V2Mac release notes',

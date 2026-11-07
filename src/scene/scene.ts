@@ -87,6 +87,7 @@ export async function startScene(canvas: HTMLCanvasElement, choice: Choice, prog
     ctx.font = `${cs.fontWeight} ${parseFloat(cs.fontSize) * k}px ${cs.fontFamily}`;
     (ctx as any).letterSpacing = `${(parseFloat(cs.letterSpacing) || 0) * k}px`;
     ctx.textAlign = 'center';
+    ctx.direction = cs.direction as CanvasDirection;
     const text = t.el.textContent!.trim();
     const m = ctx.measureText(text);
     ctx.fillText(text, c.width / 2, c.height / 2 + (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2);

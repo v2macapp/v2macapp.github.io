@@ -1,0 +1,396 @@
+---
+import { REPO_URL, faqPage } from '../strings';
+import { langOf, localize, strings } from '../i18n';
+import LangLinks from '../components/LangLinks.astro';
+import { DOWNLOAD_URL, downloadMeta, softwareApp } from '../releases';
+import Base from '../layouts/Base.astro';
+import Faq from '../components/Faq.astro';
+import Shield from '../components/Shield.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { PRESETS } from '../scene/presets';
+import Showcase from '../components/Showcase.astro';
+import Lens from '../components/Lens.astro';
+import Sandbox from '../components/Sandbox.astro';
+const lang = langOf(Astro.url.pathname);
+const t = await strings(lang);
+const software = softwareApp(t.description);
+// Google reads the site name in search results from this.
+const website = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'V2Mac', url: 'https://v2macapp.github.io/' };
+---
+<Base title={t.title} description={t.description} jsonld={[website, software, faqPage(t.faq)]} og="/og/home.jpg">
+  <img class="poster" src="/poster.jpg" alt="" aria-hidden="true" />
+  <canvas id="stage" aria-hidden="true"></canvas>
+
+  <div id="smooth-wrapper"><div id="smooth-content">
+  <main>
+    <section class="chapter hero">
+      <div class="copy">
+        <h1>{t.hero.name}</h1>
+        <p class="tagline">{t.hero.tagline}</p>
+        <p class="lede">{t.hero.lede}</p>
+        <div class="actions">
+          <a class="button primary download" href={DOWNLOAD_URL}>{t.hero.download}</a>
+          <a class="button" href={REPO_URL}>{t.hero.source}</a>
+        </div>
+        <p class="meta">{downloadMeta}</p>
+      </div>
+      <LangLinks />
+      <span class="scroll" aria-hidden="true">{t.hero.scroll}</span>
+    </section>
+
+    <section class="stage app">
+      <h2 class="ptitle">{t.app.title}</h2>
+      <Showcase />
+    </section>
+
+    <section class="stage see">
+      <h2 class="ptitle">{t.see.title}</h2>
+      <p class="lede">{t.see.lede}</p>
+      <Lens />
+    </section>
+
+    <section class="stage sandbox">
+      <h2 class="ptitle">{t.sandbox.title}</h2>
+      <Sandbox />
+    </section>
+
+    <section class="after">
+      <h2>{t.faqTitle}</h2>
+      <Faq items={t.faq} />
+    </section>
+
+    <section class="after nl">
+      <Shield />
+      <h2>{t.noleakerSection.title}</h2>
+      <p class="lede">{t.noleakerSection.text}</p>
+      <div class="actions"><a class="button" href={localize(lang, '/noleaker/')}>{t.noleakerSection.cta}</a></div>
+    </section>
+  </main>
+
+  <SiteFooter>
+    <div class="graphics" role="group" aria-label={t.footer.graphics}>
+      <span>{t.footer.graphics}:</span>
+      <button type="button" data-choice="auto">{t.footer.auto}</button>
+      {PRESETS.map((p) => <button type="button" data-choice={p}>{t.footer.presets[p]}</button>)}
+    </div>
+  </SiteFooter>
+  </div></div>
+  <div id="fps" hidden></div>
+
+  <script>
+    import { gsap } from 'gsap';
+    import { ScrollTrigger } from 'gsap/ScrollTrigger';
+    import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+    import { ScrollSmoother } from 'gsap/ScrollSmoother';
+    import { langOf, strings } from '../i18n';
+    const t = await strings(langOf(location.pathname));
+    import { savedChoice, saveChoice, reducedMotion, type Choice } from '../scene/presets';
+    import type { Progress, Stage } from '../scene/scene';
+
+    gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin, ScrollSmoother);
+    const $ = <T extends Element = HTMLElement>(s: string) => document.querySelector(s) as T;
+    const $$ = <T extends Element = HTMLElement>(s: string) => [...document.querySelectorAll<T>(s)];
+
+    // ---- Scroll: one timeline per chapter; the 3D reads `progress`.
+    const progress: Progress = { burst: 0, title: 0, out: 0, build: 0, sub: 0, mag: 0, rules: 0, conns: 0, dim: 0 };
+    const scrub = 0.6;
+    // Wheel and trackpad scrolling glide; touch keeps the phone's own scrolling.
+    ScrollSmoother.create({ wrapper: '#smooth-wrapper', content: '#smooth-content', smooth: reducedMotion() ? 0 : 1.2, smoothTouch: false });
+
+    gsap.to(progress, { burst: 1, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub } });
+    gsap.to('.hero .copy, .hero .scroll', { opacity: 0, y: -60, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: '60% top', scrub: true } });
+
+    // Chapter 2: the real window rises as the V lands in the app icon, then the camera moves across
+    // the app one beat at a time.
+    const beats = $$('.app .beat');
+    const dots = $$('.app .dots span');
+    dots[0]?.classList.add('on');
+    gsap.fromTo('.app .windows', { y: 160, rotateX: 26, opacity: 0, scale: 0.9, transformPerspective: 1600 },
+      { y: 0, rotateX: 0, opacity: 1, scale: 1, ease: 'power2.out', scrollTrigger: { trigger: '.app', start: 'top 85%', end: 'top top', scrub } });
+    // The 3D window arrives exploded and assembles as it rises.
+    gsap.to(progress, { build: 1, ease: 'none', scrollTrigger: { trigger: '.app', start: 'top bottom', end: 'top top', scrub } });
+    gsap.fromTo('.app .appicon img', { opacity: 0, scale: 0.6 },
+      { opacity: 1, scale: 1, scrollTrigger: { trigger: '.app', start: 'top 15%', end: 'top top', scrub } });
+    gsap.set('.app .rules, .app .conns, .app .sub', { opacity: 0 });
+
+    const app = gsap.timeline({ defaults: { ease: 'power2.inOut' }, scrollTrigger: { trigger: '.app', start: 'top top', end: '+=400%', pin: true, scrub } });
+    // 1: the Add Subscription sheet drops over the window, then leaves the servers it added
+    // Each DOM move has its 3D twin in `progress` at the same place.
+    app.fromTo('.app .sub', { y: -40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 })
+      .to(progress, { sub: 1, duration: 0.6 }, '<')
+      .to({}, { duration: 0.8 })
+      .to('.app .sub', { y: -40, opacity: 0, duration: 0.5 })
+      .to(progress, { sub: 0, duration: 0.5 }, '<');
+    // 2: close in on the Delay and Speed columns (3D: a liquid glass magnifier slides down them)
+    beat(1).to('.app .main img', { scale: 1.9, duration: 1 }, '<')
+      .to(progress, { mag: 1, duration: 1.8, ease: 'none' }, '<')
+      .to({}, { duration: 0.8 });
+    // 3: the Rule Editor slides in front
+    beat(2).to('.app .main img', { scale: 1, duration: 0.8 }, '<')
+      .to('.app .main', { xPercent: -8, scale: 0.92, filter: 'brightness(0.35)', duration: 0.8 }, '<') // dimmed, still opaque
+      .to(progress, { dim: 1, duration: 0.8 }, '<')
+      .fromTo('.app .rules', { xPercent: 40, rotateY: -24, opacity: 0, transformPerspective: 1600 }, { xPercent: 0, rotateY: 0, opacity: 1, duration: 0.8 }, '<0.2')
+      .to(progress, { rules: 1, duration: 0.8 }, '<')
+      .to({}, { duration: 0.8 });
+    // 4: the Connections window comes up
+    beat(3).to('.app .rules', { xPercent: 30, opacity: 0, duration: 0.6 }, '<')
+      .to(progress, { rules: 0, duration: 0.6 }, '<')
+      .fromTo('.app .conns', { yPercent: 25, opacity: 0, scale: 0.94 }, { yPercent: 0, opacity: 1, scale: 1, duration: 0.8 }, '<0.2')
+      .to(progress, { conns: 1, duration: 0.8 }, '<')
+      .to({}, { duration: 1 });
+
+    /** Cross-fade the caption and dot to beat i; returns the timeline for chaining. */
+    function beat(i: number) {
+      return app.to(beats[i - 1], { opacity: 0, y: -14, duration: 0.4 })
+        .fromTo(beats[i], { opacity: 0, y: 14 }, {
+          opacity: 1, y: 0, duration: 0.4,
+          onStart: () => dots.forEach((d, j) => d.classList.toggle('on', j === i)),
+          onReverseComplete: () => dots.forEach((d, j) => d.classList.toggle('on', j === i - 1)),
+        });
+    }
+
+    // Chapter 3: the title re-forms, the stage pins while you play with the lens.
+    gsap.to(progress, { title: 1, ease: 'none', scrollTrigger: { trigger: '.see', start: 'top bottom', end: 'top top', scrub } });
+    // The window explodes again as it leaves.
+    gsap.fromTo(progress, { build: 1 }, { build: 0, ease: 'none', immediateRender: false, scrollTrigger: { trigger: '.see', start: 'top bottom', end: 'top top', scrub } });
+    ScrollTrigger.create({ trigger: '.see', start: 'top top', end: '+=100%', pin: true });
+
+    // Chapter 4: the sandbox title; the particle title can't scroll with the page, so it fades as the stage unpins.
+    const next = (title: number, sel: string) => gsap.fromTo(progress, { title: title - 1 }, {
+      title, ease: 'none', immediateRender: false, scrollTrigger: { trigger: sel, start: 'top bottom', end: 'top top', scrub },
+    });
+    next(2, '.sandbox');
+    // One idea per beat, like chapter 2. Beat 3 cuts Frankfurt on its own; the last beat hands the Cut buttons over.
+    const sbBeats = $$('.sandbox .beat'), sbDots = $$('.sandbox .dots span');
+    sbDots[0]?.classList.add('on');
+    const rooms = $$('.sandbox .room'), exits = $$('.sandbox .exit'), routes = $$('.sandbox .route');
+    /** Mini VM i with its server up or cut: the room seals, the line breaks. */
+    function setCut(i: number, down: boolean) {
+      const cut = exits[i].querySelector<HTMLButtonElement>('.cut')!, state = exits[i].querySelector<HTMLElement>('.state')!;
+      rooms[i].classList.toggle('sealed', down);
+      routes[i].classList.toggle('down', down);
+      exits[i].classList.toggle('down', down);
+      cut.setAttribute('aria-pressed', String(down));
+      cut.textContent = down ? t.sandbox.restore : t.sandbox.cut;
+      state.textContent = down ? t.sandbox.down : state.dataset.up!;
+    }
+    let scriptedCut = false, playing = false;
+    const sb = gsap.timeline({
+      defaults: { ease: 'power2.inOut' },
+      scrollTrigger: { trigger: '.sandbox', start: 'top top', end: '+=800%', pin: true, scrub },
+      onUpdate() { // only when the playhead crosses, so it never undoes the visitor's own clicks
+        const inside = sb.time() >= sb.labels.cut && sb.time() < sb.labels.ask;
+        if (inside !== scriptedCut) { scriptedCut = inside; setCut(0, inside); }
+        // Scrolling back out of the last beat clears the visitor's cuts, so the story replays clean.
+        const open = sb.time() >= sb.labels.try;
+        if (playing && !open) rooms.forEach((_, i) => setCut(i, i === 0 && inside));
+        playing = open;
+      },
+    });
+    const sbBeat = (i: number) => sb.to(sbBeats[i - 1], { opacity: 0, y: -14, duration: 0.4 })
+      .fromTo(sbBeats[i], { opacity: 0, y: 14 }, {
+        opacity: 1, y: 0, duration: 0.4,
+        onStart: () => sbDots.forEach((d, j) => d.classList.toggle('on', j === i)),
+        onReverseComplete: () => sbDots.forEach((d, j) => d.classList.toggle('on', j === i - 1)),
+      });
+    const hold = (d = 1) => sb.to({}, { duration: d });
+    const S = '.sandbox ';
+    const lines = S + '.line', packets = S + '.packets';
+    const net = [S + '.links', S + '.exit'];
+    // Start as one stack on your Mac; the panes and the exits aren't there yet.
+    gsap.set(rooms, { xPercent: 30, yPercent: (i: number) => [110, 0, -110][i], rotate: (i: number) => [-4, 2, 5][i], scale: 0.94 });
+    gsap.set(S + '.pane', { opacity: 0 });
+    gsap.set(lines, { strokeDashoffset: 1 });
+    gsap.set(packets, { opacity: 0 });
+    gsap.set(S + '.exit', { autoAlpha: 0, x: 24 });
+    gsap.set([S + '.cut', S + '.more'], { autoAlpha: 0 });
+
+    // 0: the stack comes apart, each window closes in its own glass room
+    sb.to(rooms, { xPercent: 0, yPercent: 0, rotate: 0, scale: 1, stagger: 0.08, duration: 1.1 })
+      .to(S + '.pane', { opacity: 1, duration: 0.6, stagger: 0.08 }, '-=0.5');
+    hold();
+    // 1: a line out of each room to its server
+    sbBeat(1).to(lines, { strokeDashoffset: 0, stagger: 0.15, duration: 0.7 }, '<')
+      .to(S + '.exit', { autoAlpha: 1, x: 0, stagger: 0.15, duration: 0.6 }, '<0.2')
+      .to(packets, { opacity: 1, duration: 0.3 });
+    hold();
+    // 2: closer on one room: what is inside, what isn't
+    sbBeat(2).to(net, { autoAlpha: 0, duration: 0.5 }, '<')
+      .to([rooms[1], rooms[2]], { autoAlpha: 0, duration: 0.5 }, '<')
+      .to(rooms[0], { yPercent: 110, scale: 1.04, duration: 0.8 }, '<')
+      .fromTo(S + '.sees', { autoAlpha: 0, x: 30 }, { autoAlpha: 1, x: 0, duration: 0.5 }, '<0.3')
+      .from(S + '.sees li', { autoAlpha: 0, x: 12, stagger: 0.08, duration: 0.3 }, '<0.2');
+    hold(1.2);
+    // 3: back to all three; Frankfurt dies, the others carry on
+    sbBeat(3).to(S + '.sees', { autoAlpha: 0, x: 30, duration: 0.4 }, '<')
+      .to(rooms[0], { yPercent: 0, scale: 1, duration: 0.7 }, '<')
+      .to([rooms[1], rooms[2]], { autoAlpha: 1, duration: 0.5 }, '<')
+      .to(net, { autoAlpha: 1, duration: 0.5 }, '<');
+    sb.addLabel('cut');
+    sb.fromTo(rooms[0], { x: -8 }, { x: 0, duration: 0.5, ease: 'elastic.out(1.2, 0.3)' })
+      .fromTo(S + '.notice', { autoAlpha: 0, y: -16 }, { autoAlpha: 1, y: 0, duration: 0.4 }, '<');
+    hold(1.2);
+    // 4: the install sheet
+    sbBeat(4).to(S + '.notice', { autoAlpha: 0, duration: 0.3 }, '<');
+    sb.addLabel('ask');
+    sb.to([...rooms, ...net], { autoAlpha: 0.14, duration: 0.5 }, '<')
+      .fromTo(S + '.sheet', { autoAlpha: 0, scale: 0.94, y: 20 }, { autoAlpha: 1, scale: 1, y: 0, duration: 0.5 }, '<0.1')
+      .from(S + '.sheet li', { autoAlpha: 0, x: -10, stagger: 0.08, duration: 0.3 }, '<0.2');
+    hold(1.2);
+    // 5: they're Mac apps: the rooms give way to the Dock
+    sbBeat(5).to(S + '.sheet', { autoAlpha: 0, y: -20, duration: 0.4 }, '<')
+      .to([...rooms, ...net], { autoAlpha: 0, duration: 0.4 }, '<')
+      .fromTo(S + '.desk', { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.6 }, '<0.2')
+      .from(S + '.dock > *', { y: 40, autoAlpha: 0, stagger: 0.1, duration: 0.5, ease: 'back.out(1.8)' }, '<0.1');
+    hold(1.2);
+    // 6: your turn
+    sb.addLabel('try');
+    sbBeat(6).to(S + '.desk', { autoAlpha: 0, y: 40, duration: 0.4 }, '<')
+      .to([...rooms, ...net], { autoAlpha: 1, duration: 0.5 }, '<0.2')
+      .to([S + '.cut', S + '.more'], { autoAlpha: 1, duration: 0.4 }, '<0.2');
+    hold(1.4);
+    const lastPin = sb.scrollTrigger!;
+    gsap.to(progress, { out: 1, ease: 'none', scrollTrigger: { start: () => lastPin.end, end: () => lastPin.end + innerHeight * 0.08, scrub: true } });
+
+    // ---- The lens follows the pointer; until then it wanders on its own.
+    const stream = $('.stream');
+    const lens = { x: 0, y: 0 };
+    const place = () => { stream.style.setProperty('--x', `${lens.x}px`); stream.style.setProperty('--y', `${lens.y}px`); };
+    const followX = gsap.quickTo(lens, 'x', { duration: 0.35, ease: 'power3', onUpdate: place });
+    const followY = gsap.quickTo(lens, 'y', { duration: 0.35, ease: 'power3', onUpdate: place });
+    lens.x = stream.clientWidth / 2;
+    lens.y = stream.clientHeight / 2;
+    place();
+    const wander = gsap.timeline({ repeat: -1, yoyo: true, defaults: { duration: 2.4, ease: 'sine.inOut', onUpdate: place } })
+      .to(lens, { x: () => stream.clientWidth * 0.3, y: () => stream.clientHeight * 0.3 })
+      .to(lens, { x: () => stream.clientWidth * 0.7, y: () => stream.clientHeight * 0.7 })
+      .to(lens, { x: () => stream.clientWidth * 0.55, y: () => stream.clientHeight * 0.25 });
+    if (reducedMotion()) wander.pause();
+    stream.addEventListener('pointermove', (e) => {
+      wander.kill();
+      const r = stream.getBoundingClientRect();
+      followX(e.clientX - r.left);
+      followY(e.clientY - r.top);
+    });
+
+    // ---- Connect: what the lens reads scrambles into what the protocol shows.
+    const bar = $('.see .bar');
+    const power = $<HTMLButtonElement>('.see .power');
+    const status = $('.see .status');
+    const line = $('.see .line');
+    const what = $('.see .what');
+    const chips = $$<HTMLButtonElement>('.see .chip');
+    const seen = $$('.see .seen');
+    let connected = false;
+    let proto = 0;
+    let run = 0; // the latest click wins
+
+    const bytes = () => Array.from({ length: 6 }, () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0')).join(' ');
+    function scramble() {
+      const p = t.see.protocols[proto];
+      seen.forEach((el) => gsap.to(el, {
+        duration: 0.9,
+        delay: Math.random() * 0.3,
+        scrambleText: { text: connected ? p.shows || bytes() : el.dataset.real!, chars: '0123456789abcdef.-', speed: 0.6 },
+      }));
+      what.textContent = connected ? p.what : t.see.off;
+    }
+
+    function show(state: 'idle' | 'connecting' | 'connected') {
+      bar.dataset.state = state;
+      power.setAttribute('aria-pressed', String(state !== 'idle'));
+      power.setAttribute('aria-label', state === 'idle' ? t.see.connect : t.see.disconnect);
+      status.textContent = state === 'idle' ? t.see.idle
+        : state === 'connecting' ? t.see.connecting
+        : `${t.see.connected} · ${t.see.delay}`;
+    }
+
+    async function connect() {
+      const me = ++run;
+      show('connecting');
+      await new Promise((r) => setTimeout(r, 450));
+      if (me !== run) return;
+      connected = true;
+      show('connected');
+      stream.classList.add('connected');
+      scramble();
+    }
+
+    function disconnect() {
+      run++;
+      connected = false;
+      show('idle');
+      stream.classList.remove('connected');
+      scramble();
+    }
+
+    power.addEventListener('click', () => (connected ? disconnect() : connect()));
+    chips.forEach((chip, i) => chip.addEventListener('click', () => {
+      proto = i;
+      chips.forEach((c, j) => c.setAttribute('aria-pressed', String(i === j)));
+      line.textContent = t.see.protocols[i].line;
+      if (connected) scramble(); else connect();
+    }));
+
+    // ---- Chapter 4: the visitor's own Cut buttons.
+    exits.forEach((e, i) => e.querySelector('.cut')!.addEventListener('click', () => {
+      setCut(i, !rooms[i].classList.contains('sealed'));
+      if (rooms[i].classList.contains('sealed') && !reducedMotion()) gsap.fromTo(rooms[i], { x: -8 }, { x: 0, duration: 0.5, ease: 'elastic.out(1.2, 0.3)' });
+    }));
+
+    // ---- Buttons and chips lean toward the cursor and spring back.
+    if (!reducedMotion()) for (const el of $$('.button, .chip, .power')) {
+      const x = gsap.quickTo(el, 'x', { duration: 0.4, ease: 'power3' });
+      const y = gsap.quickTo(el, 'y', { duration: 0.4, ease: 'power3' });
+      el.addEventListener('pointermove', (e) => {
+        const r = el.getBoundingClientRect();
+        x((e.clientX - r.left - r.width / 2) * 0.3);
+        y((e.clientY - r.top - r.height / 2) * 0.4);
+      });
+      el.addEventListener('pointerleave', () => gsap.to(el, { x: 0, y: 0, duration: 0.8, ease: 'elastic.out(1, 0.4)' }));
+    }
+
+    // ---- Graphics switch
+    let stage: Stage | null = null;
+    let choice: Choice = savedChoice();
+    const choiceButtons = $$<HTMLButtonElement>('[data-choice]');
+    function markChoice() {
+      for (const b of choiceButtons) {
+        const c = b.dataset.choice as Choice;
+        b.setAttribute('aria-pressed', String(c === choice));
+        if (c === 'auto') b.textContent = stage && choice === 'auto' ? `${t.footer.auto} (${t.footer.presets[stage.preset]})` : t.footer.auto;
+      }
+    }
+    choiceButtons.forEach((b) => b.addEventListener('click', () => {
+      choice = b.dataset.choice as Choice;
+      saveChoice(choice);
+      stage?.setChoice(choice);
+      markChoice();
+    }));
+    markChoice();
+
+    // ---- The 3D loads after the content has painted.
+    async function load3D() {
+      try {
+        const { startScene } = await import('../scene/scene');
+        const pinned = (sel: string) => ({ el: $(`${sel} .ptitle`), section: $(sel) });
+        stage = await startScene($<HTMLCanvasElement>('#stage'), choice, progress,
+          [pinned('.app'), pinned('.see'), pinned('.sandbox')], { el: $('.app .frame'), section: $('.app') });
+        ScrollTrigger.addEventListener('refresh', stage.layout);
+        stage.onPreset.add(markChoice);
+        markChoice();
+        if (new URLSearchParams(location.search).has('fps')) {
+          const fps = $('#fps');
+          fps.hidden = false;
+          setInterval(() => {
+            fps.textContent = `${Math.round(stage!.fps)} FPS · ${stage!.preset} · ${stage!.webgpu ? 'WebGPU' : 'WebGL 2'}`;
+          }, 500);
+        }
+      } catch (e) {
+        console.warn('3D unavailable, keeping the poster', e);
+      }
+    }
+    const idle = (window as any).requestIdleCallback ?? ((f: () => void) => setTimeout(f, 1));
+    if (document.readyState === 'complete') idle(load3D); else addEventListener('load', () => idle(load3D));
+  </script>
+</Base>
