@@ -50,7 +50,7 @@ export const en = {
     title: 'Secure Sandbox.',
     beta: 'Beta',
     beats: [
-      { title: 'A room for every app.', text: 'Each app runs in its own mini VM, shut off from your Mac and from the other mini VMs.' },
+      { title: 'A room for every app.', text: 'Each app runs in its own mini VM: a set of containers that share one Linux kernel, inside one VM that has no network device. Your Mac stays outside that VM.' },
       { title: 'Its own way out.', text: 'Every mini VM has its own server. Nothing it does reaches the internet any other way.' },
       { title: 'It sees only its room.', text: 'Inside, the app finds the place and time zone of its exit. Your Mac isn’t there.' },
       { title: 'Server down? Cut off.', text: 'If its server stops working, the apps lose the internet. They never fall back to your real connection.' },
