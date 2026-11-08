@@ -2,6 +2,7 @@
 // The comparison pages and guides: same shape, text in strings.ts.
 import Page from '../layouts/Page.astro';
 import { LANGS, langOf, localize, strings } from '../i18n';
+import { docsHome } from '../docs';
 import { DOWNLOAD_URL, downloadMeta } from '../releases';
 
 export const getStaticPaths = async () => (await Promise.all(LANGS.map(async (lang) =>
@@ -34,7 +35,7 @@ const { a, og } = Astro.props as any;
   ))}
   <section class="actions">
     <a class="button primary download" href={DOWNLOAD_URL}>{t.hero.download}</a>
-    <a class="button" href={localize(lang, '/docs/')}>{t.footer.links.docs}</a>
+    <a class="button" href={docsHome(lang)}>{t.footer.links.docs}</a>
   </section>
   <p class="meta">{downloadMeta}</p>
 </Page>

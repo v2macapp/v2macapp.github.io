@@ -1,6 +1,7 @@
 ---
 import { REPO_URL } from '../strings';
 import { langOf, localize, strings } from '../i18n';
+import { docsHome } from '../docs';
 const lang = langOf(Astro.url.pathname), t = await strings(lang), l = t.footer.links;
 const to = (p: string) => localize(lang, p);
 ---
@@ -13,7 +14,7 @@ const to = (p: string) => localize(lang, p);
     <a href={to('/v2rayx-alternative/')}>{l.v2rayx}</a>
     <a href={to('/guides/vless-reality-mac/')}>{l.reality}</a>
     <a href={to('/guides/hysteria2-mac/')}>{l.hysteria}</a>
-    <a href={to('/docs/')}>{l.docs}</a>
+    <a href={docsHome(lang)}>{l.docs}</a>
     <a href={REPO_URL}>{l.source}</a>
   </nav>
   <slot />

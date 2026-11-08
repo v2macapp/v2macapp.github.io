@@ -15,10 +15,11 @@ export type Doc = { lang: Lang; slug: string; path: string; name: string; headin
 async function load(): Promise<Doc[]> {
   try {
     const sidebar = await page('_Sidebar');
-    const targets = [...sidebar.matchAll(/\[([^\]]+)\]\(((?:fa-|zh-|ru-)?[A-Z][A-Za-z-]*)\)/g)];
+    const prefixes = LANGS.filter((lang) => lang !== 'en').sort((a, b) => b.length - a.length);
+    const targets = [...sidebar.matchAll(/\[([^\]]+)\]\(([A-Za-z-]+)\)/g)];
     return await Promise.all(targets.map(async ([, name, target]) => {
-      const m = target.match(/^(fa|zh|ru)-(.*)$/);
-      const lang = (m?.[1] ?? 'en') as Lang, base = m?.[2] ?? target;
+      const prefix = prefixes.find((lang) => target.startsWith(`${lang}-`));
+      const lang = (prefix ?? 'en') as Lang, base = prefix ? target.slice(prefix.length + 1) : target;
       const slug = base === 'Home' ? '' : base.toLowerCase();
       const md = docMarkdown(await page(target), localize(lang, '/docs/'));
       return {
@@ -38,3 +39,5 @@ async function load(): Promise<Doc[]> {
 
 export const docs = await load();
 export const docsIn = (lang: Lang) => docs.filter((d) => d.lang === lang);
+// A language whose wiki pages are not published yet links to the English docs.
+export const docsHome = (lang: Lang) => (docsIn(lang).length ? localize(lang, '/docs/') : '/docs/');

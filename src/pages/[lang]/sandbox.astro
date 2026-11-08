@@ -1,5 +1,6 @@
 ---
 import View from '../../views/SandboxPage.astro';
-export const getStaticPaths = () => ['fa', 'zh', 'ru'].map((lang) => ({ params: { lang } }));
+import { LANGS } from '../../i18n';
+export const getStaticPaths = () => LANGS.filter((lang) => lang !== 'en').map((lang) => ({ params: { lang } }));
 ---
 <View />

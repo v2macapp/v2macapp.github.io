@@ -1,0 +1,233 @@
+import { en } from './strings';
+
+const install = 'Mit Homebrew: <code>brew install --cask v2macapp/tap/v2mac</code>. Oder verwenden Sie das DMG und klicken Sie beim ersten Start unter Systemeinstellungen → Datenschutz &amp; Sicherheit auf Dennoch öffnen. Benötigt macOS 26 oder neuer auf Apple Silicon.';
+const asks = ['Zwischenablage verwenden', 'Den freigegebenen Ordner dieser Mini-VM lesen und beschreiben', 'Nach Ihrer Erlaubnis SSH-Schlüssel aus dem ssh-agent Ihres Macs verwenden', 'Nach Ihrer Erlaubnis Ton wiedergeben', 'Nach Ihrer Erlaubnis das Mikrofon verwenden'];
+const A = en.articles;
+
+export const de: typeof en = {
+  ...en,
+  title: 'V2Mac: nativer Xray- und V2Ray-Client für Mac',
+  description: 'Kostenloser Xray-core- und V2Ray-Client für Mac mit offenem Quellcode. VLESS, REALITY, Hysteria2, Trojan und Shadowsocks in einer nativen SwiftUI-Menüleisten-App für Apple Silicon.',
+  hero: {
+    name: 'V2Mac', tagline: 'Ein nativer macOS-Client für Xray-core.',
+    lede: 'VLESS, REALITY, Hysteria2, Trojan und Shadowsocks in einer schnellen SwiftUI-Menüleisten-App. Ohne Electron, ohne Telemetrie.',
+    download: 'Für Mac laden', source: 'Quellcode auf GitHub', scroll: 'Scrollen',
+  },
+  app: {
+    title: 'Das ist V2Mac.', icon: 'Das V2Mac-App-Symbol',
+    beats: [
+      { title: 'Ein Link genügt.', text: 'Abonnement hinzufügen und alle Server erscheinen gruppiert und einsatzbereit.' },
+      { title: 'Die schnellsten in Grün.', text: 'Alle Server gleichzeitig testen und Latenz und Geschwindigkeit direkt vergleichen.' },
+      { title: 'Ihre Regeln.', text: 'Jede App und Website so leiten, wie Sie möchten: Proxy, Direkt oder Blockieren.' },
+      { title: 'Alles sichtbar.', text: 'Jede Verbindung sehen, die verursachende App und die zuständige Regel. TUN einschalten und der ganze Mac nutzt die Verbindung.' },
+    ],
+    shots: {
+      main: 'V2Mac-Hauptfenster: Server eines Abonnements mit Latenz und Geschwindigkeit',
+      subscription: 'Dialog zum Hinzufügen eines Abonnements',
+      rules: 'Regeleditor mit Proxy-, Direkt- und Blockierregeln',
+      connections: 'Verbindungsfenster: jede App, ihr Ziel und die zuständige Regel',
+    },
+  },
+  see: {
+    ...en.see, title: 'Was andere sehen.',
+    lede: 'Ziehen Sie die Lupe über Ihren Datenverkehr. Sie zeigt, was Ihr Internetanbieter lesen kann.',
+    off: 'Ohne V2Mac kann jeder auf dem Übertragungsweg die von Ihnen geöffneten Websites sehen.',
+    idle: 'Nicht verbunden', connecting: 'Verbindung wird hergestellt…', connected: 'Verbunden',
+    connect: 'Verbinden', disconnect: 'Trennen', protocolsLabel: 'Jedes Protokoll verbirgt Sie auf andere Weise',
+    protocols: [
+      { ...en.see.protocols[0], what: 'Nutzt den Handshake einer echten Website. Andere sehen einen gewöhnlichen Besuch bei microsoft.com.' },
+      { ...en.see.protocols[1], what: 'QUIC über UDP für verlustreiche Verbindungen. Andere sehen verschlüsseltes QUIC auf Port 443.' },
+      { ...en.see.protocols[2], what: 'Verbirgt sich in normalem HTTPS. Andere sehen einen sicheren Besuch auf der Website Ihres Servers.' },
+      { ...en.see.protocols[3], what: 'Verschlüsselte Bytes ohne erkennbares Muster. Andere sehen Rauschen.' },
+    ],
+  },
+  sandbox: {
+    ...en.sandbox, title: 'Sichere Sandbox.', beta: 'Beta',
+    beats: [
+      { title: 'Ein Raum für jede App.', text: 'Jede App läuft in ihrer eigenen Mini-VM: eine Gruppe von Containern mit gemeinsamem Linux-Kernel innerhalb einer VM ohne Netzwerkgerät. Ihr Mac bleibt außerhalb dieser VM.' },
+      { title: 'Ihr eigener Ausgang.', text: 'Jede Mini-VM hat ihren eigenen Server. Kein anderer Weg führt für sie ins Internet.' },
+      { title: 'Sie sieht nur ihren Raum.', text: 'Die App sieht den Standort und die Zeitzone ihres Ausgangs. Ihr Mac ist nicht dort.' },
+      { title: 'Server ausgefallen? Verbindung gesperrt.', text: 'Fällt der Server aus, verlieren die Apps den Internetzugang. Sie weichen niemals auf Ihre echte Verbindung aus.' },
+      { title: 'Sie bestimmen die Rechte.', text: 'Vor der Installation sehen Sie die angefragten Berechtigungen. Ton, Mikrofon und SSH-Schlüssel fragen bei der Nutzung erneut.' },
+      { title: 'Weiterhin eine Mac-App.', text: 'Jede App öffnet sich als eigene Mac-App mit eigenem Fenster und Dock-Symbol in der Farbe ihrer Mini-VM.' },
+      { title: 'Probieren Sie es. Trennen Sie einen Server.', text: 'Vor dem ersten Öffnen der Sandbox wird nichts heruntergeladen.' },
+    ],
+    cut: 'Server trennen', restore: 'Wiederherstellen', down: 'Nicht verbunden', sealed: 'Blockiert · keine Datenlecks', more: 'Über die Sandbox',
+    sees: {
+      title: 'Firefox — Arbeit sieht',
+      yes: ['Frankfurt als Standort', 'Die Zeitzone von Frankfurt', 'Seinen eigenen Benutzerordner', 'Den freigegebenen Ordner, wenn Sie es erlauben'],
+      notTitle: 'Nicht sichtbar', no: ['Dateien Ihres Macs', 'Netzwerk Ihres Macs', 'Andere Mini-VMs'],
+    },
+    notice: { title: 'Arbeit: Nicht verbunden', text: 'Frankfurt ist ausgefallen. Die Apps sind vom Netz getrennt.' },
+    sheet: { title: 'Firefox zu Arbeit hinzufügen', lede: 'Diese App bittet um Erlaubnis für:', items: asks, cancel: 'Abbrechen', without: 'Ohne diese Berechtigungen installieren', allow: 'Erlauben und installieren' },
+    vms: [
+      { ...en.sandbox.vms[0], vm: 'Arbeit' },
+      { ...en.sandbox.vms[1], vm: 'Einkaufen' },
+      { ...en.sandbox.vms[2], vm: 'Entwicklung' },
+    ],
+  },
+  footer: {
+    graphics: 'Grafik', auto: 'Automatisch', presets: { ultra: 'Ultra', high: 'Hoch', medium: 'Mittel', low: 'Niedrig' },
+    tracking: 'Diese Website verfolgt nichts.', credit: 'Erdtexturen: Solar System Scope, CC BY 4.0.',
+    links: { sandbox: 'Sichere Sandbox', noleaker: 'NoLeaker', blog: 'Versionshinweise', v2rayn: 'v2rayN für Mac', v2rayx: 'V2RayX-Alternative', reality: 'VLESS REALITY auf Mac', hysteria: 'Hysteria2 auf Mac', docs: 'Dokumentation', source: 'GitHub' },
+  },
+  send: { label: 'An meinen Mac senden', copied: 'Link kopiert', title: 'V2Mac für Mac' },
+  faqTitle: 'Fragen.',
+  faq: [
+    { q: 'Ist V2Mac ein V2Ray-Client für Mac?', a: 'Ja. Es verwendet Xray-core, den Nachfolger des V2Ray-Kerns, und liest V2Ray- und Xray-Links und -Abonnements.' },
+    { q: 'Unterstützt es VLESS REALITY und XTLS Vision?', a: 'Ja, über Links und im Servereditor, mit TCP, WebSocket, gRPC, HTTPUpgrade, XHTTP und mKCP.' },
+    { q: 'Wie leite ich alle Apps über den Proxy, auch ohne eigene Proxy-Einstellungen?', a: 'Aktivieren Sie TUN. Dann laufen jede App und jede DNS-Anfrage über die Verbindung.' },
+    { q: 'Kann ich es als Proxifier-Ersatz verwenden?', a: 'Ja. Es bietet Regeln nach App und Host, importiert aus Proxifier, Clash, sing-box, v2rayN und Shadowrocket und kann QUIC blockieren.' },
+    { q: 'Können andere Geräte in meinem Netzwerk es verwenden?', a: 'Ja. Aktivieren Sie unter Einstellungen → Proxy die Option Verbindungen aus dem LAN erlauben, am besten mit Benutzername und Passwort. Stellen Sie auf dem anderen Gerät die LAN-Adresse und den Port Ihres Macs ein.' },
+    { q: 'Funktioniert es auf Intel-Macs oder älterem macOS?', a: 'Nein. Es benötigt macOS 26 oder neuer auf Apple Silicon.' },
+    { q: 'Warum meldet macOS, dass es nicht geöffnet werden kann?', a: 'Das DMG ist nicht notarisiert. Klicken Sie unter Systemeinstellungen → Datenschutz & Sicherheit auf Dennoch öffnen oder installieren Sie mit Homebrew: brew install --cask v2macapp/tap/v2mac.' },
+    { q: 'Sammelt V2Mac Daten?', a: 'Nein. Es gibt keine Telemetrie. Ein Problembericht wird nur übermittelt, wenn Sie ihn selbst auf GitHub einfügen.' },
+    { q: 'Wie verhindere ich WebRTC- und DNS-Datenlecks im Browser?', a: 'Verwenden Sie NoLeaker, die kostenlose Chrome- und Firefox-Erweiterung desselben Projekts, mit dem Proxy 127.0.0.1:10808.' },
+    { q: 'Wie übertrage ich meine Server auf einen anderen Mac?', a: 'Verwenden Sie Sicherung exportieren… und Sicherung wiederherstellen…. Die Daten liegen unter ~/Library/Application Support/v2mac.' },
+  ],
+  noleakerSection: { title: 'Ihr Browser kann Sie trotzdem verraten.', text: 'WebRTC, QUIC, Ihre Zeitzone und Sprache können Sie hinter einem Proxy verraten. NoLeaker ist eine kostenlose Erweiterung, die das verhindert. Testen Sie Ihren Browser jetzt.', cta: 'Meinen Browser testen' },
+  nav: { home: 'V2Mac', sandbox: 'Sandbox', noleaker: 'NoLeaker', blog: 'Versionshinweise' },
+  docs: { title: 'V2Mac-Dokumentation: installieren, verbinden und routen auf Mac', heading: 'V2Mac-Dokumentation' },
+  notFound: { title: 'Seite nicht gefunden | V2Mac', description: 'Diese Seite gibt es auf der V2Mac-Website nicht.', heading: 'Seite nicht gefunden', text: 'Diese Seite ist nicht vorhanden. Versuchen Sie einen der obigen Links.' },
+  blog: { title: 'V2Mac-Versionshinweise', description: 'Änderungen jeder Version von V2Mac, dem nativen Xray-Client für macOS.', heading: 'Versionshinweise', empty: 'Die Versionshinweise konnten beim Erstellen dieser Seite nicht geladen werden.', onGithub: 'Diese Version auf GitHub', all: 'Alle Versionshinweise' },
+  sandboxPage: {
+    title: 'Sichere Sandbox: Mac-Apps über eigene VPN-Server ausführen | V2Mac',
+    description: 'VPN pro App auf Mac: Die sichere Sandbox führt jede App in einer Mini-VM mit eigenem Server aus. Bei Serverausfall wird die App getrennt und weicht nie auf Ihre echte Verbindung aus.',
+    heading: 'Sichere Sandbox', beta: 'Beta', lede: 'Jede App in ihrer eigenen Mini-VM mit eigenem Server. Fällt der Server aus, wird die App getrennt. Sie weicht niemals auf Ihre echte Verbindung aus.',
+    get: {
+      title: 'Eine Mini-VM, dann eine App im Dock',
+      steps: [
+        ['Sandbox öffnen', 'Klicken Sie in V2Mac auf Sandbox. Beim ersten Mal zeigt ein Dialog die Downloadgröße und den möglichen Speicherverbrauch.'],
+        ['Mini-VM hinzufügen', 'Beginnen Sie leer, mit einer Vorlage mit fertigen Apps oder mit einem Klon einer vorhandenen Mini-VM.'],
+        ['Ausgang wählen', 'Wählen Sie den Server für den Datenverkehr. Jede Mini-VM hat ihren eigenen.'],
+        ['App hinzufügen', 'Sie erscheint unter ~/Applications/V2Mac Sandbox als eigene Mac-App mit einem Symbol in der Farbe der Mini-VM.'],
+      ],
+      exitsLabel: 'Jede Mini-VM zeigt ihren Ausgang', exits: [
+        { dot: 'green', name: 'Arbeit', state: 'Frankfurt' }, { dot: 'red', name: 'Einkaufen', state: 'Nicht verbunden' }, { dot: 'gray', name: 'Offline-Notizen', state: 'Kein Ausgang (blockiert)' },
+      ],
+    },
+    fail: {
+      title: 'Trennen Sie den Server. Sehen Sie, wo es stoppt.', nodes: ['App', 'Mini-VM', 'Ihr Server', 'Internet'],
+      up: 'Der Datenverkehr der App hat nur einen Weg nach draußen: den gewählten Server.',
+      down: 'Der Server fällt aus. Der Datenverkehr stoppt innerhalb der Mini-VM und Sie erhalten eine Mitteilung. Wählen Sie einen anderen Server. V2Mac wechselt niemals selbstständig.',
+      own: 'Die Sandbox hat ihre eigene Verbindung zu jedem Server. Sie funktioniert weiter, wenn V2Mac getrennt, mit einem anderen Server verbunden oder im TUN-Modus ist.',
+    },
+    inside: { title: 'Was drinnen ist und was nicht', yesTitle: 'Eine App sieht', yes: ['Standort und Zeitzone ihres Ausgangs', 'Ihren eigenen Benutzerordner', 'Den freigegebenen Ordner, wenn Sie es erlauben'], noTitle: 'Eine App sieht niemals', no: ['Dateien Ihres Macs', 'Netzwerk Ihres Macs', 'Andere Mini-VMs'] },
+    perms: {
+      title: 'Sie bestimmen die Rechte', lede: 'Vor der Installation zeigt V2Mac die angefragten Berechtigungen. Wählen Sie Erlauben und installieren, Ohne diese Berechtigungen installieren oder Abbrechen.', items: asks,
+      ask: 'Die letzten drei fragen bei der Nutzung erneut: Erlauben, Nicht erlauben oder Immer erlauben. Bis zu Ihrer Antwort wartet die App. Ohne Erlaubnis erhält sie keinen Zugriff.',
+      more: 'Für jede Mini-VM bestimmen Sie, ob ⌘V die Mac-Zwischenablage einsetzt und ob Kopieren Ihren Mac erreicht. In den freigegebenen Ordner geschriebene Dateien werden als heruntergeladen markiert, damit macOS sie vor dem Öffnen prüft.',
+    },
+    keep: { title: 'Behalten oder verwerfen', items: [['Einweg', 'Die Daten werden bei jedem Stoppen der Sandbox gelöscht.'], ['Klonen', 'Eine Kopie einer Mini-VM samt Apps und Daten.'], ['Daten löschen', 'Die Mini-VM leeren und sie selbst behalten.']] },
+    trust: {
+      title: 'Warum Sie es überprüfen können', items: [
+        ['Ein signierter Store', 'Apps stammen aus dem V2Mac-Store mit signiertem Index.'],
+        ['Installation verifizieren', 'Zeigt Herkunft (Repository und Commit), Berechtigungen und unveränderte Dateien. „Verifiziert“ bedeutet unverändert, nicht sicher.'],
+        ['Zurückgezogene Apps', 'Eine aus dem Store zurückgezogene App zeigt ein Warnsymbol und den Grund. Ihre Daten bleiben erhalten.'],
+        ['Signierte Updates', 'Die Sandbox aktualisiert sich selbst. V2Mac installiert nur Versionen, deren Pin mit dem V2Mac-Updateschlüssel signiert ist und deren Dateien übereinstimmen. Ältere Versionen werden niemals installiert.'],
+      ],
+    },
+    apps: { title: 'Apps und eigene Entwicklung', text: 'Chromium ist bereits im Store. Entwickler können mit der Plugin-Vorlage eigene Apps erstellen und beim Store einreichen.', template: 'Plugin-Vorlage', store: 'Der Store' },
+    cost: {
+      title: 'Was es benötigt', items: ['Vor dem ersten Öffnen der Sandbox wird nichts heruntergeladen. Der Dialog zeigt die Größe vorab.', 'Sie bestimmen das maximale Arbeitsspeicherlimit.', 'Sie startet beim Öffnen einer Sandbox-App und stoppt 5 Minuten nach dem Schließen der letzten App.', 'Sandbox entfernen löscht die Sandbox, alle Mini-VMs samt Daten und die Sandbox-Apps.'],
+      betaTitle: 'Es ist eine Beta', beta: 'Rechnen Sie mit Ecken und Kanten und einer kurzen App-Liste. Sandbox-Apps laufen niemals ohne V2Mac. Beim Beenden fragt V2Mac, ob es sie ebenfalls beenden soll. Wie V2Mac benötigt die Sandbox macOS 26 oder neuer auf Apple Silicon.',
+    },
+    faq: [
+      { q: 'Kann ich eine einzelne Mac-App über einen VPN-Server ausführen?', a: 'Ja. Legen Sie die App in eine Mini-VM und wählen Sie einen Server. Die App erreicht das Internet ausschließlich darüber. Sie läuft weiter, während der übrige Mac einen anderen oder keinen Server verwendet.' },
+      { q: 'Was geschieht bei Serverausfall?', a: 'Die Apps dieser Mini-VM verlieren den Internetzugang und Sie erhalten eine Mitteilung. Sie weichen niemals auf Ihre normale Verbindung aus und V2Mac wechselt nicht selbstständig den Server.' },
+      { q: 'Kann eine Sandbox-App meine Mac-Dateien lesen?', a: 'Nein. Sie sieht ihren eigenen Benutzerordner und, mit Ihrer Erlaubnis, den freigegebenen Ordner unter ~/V2Mac Sandbox/<mini VM>/Shared.' },
+      { q: 'Wird etwas heruntergeladen, wenn ich sie nie verwende?', a: 'Nein. Erst beim ersten Öffnen der Sandbox wird etwas heruntergeladen. Vor Ihrer Zustimmung sehen Sie die Größe.' },
+      { q: 'Wie entferne ich sie?', a: 'Einstellungen → Sandbox → Sandbox entfernen… löscht die Sandbox, alle Mini-VMs samt Daten und die Sandbox-Apps.' },
+    ], faqTitle: 'Fragen.',
+  },
+  noleakerPage: {
+    title: 'Browser-Datenlecktest: WebRTC, Zeitzone, Sprache, QUIC | NoLeaker',
+    description: 'Prüfen Sie Ihren Browser auf WebRTC-, Zeitzonen-, Sprach- und QUIC-Datenlecks. NoLeaker ist eine kostenlose SOCKS5-Erweiterung für Chrome und Firefox, die diese verhindert.',
+    heading: 'Verrät Ihr Browser Sie?', lede: 'Ein Proxy leitet Ihren Datenverkehr um. Ihr Browser kann einer Website trotzdem Ihren echten Standort verraten. Testen Sie es hier mit eingeschaltetem Proxy.',
+    run: 'Test starten', again: 'Erneut testen',
+    privacy: 'Vor Ihrem Klick wird nichts ausgeführt. Danach fragt Ihr Browser ipinfo.io (oder ipwho.is) und Cloudflare nach Ihrer Adresse. Die Antworten bleiben auf dieser Seite. Diese Website speichert nichts.',
+    tests: { ip: 'Ihre Adresse', webrtc: 'WebRTC', timezone: 'Zeitzone', language: 'Sprache', quic: 'QUIC', dns: 'DNS' },
+    pending: 'Test läuft…', verdict: { ok: 'Kein Datenleck', leak: 'Datenleck', hint: 'Hinweis', unknown: 'Nicht prüfbar', shown: 'Was Websites sehen' },
+    says: {
+      ipFailed: 'Die Adressdienste haben nicht geantwortet. Ein Vergleich ist daher nicht möglich.',
+      webrtcOk: 'WebRTC zeigt keine weitere öffentliche Adresse.',
+      webrtcLeak: (ips: string) => `WebRTC zeigt ${ips} statt der obigen Adresse. Jede Webseite kann dies lesen.`,
+      webrtcBlocked: 'WebRTC ist in diesem Browser deaktiviert.',
+      tzOk: (tz: string) => `${tz} passt zu Ihrer Adresse.`,
+      tzLeak: (tz: string, ipTz: string) => `Ihr Browser meldet ${tz}, Ihre Adresse ${ipTz}. Jede Webseite kann dies vergleichen.`,
+      langOk: (lang: string) => `${lang} deutet nicht auf einen anderen Standort hin.`,
+      langHint: (lang: string, country: string) => `${lang} deutet auf ein anderes Land als Ihre Adresse (${country}). Das kommt häufig vor, grenzt Sie aber ein.`,
+      quicUsed: 'Dieser Browser hat HTTP/3 verwendet. QUIC läuft über UDP, das ein Proxy möglicherweise nicht überträgt. Es kann daher den Proxy umgehen.',
+      quicLeak: 'Dieser Browser hat HTTP/3 verwendet und die Anfrage kam von einer anderen Adresse als Ihr übriger Datenverkehr. Sie hat den Proxy umgangen.',
+      quicNone: 'Dieser Browser hat hier kein HTTP/3 verwendet.', quicFailed: 'Cloudflare hat nicht geantwortet.',
+      dns: 'Eine Webseite kann dies ohne eigenen DNS-Server nicht testen. Der integrierte NoLeaker-Datenlecktest kann es.',
+    },
+    summaryLeak: (n: number) => `${n === 1 ? 'Ein Datenleck ist' : `${n} Datenlecks sind`} durchgekommen. NoLeaker verhindert diese.`,
+    summaryOk: 'Nichts ist durchgekommen. Prüfen Sie erneut mit eingeschaltetem Proxy, falls er ausgeschaltet war.',
+    what: {
+      title: 'Was NoLeaker macht', lede: 'Eine kostenlose Erweiterung mit offenem Quellcode für Chrome 120+ und Firefox 140+. Sie leitet den Browser über Ihren SOCKS5-Proxy und lässt ihn im Land des Proxys erscheinen. Kein Konto, kein Lizenzschlüssel, keine eigenen Server.',
+      items: [
+        ['IP und DNS', 'Der gesamte Browser-Datenverkehr und DNS-Anfragen laufen über Ihren SOCKS5-Proxy.'],
+        ['WebRTC', 'Auf UDP über den Proxy beschränkt, damit Webseiten Ihre echte IP nicht lesen können.'],
+        ['QUIC / HTTP3', 'Protokollwechsel werden verhindert, damit der Datenverkehr beim Proxy bleibt.'],
+        ['Zeitzone', 'Date und Intl melden die Zeitzone des Proxy-Landes.'],
+        ['Sprache', 'navigator.language und Accept-Language folgen Ihrer Auswahl.'],
+        ['Standort', 'Meldet einen Punkt im Ausgangsland statt Ihrer echten Position.'],
+        ['Proxy fällt aus', 'Kill Switch: Anfragen werden blockiert statt direkt gesendet.'],
+      ], download: 'NoLeaker laden', source: 'Quellcode auf GitHub', pair: 'Mit V2Mac verwenden Sie den Proxy 127.0.0.1:10808.',
+    },
+  },
+  articles: {
+    'v2rayn-for-mac': {
+      title: 'v2rayN für Mac: Vergleich mit V2Mac', description: 'Ein ehrlicher Vergleich von v2rayN und V2Mac auf macOS: Plattformen, Kerne, Oberfläche und Auswahlhilfe.',
+      heading: 'v2rayN für Mac und V2Mac', lede: 'v2rayN ist ein gutes, aktives Projekt und läuft auf macOS. V2Mac ist nur für eine Plattform gebaut. So entscheiden Sie.',
+      table: { head: ['', 'V2Mac', 'v2rayN'], rows: [
+        ['Plattform', 'macOS 26+, Apple Silicon', 'Windows, Linux, macOS (Intel und Apple Silicon)'],
+        ['Kerne', 'Xray-core', 'Xray, sing-box und weitere'], ['Oberfläche', 'Natives SwiftUI in der Menüleiste', 'Plattformübergreifende Desktop-App'],
+        ['Apps mit eigener VM und eigenem Server', 'Ja, sichere Sandbox (Beta)', 'Nein'], ['Lizenz', 'GPL-3.0', 'GPL-3.0'],
+      ] },
+      sections: [
+        { h: 'Wählen Sie v2rayN, wenn', list: ['Sie einen Intel-Mac oder macOS vor Version 26 verwenden. V2Mac läuft dort nicht.', 'Sie sing-box oder einen anderen Kern möchten.', 'Sie dieselbe App auch unter Windows oder Linux verwenden möchten.'] },
+        { h: 'Wählen Sie V2Mac, wenn', list: ['Sie eine App möchten, die sich wie der Rest Ihres Macs anfühlt.', 'Sie nach App und Host routen oder von Proxifier wechseln.', 'Sie einige Apps in einer Mini-VM mit eigenem Server ausführen möchten.'] },
+        { h: 'Umsteigen', body: 'V2Mac importiert Routingregeln aus v2rayN. Server übertragen Sie als Abonnement-URL oder Freigabelinks: Fügen Sie diese unter Abonnement hinzufügen (⌘N) ein.' },
+        { h: 'Gut zu wissen', body: 'Das V2Mac-DMG ist nicht notarisiert. macOS verlangt daher eine Freigabe beim ersten Start. Mit Homebrew entfällt diese Abfrage.' },
+      ],
+    },
+    'v2rayx-alternative': {
+      title: 'V2RayX-Alternative für moderne Macs | V2Mac', description: 'V2RayX wurde am 12.01.2024 archiviert. V2Mac ist eine gepflegte native Alternative für Apple Silicon mit Xray-core, REALITY und Hysteria2.',
+      heading: 'Eine V2RayX-Alternative', lede: 'V2RayX hat Mac-Nutzern jahrelang gute Dienste geleistet. Das Repository wurde am 12. Januar 2024 archiviert und erhält keine Updates mehr.',
+      table: { head: ['', 'V2Mac', 'V2RayX'], rows: [
+        ['Status', 'Wird gepflegt', 'Seit 12.01.2024 archiviert'], ['Kern', 'Xray-core', 'v2ray-core'],
+        ['REALITY', 'Ja', 'Nein, REALITY stammt aus Xray'], ['Plattform', 'macOS 26+, Apple Silicon', 'Siehe Repository'], ['Lizenz', 'GPL-3.0', 'GPL-3.0'],
+      ] },
+      sections: [
+        { h: 'Umsteigen', body: 'V2Mac liest V2Ray- und Xray-Freigabelinks und -Abonnements. Xray-JSON-Konfigurationen können Sie auf das Fenster ziehen. Fügen Sie Ihre Abonnement-URL oder Links unter Abonnement hinzufügen (⌘N) ein.' },
+        { h: 'Wann V2Mac nicht passt', body: 'V2Mac benötigt macOS 26 oder neuer auf Apple Silicon. Auf Intel-Macs oder älterem macOS können Sie v2rayN verwenden, das weiterhin gepflegt wird und Intel sowie Apple Silicon unterstützt.' },
+      ],
+    },
+    'guides/vless-reality-mac': {
+      title: 'VLESS REALITY auf Mac verwenden | V2Mac', description: 'Mit V2Mac unter macOS einen VLESS-REALITY-Server verwenden: Link einfügen oder Details eingeben, tatsächliche Latenz testen und Apps darüber leiten.',
+      heading: 'VLESS REALITY auf einem Mac', lede: 'REALITY nutzt den Handshake einer echten Website, sodass Ihre Verbindung auf dem Übertragungsweg wie ein Besuch dieser Website aussieht. Sie benötigen einen entsprechenden Server von Ihrem Anbieter oder einen eigenen.',
+      sections: [
+        { h: '1. V2Mac installieren', body: install },
+        { h: '2. Server hinzufügen', body: 'Drücken Sie ⌘N und fügen Sie Ihre Abonnement-URL oder Ihren Link ein. Ein REALITY-Link sieht mit Ihren eigenen Werten so aus:', code: A['guides/vless-reality-mac'].sections[1].code },
+        { h: 'Oder manuell eingeben', body: 'Wählen Sie im selben Dialog Details manuell eingeben…. Wählen Sie REALITY unter Sicherheit und geben Sie SNI, Fingerabdruck, öffentlichen Schlüssel, Short ID und Spider X ein. Alle Werte stammen aus Ihren Servereinstellungen.' },
+        { h: '3. Testen und verbinden', body: 'Drücken Sie ⌘T für die tatsächliche Latenz: Eine Anfrage über den Server wird zeitlich gemessen. Doppelklicken Sie anschließend auf den Server. Die Verbindungsleiste zeigt das Ausgangsland. „Keine Antwort über diesen Server“ bedeutet, dass der Kern läuft, aber der Server keinen Datenverkehr weiterleitet.' },
+        { h: '4. Apps darüber leiten', body: 'Aktivieren Sie System-Proxy für Apps, die macOS-Einstellungen beachten, oder TUN für alle Apps und DNS-Anfragen. Eine einzelne App können Sie auf <code>127.0.0.1:10808</code> einstellen. Der Port unterstützt SOCKS5 und HTTP.' },
+        { h: 'Wenn der Browser Host-Regeln ignoriert', body: 'Browser verwenden QUIC auf UDP 443, wodurch Hostnamen verborgen werden. Aktivieren Sie QUIC blockieren im Fenster Regeln.' },
+      ],
+    },
+    'guides/hysteria2-mac': {
+      title: 'Hysteria2 auf Mac verwenden | V2Mac', description: 'Mit V2Mac unter macOS einen Hysteria2-Server verwenden: hy2-Link einfügen, Portwechsel oder Salamander einstellen und tatsächliche Latenz testen.',
+      heading: 'Hysteria2 auf einem Mac', lede: 'Hysteria2 verwendet QUIC über UDP und ist für verlustreiche Verbindungen ausgelegt. Auf dem Übertragungsweg sieht es wie verschlüsseltes QUIC aus. Sie benötigen einen entsprechenden Server von Ihrem Anbieter oder einen eigenen.',
+      sections: [
+        { h: '1. V2Mac installieren', body: install },
+        { h: '2. Server hinzufügen', body: 'Drücken Sie ⌘N und fügen Sie Ihre Abonnement-URL oder Ihren Link ein. V2Mac liest <code>hysteria2://</code> und <code>hy2://</code>. Mit Ihren eigenen Werten:', code: A['guides/hysteria2-mac'].sections[1].code },
+        { h: 'Optionale Einstellungen', body: 'Der Servereditor (⌘E) bietet Passwort, Salamander-Verschleierung, Portwechsel (Ports und Intervall), SNI, ALPN, Zertifikat-Pin und Unsichere Verbindung erlauben. Stimmen Sie diese auf Ihren Server ab.' },
+        { h: '3. Richtig testen', body: 'TCP-Ping zeigt für Hysteria2 „n/a“, da es UDP verwendet. Das ist normal. Verwenden Sie Tatsächliche Latenz (⌘T), um eine Anfrage durch den Server zu senden.' },
+        { h: '4. Verbinden', body: 'Doppelklicken Sie auf den Server und aktivieren Sie System-Proxy oder TUN. Oder stellen Sie eine einzelne App auf <code>127.0.0.1:10808</code> ein.' },
+        { h: 'Wenn die Verbindung fehlschlägt', body: 'Manche Netzwerke blockieren oder drosseln UDP. Portwechsel können helfen, wenn Ihr Server dafür eingerichtet ist. Versuchen Sie andernfalls einen Server mit anderem Protokoll. V2Mac kann eine ganze Gruppe gleichzeitig testen.' },
+      ],
+    },
+  } as typeof en.articles,
+};

@@ -4,6 +4,7 @@ import Base from './Base.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import LangLinks from '../components/LangLinks.astro';
 import { langOf, localize, strings } from '../i18n';
+import { docsHome } from '../docs';
 const { earth = false, ...head } = Astro.props;
 const lang = langOf(Astro.url.pathname), t = await strings(lang);
 ---
@@ -15,7 +16,7 @@ const lang = langOf(Astro.url.pathname), t = await strings(lang);
       <a href={localize(lang, '/sandbox/')}>{t.nav.sandbox}</a>
       <a href={localize(lang, '/noleaker/')}>{t.nav.noleaker}</a>
       <a href="/blog/">{t.nav.blog}</a>
-      <a href={localize(lang, '/docs/')}>{t.footer.links.docs}</a>
+      <a href={docsHome(lang)}>{t.footer.links.docs}</a>
     </nav>
     <LangLinks />
   </header>
