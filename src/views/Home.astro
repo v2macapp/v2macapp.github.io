@@ -2,7 +2,7 @@
 import { REPO_URL, faqPage } from '../strings';
 import { langOf, localize, strings } from '../i18n';
 import LangLinks from '../components/LangLinks.astro';
-import { DOWNLOAD_URL, downloadMeta, softwareApp } from '../releases';
+import { INTEL_DOWNLOAD_URL, DOWNLOAD_URL, downloadMeta, softwareApp } from '../releases';
 import Base from '../layouts/Base.astro';
 import Faq from '../components/Faq.astro';
 import Shield from '../components/Shield.astro';
@@ -30,6 +30,7 @@ const website = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'V
         <p class="lede">{t.hero.lede}</p>
         <div class="actions">
           <a class="button primary download" href={DOWNLOAD_URL}>{t.hero.download}</a>
+          <a class="button download" href={INTEL_DOWNLOAD_URL}>{t.hero.downloadIntel}</a>
           <a class="button" href={REPO_URL}>{t.hero.source}</a>
         </div>
         <p class="meta">{downloadMeta}</p>

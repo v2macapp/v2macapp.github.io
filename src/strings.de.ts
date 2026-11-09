@@ -1,17 +1,18 @@
 import { en } from './strings';
 
-const install = 'Mit Homebrew: <code>brew install --cask v2macapp/tap/v2mac</code>. Oder verwenden Sie das DMG und klicken Sie beim ersten Start unter Systemeinstellungen → Datenschutz &amp; Sicherheit auf Dennoch öffnen. Benötigt macOS 26 oder neuer auf Apple Silicon.';
+const install = 'Mit Homebrew: <code>brew install --cask v2macapp/tap/v2mac</code>. Oder verwenden Sie das DMG und klicken Sie beim ersten Start unter Systemeinstellungen → Datenschutz &amp; Sicherheit auf Dennoch öffnen. Benötigt macOS 14 oder neuer auf Apple Silicon / Intel.';
 const asks = ['Zwischenablage verwenden', 'Den freigegebenen Ordner dieser Mini-VM lesen und beschreiben', 'Nach Ihrer Erlaubnis SSH-Schlüssel aus dem ssh-agent Ihres Macs verwenden', 'Nach Ihrer Erlaubnis Ton wiedergeben', 'Nach Ihrer Erlaubnis das Mikrofon verwenden'];
 const A = en.articles;
 
 export const de: typeof en = {
   ...en,
   title: 'V2Mac: nativer Xray- und V2Ray-Client für Mac',
-  description: 'Kostenloser Xray-core- und V2Ray-Client für Mac mit offenem Quellcode. VLESS, REALITY, Hysteria2, Trojan und Shadowsocks in einer nativen SwiftUI-Menüleisten-App für Apple Silicon.',
+  description: 'Kostenloser Xray-core- und V2Ray-Client für Mac mit offenem Quellcode. VLESS, REALITY, Hysteria2, Trojan und Shadowsocks in einer nativen SwiftUI-Menüleisten-App für Apple Silicon / Intel.',
   hero: {
     name: 'V2Mac', tagline: 'Ein nativer macOS-Client für Xray-core.',
     lede: 'VLESS, REALITY, Hysteria2, Trojan und Shadowsocks in einer schnellen SwiftUI-Menüleisten-App. Ohne Electron, ohne Telemetrie.',
     download: 'Für Mac laden', source: 'Quellcode auf GitHub', scroll: 'Scrollen',
+    downloadIntel: 'Intel-Mac',
   },
   app: {
     title: 'Das ist V2Mac.', icon: 'Das V2Mac-App-Symbol',
@@ -79,7 +80,7 @@ export const de: typeof en = {
     { q: 'Wie leite ich alle Apps über den Proxy, auch ohne eigene Proxy-Einstellungen?', a: 'Aktivieren Sie TUN. Dann laufen jede App und jede DNS-Anfrage über die Verbindung.' },
     { q: 'Kann ich es als Proxifier-Ersatz verwenden?', a: 'Ja. Es bietet Regeln nach App und Host, importiert aus Proxifier, Clash, sing-box, v2rayN und Shadowrocket und kann QUIC blockieren.' },
     { q: 'Können andere Geräte in meinem Netzwerk es verwenden?', a: 'Ja. Aktivieren Sie unter Einstellungen → Proxy die Option Verbindungen aus dem LAN erlauben, am besten mit Benutzername und Passwort. Stellen Sie auf dem anderen Gerät die LAN-Adresse und den Port Ihres Macs ein.' },
-    { q: 'Funktioniert es auf Intel-Macs oder älterem macOS?', a: 'Nein. Es benötigt macOS 26 oder neuer auf Apple Silicon.' },
+    { q: 'Funktioniert es auf Intel-Macs oder älterem macOS?', a: 'Ja. V2Mac unterstützt macOS 14 oder neuer auf Apple Silicon und Intel. Die Sandbox benötigt Apple Silicon und macOS 26 oder neuer.' },
     { q: 'Warum meldet macOS, dass es nicht geöffnet werden kann?', a: 'Das DMG ist nicht notarisiert. Klicken Sie unter Systemeinstellungen → Datenschutz & Sicherheit auf Dennoch öffnen oder installieren Sie mit Homebrew: brew install --cask v2macapp/tap/v2mac.' },
     { q: 'Sammelt V2Mac Daten?', a: 'Nein. Es gibt keine Telemetrie. Ein Problembericht wird nur übermittelt, wenn Sie ihn selbst auf GitHub einfügen.' },
     { q: 'Wie verhindere ich WebRTC- und DNS-Datenlecks im Browser?', a: 'Verwenden Sie NoLeaker, die kostenlose Chrome- und Firefox-Erweiterung desselben Projekts, mit dem Proxy 127.0.0.1:10808.' },
@@ -130,7 +131,7 @@ export const de: typeof en = {
     apps: { title: 'Apps und eigene Entwicklung', text: 'Chromium ist bereits im Store. Entwickler können mit der Plugin-Vorlage eigene Apps erstellen und beim Store einreichen.', template: 'Plugin-Vorlage', store: 'Der Store' },
     cost: {
       title: 'Was es benötigt', items: ['Vor dem ersten Öffnen der Sandbox wird nichts heruntergeladen. Der Dialog zeigt die Größe vorab.', 'Sie bestimmen das maximale Arbeitsspeicherlimit.', 'Sie startet beim Öffnen einer Sandbox-App und stoppt 5 Minuten nach dem Schließen der letzten App.', 'Sandbox entfernen löscht die Sandbox, alle Mini-VMs samt Daten und die Sandbox-Apps.'],
-      betaTitle: 'Es ist eine Beta', beta: 'Rechnen Sie mit Ecken und Kanten und einer kurzen App-Liste. Sandbox-Apps laufen niemals ohne V2Mac. Beim Beenden fragt V2Mac, ob es sie ebenfalls beenden soll. Wie V2Mac benötigt die Sandbox macOS 26 oder neuer auf Apple Silicon.',
+      betaTitle: 'Es ist eine Beta', beta: 'Rechnen Sie mit Ecken und Kanten und einer kurzen App-Liste. Sandbox-Apps laufen niemals ohne V2Mac. Beim Beenden fragt V2Mac, ob es sie ebenfalls beenden soll. Die Sandbox benötigt macOS 26 oder neuer auf Apple Silicon.',
     },
     faq: [
       { q: 'Kann ich eine einzelne Mac-App über einen VPN-Server ausführen?', a: 'Ja. Legen Sie die App in eine Mini-VM und wählen Sie einen Server. Die App erreicht das Internet ausschließlich darüber. Sie läuft weiter, während der übrige Mac einen anderen oder keinen Server verwendet.' },
@@ -182,27 +183,27 @@ export const de: typeof en = {
       title: 'v2rayN für Mac: Vergleich mit V2Mac', description: 'Ein ehrlicher Vergleich von v2rayN und V2Mac auf macOS: Plattformen, Kerne, Oberfläche und Auswahlhilfe.',
       heading: 'v2rayN für Mac und V2Mac', lede: 'v2rayN ist ein gutes, aktives Projekt und läuft auf macOS. V2Mac ist nur für eine Plattform gebaut. So entscheiden Sie.',
       table: { head: ['', 'V2Mac', 'v2rayN'], rows: [
-        ['Plattform', 'macOS 26+, Apple Silicon', 'Windows, Linux, macOS (Intel und Apple Silicon)'],
+        ['Plattform', 'macOS 14+, Apple Silicon / Intel', 'Windows, Linux, macOS (Intel und Apple Silicon)'],
         ['Kerne', 'Xray-core', 'Xray, sing-box und weitere'], ['Oberfläche', 'Natives SwiftUI in der Menüleiste', 'Plattformübergreifende Desktop-App'],
         ['Apps mit eigener VM und eigenem Server', 'Ja, sichere Sandbox (Beta)', 'Nein'], ['Lizenz', 'GPL-3.0', 'GPL-3.0'],
       ] },
       sections: [
-        { h: 'Wählen Sie v2rayN, wenn', list: ['Sie einen Intel-Mac oder macOS vor Version 26 verwenden. V2Mac läuft dort nicht.', 'Sie sing-box oder einen anderen Kern möchten.', 'Sie dieselbe App auch unter Windows oder Linux verwenden möchten.'] },
+        { h: 'Wählen Sie v2rayN, wenn', list: ['Sie macOS vor Version 14 verwenden. V2Mac benötigt macOS 14 oder neuer.', 'Sie sing-box oder einen anderen Kern möchten.', 'Sie dieselbe App auch unter Windows oder Linux verwenden möchten.'] },
         { h: 'Wählen Sie V2Mac, wenn', list: ['Sie eine App möchten, die sich wie der Rest Ihres Macs anfühlt.', 'Sie nach App und Host routen oder von Proxifier wechseln.', 'Sie einige Apps in einer Mini-VM mit eigenem Server ausführen möchten.'] },
         { h: 'Umsteigen', body: 'V2Mac importiert Routingregeln aus v2rayN. Server übertragen Sie als Abonnement-URL oder Freigabelinks: Fügen Sie diese unter Abonnement hinzufügen (⌘N) ein.' },
         { h: 'Gut zu wissen', body: 'Das V2Mac-DMG ist nicht notarisiert. macOS verlangt daher eine Freigabe beim ersten Start. Mit Homebrew entfällt diese Abfrage.' },
       ],
     },
     'v2rayx-alternative': {
-      title: 'V2RayX-Alternative für moderne Macs | V2Mac', description: 'V2RayX wurde am 12.01.2024 archiviert. V2Mac ist eine gepflegte native Alternative für Apple Silicon mit Xray-core, REALITY und Hysteria2.',
+      title: 'V2RayX-Alternative für moderne Macs | V2Mac', description: 'V2RayX wurde am 12.01.2024 archiviert. V2Mac ist eine gepflegte native Alternative für Apple Silicon / Intel mit Xray-core, REALITY und Hysteria2.',
       heading: 'Eine V2RayX-Alternative', lede: 'V2RayX hat Mac-Nutzern jahrelang gute Dienste geleistet. Das Repository wurde am 12. Januar 2024 archiviert und erhält keine Updates mehr.',
       table: { head: ['', 'V2Mac', 'V2RayX'], rows: [
         ['Status', 'Wird gepflegt', 'Seit 12.01.2024 archiviert'], ['Kern', 'Xray-core', 'v2ray-core'],
-        ['REALITY', 'Ja', 'Nein, REALITY stammt aus Xray'], ['Plattform', 'macOS 26+, Apple Silicon', 'Siehe Repository'], ['Lizenz', 'GPL-3.0', 'GPL-3.0'],
+        ['REALITY', 'Ja', 'Nein, REALITY stammt aus Xray'], ['Plattform', 'macOS 14+, Apple Silicon / Intel', 'Siehe Repository'], ['Lizenz', 'GPL-3.0', 'GPL-3.0'],
       ] },
       sections: [
         { h: 'Umsteigen', body: 'V2Mac liest V2Ray- und Xray-Freigabelinks und -Abonnements. Xray-JSON-Konfigurationen können Sie auf das Fenster ziehen. Fügen Sie Ihre Abonnement-URL oder Links unter Abonnement hinzufügen (⌘N) ein.' },
-        { h: 'Wann V2Mac nicht passt', body: 'V2Mac benötigt macOS 26 oder neuer auf Apple Silicon. Auf Intel-Macs oder älterem macOS können Sie v2rayN verwenden, das weiterhin gepflegt wird und Intel sowie Apple Silicon unterstützt.' },
+        { h: 'Wann V2Mac nicht passt', body: 'V2Mac benötigt macOS 14 oder neuer auf Apple Silicon oder Intel. Auf macOS vor Version 14 können Sie v2rayN verwenden, das weiterhin gepflegt wird und Intel sowie Apple Silicon unterstützt.' },
       ],
     },
     'guides/vless-reality-mac': {

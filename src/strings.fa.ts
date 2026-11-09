@@ -1,19 +1,20 @@
 // Persian. Names of buttons and settings follow the app (Localizable.xcstrings) and ../wiki/fa-*.md.
 import { en } from './strings';
 
-const install = 'با Homebrew: <code>brew install --cask v2macapp/tap/v2mac</code>. یا از DMG استفاده کنید و بار اول در System Settings → Privacy &amp; Security روی Open Anyway بزنید. به macOS 26 یا جدیدتر روی Apple Silicon نیاز دارد.';
+const install = 'با Homebrew: <code>brew install --cask v2macapp/tap/v2mac</code>. یا از DMG استفاده کنید و بار اول در System Settings → Privacy &amp; Security روی Open Anyway بزنید. به macOS 14 یا جدیدتر روی Apple Silicon / Intel نیاز دارد.';
 const asks = ['استفاده از کلیپ‌بورد', 'خواندن و نوشتن در پوشهٔ Shared این ماشین مجازی کوچک', 'استفاده از کلیدهای SSH در ssh-agent مک، پس از پرسیدن از شما', 'پخش صدا، پس از پرسیدن از شما', 'استفاده از میکروفون، پس از پرسیدن از شما'];
 const A = en.articles;
 
 export const fa: typeof en = {
   ...en,
   title: 'V2Mac: کلاینت بومی Xray و V2Ray برای مک',
-  description: 'کلاینت رایگان و متن‌باز Xray-core و V2Ray برای مک. VLESS، REALITY، Hysteria2، Trojan و Shadowsocks در یک برنامهٔ بومی SwiftUI در نوار منو برای Apple Silicon.',
+  description: 'کلاینت رایگان و متن‌باز Xray-core و V2Ray برای مک. VLESS، REALITY، Hysteria2، Trojan و Shadowsocks در یک برنامهٔ بومی SwiftUI در نوار منو برای Apple Silicon / Intel.',
   hero: {
     name: 'V2Mac',
     tagline: 'کلاینت بومی macOS برای Xray-core.',
     lede: 'VLESS، REALITY، Hysteria2، Trojan و Shadowsocks در یک برنامهٔ سریع SwiftUI در نوار منو. بدون Electron، بدون تله‌متری.',
     download: 'دانلود برای مک',
+    downloadIntel: 'مک Intel',
     source: 'سورس در GitHub',
     scroll: 'اسکرول کنید',
   },
@@ -99,7 +100,7 @@ export const fa: typeof en = {
     { q: 'چطور همهٔ برنامه‌ها، حتی آن‌هایی که تنظیم پروکسی ندارند، را از پروکسی بگذرانم؟', a: 'TUN را روشن کنید. آن‌وقت هر برنامه و هر جست‌وجوی DNS از اتصال می‌گذرد.' },
     { q: 'می‌توانم آن را به‌جای Proxifier استفاده کنم؟', a: 'بله. قانون بر اساس برنامه و میزبان دارد، از Proxifier، Clash، sing-box، v2rayN و Shadowrocket وارد می‌کند و می‌تواند QUIC را مسدود کند.' },
     { q: 'دستگاه‌های دیگر شبکه‌ام می‌توانند از آن استفاده کنند؟', a: 'بله. «اجازه اتصال از شبکه محلی» را در تنظیمات ← Proxy روشن کنید، بهتر است با نام کاربری و گذرواژه، سپس دستگاه دیگر را به آدرس شبکهٔ محلی و پورت مک خود وصل کنید.' },
-    { q: 'روی مک‌های Intel یا macOS قدیمی‌تر کار می‌کند؟', a: 'نه. به macOS 26 یا جدیدتر روی Apple Silicon نیاز دارد.' },
+    { q: 'روی مک‌های Intel یا macOS قدیمی‌تر کار می‌کند؟', a: 'بله. macOS 14 یا جدیدتر روی Apple Silicon و Intel پشتیبانی می‌شود. سندباکس به Apple Silicon و macOS 26 یا جدیدتر نیاز دارد.' },
     { q: 'چرا macOS می‌گوید نمی‌تواند آن را باز کند؟', a: 'فایل DMG نوتاریز نشده است. در System Settings → Privacy & Security روی Open Anyway بزنید یا با Homebrew نصب کنید: brew install --cask v2macapp/tap/v2mac.' },
     { q: 'آیا V2Mac داده جمع می‌کند؟', a: 'نه. تله‌متری ندارد و گزارش مشکل فقط وقتی فرستاده می‌شود که خودتان آن را در GitHub بچسبانید.' },
     { q: 'چطور جلوی نشت WebRTC و DNS را در مرورگرم بگیرم؟', a: 'از NoLeaker استفاده کنید، افزونهٔ رایگان Chrome و Firefox از همین پروژه، با پروکسی 127.0.0.1:10808.' },
@@ -177,7 +178,7 @@ export const fa: typeof en = {
       title: 'چه هزینه‌ای برایتان دارد',
       items: ['تا اولین باری که سندباکس را باز کنید چیزی دانلود نمی‌شود. برگه اول حجم را نشان می‌دهد.', 'بیشترین حافظهٔ قابل استفاده را خودتان تعیین می‌کنید.', 'با باز کردن یک برنامهٔ سندباکس شروع می‌شود و ۵ دقیقه پس از بسته شدن آخرین برنامه متوقف می‌شود.', '«حذف سندباکس…» سندباکس، همهٔ ماشین‌های مجازی کوچک با داده‌هایشان و برنامه‌های سندباکس را پاک می‌کند.'],
       betaTitle: 'این نسخهٔ بتاست',
-      beta: 'منتظر نقص‌های کوچک و فهرست کوتاهی از برنامه‌ها باشید. برنامه‌های سندباکس هرگز بدون V2Mac اجرا نمی‌شوند: هنگام خروج از V2Mac می‌پرسد آن‌ها هم بسته شوند یا نه. مثل V2Mac به macOS 26 یا جدیدتر روی Apple Silicon نیاز دارد.',
+      beta: 'منتظر نقص‌های کوچک و فهرست کوتاهی از برنامه‌ها باشید. برنامه‌های سندباکس هرگز بدون V2Mac اجرا نمی‌شوند: هنگام خروج از V2Mac می‌پرسد آن‌ها هم بسته شوند یا نه. به macOS 26 یا جدیدتر روی Apple Silicon نیاز دارد.',
     },
     faq: [
       { q: 'می‌توانم فقط یک برنامه را در مک از سرور VPN بگذرانم؟', a: 'بله. برنامه را در یک ماشین مجازی کوچک بگذارید و برایش سرور انتخاب کنید. هیچ کاری از آن برنامه از راه دیگری به اینترنت نمی‌رسد و بقیهٔ مک می‌تواند از سرور دیگری یا بدون سرور کار کند.' },
@@ -242,7 +243,7 @@ export const fa: typeof en = {
       table: {
         head: ['', 'V2Mac', 'v2rayN'],
         rows: [
-          ['اجرا روی', 'macOS 26+، Apple Silicon', 'Windows، Linux، macOS (Intel و Apple Silicon)'],
+          ['اجرا روی', 'macOS 14+، Apple Silicon / Intel', 'Windows، Linux، macOS (Intel و Apple Silicon)'],
           ['هسته‌ها', 'Xray-core', 'Xray، sing-box و دیگران'],
           ['رابط کاربری', 'SwiftUI بومی، در نوار منو', 'برنامهٔ دسکتاپ چندسکویی'],
           ['برنامه‌ها در VM و سرور جداگانه', 'بله، سندباکس امن (بتا)', 'نه'],
@@ -250,7 +251,7 @@ export const fa: typeof en = {
         ],
       },
       sections: [
-        { h: 'v2rayN را انتخاب کنید اگر', list: ['مک Intel یا macOS قدیمی‌تر از 26 دارید. V2Mac آنجا اجرا نمی‌شود.', 'sing-box یا هستهٔ دیگری می‌خواهید.', 'همان برنامه را روی Windows یا Linux هم می‌خواهید.'] },
+        { h: 'v2rayN را انتخاب کنید اگر', list: ['macOS قدیمی‌تر از 14 دارید. V2Mac به macOS 14 یا جدیدتر نیاز دارد.', 'sing-box یا هستهٔ دیگری می‌خواهید.', 'همان برنامه را روی Windows یا Linux هم می‌خواهید.'] },
         { h: 'V2Mac را انتخاب کنید اگر', list: ['برنامه‌ای می‌خواهید که شکل و رفتارش مثل بقیهٔ مک باشد.', 'بر اساس برنامه و میزبان مسیریابی می‌کنید یا از Proxifier می‌آیید.', 'می‌خواهید بعضی برنامه‌ها در ماشین مجازی کوچکی با سرور خودشان باشند.'] },
         { h: 'مهاجرت', body: 'V2Mac قانون‌های مسیریابی را از v2rayN وارد می‌کند. سرورها به‌صورت URL اشتراک یا لینک اشتراک‌گذاری منتقل می‌شوند: آن‌ها را در «افزودن اشتراک» (⌘N) بچسبانید.' },
         { h: 'یک نکته', body: 'DMG برنامهٔ V2Mac نوتاریز نشده، پس macOS برای اولین اجرا از شما تأیید می‌خواهد. Homebrew از این مرحله رد می‌شود.' },
@@ -258,7 +259,7 @@ export const fa: typeof en = {
     },
     'v2rayx-alternative': {
       title: 'جایگزین V2RayX برای مک‌های جدید | V2Mac',
-      description: 'V2RayX در ۱۲ ژانویهٔ ۲۰۲۴ آرشیو شد. V2Mac جایگزین بومی و فعال برای Apple Silicon با Xray-core، REALITY و Hysteria2 است.',
+      description: 'V2RayX در ۱۲ ژانویهٔ ۲۰۲۴ آرشیو شد. V2Mac جایگزین بومی و فعال برای Apple Silicon / Intel با Xray-core، REALITY و Hysteria2 است.',
       heading: 'جایگزینی برای V2RayX',
       lede: 'V2RayX سال‌ها به کاربران مک خدمت کرد. مخزن آن در ۱۲ ژانویهٔ ۲۰۲۴ آرشیو شد، پس دیگر به‌روزرسانی نمی‌گیرد.',
       table: {
@@ -267,13 +268,13 @@ export const fa: typeof en = {
           ['وضعیت', 'فعال', 'آرشیوشده در 2024-01-12'],
           ['هسته', 'Xray-core', 'v2ray-core'],
           ['REALITY', 'بله', 'نه، REALITY از Xray می‌آید'],
-          ['اجرا روی', 'macOS 26+، Apple Silicon', 'مخزن آن را ببینید'],
+          ['اجرا روی', 'macOS 14+، Apple Silicon / Intel', 'مخزن آن را ببینید'],
           ['مجوز', 'GPL-3.0', 'GPL-3.0'],
         ],
       },
       sections: [
         { h: 'مهاجرت', body: 'V2Mac لینک‌ها و اشتراک‌های V2Ray و Xray را می‌خواند و می‌توانید پیکربندی‌های JSON برنامهٔ Xray را روی پنجره‌اش بیندازید. URL اشتراک یا لینک‌ها را با «افزودن اشتراک» (⌘N) اضافه کنید.' },
-        { h: 'وقتی V2Mac پاسخ نیست', body: 'V2Mac به macOS 26 یا جدیدتر روی Apple Silicon نیاز دارد. روی مک Intel یا macOS قدیمی‌تر سراغ v2rayN بروید که هنوز نگهداری می‌شود و از Intel و Apple Silicon پشتیبانی می‌کند.' },
+        { h: 'وقتی V2Mac پاسخ نیست', body: 'V2Mac به macOS 14 یا جدیدتر روی Apple Silicon یا Intel نیاز دارد. روی macOS قدیمی‌تر از 14 سراغ v2rayN بروید که هنوز نگهداری می‌شود و از Intel و Apple Silicon پشتیبانی می‌کند.' },
       ],
     },
     'guides/vless-reality-mac': {

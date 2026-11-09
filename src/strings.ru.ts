@@ -1,19 +1,20 @@
 // Russian. Names of buttons and settings follow the app (Localizable.xcstrings) and ../wiki/ru-*.md.
 import { en } from './strings';
 
-const install = 'Через Homebrew: <code>brew install --cask v2macapp/tap/v2mac</code>. Или через DMG: при первом запуске нажмите Open Anyway в System Settings → Privacy &amp; Security. Нужна macOS 26 или новее на Apple Silicon.';
+const install = 'Через Homebrew: <code>brew install --cask v2macapp/tap/v2mac</code>. Или через DMG: при первом запуске нажмите Open Anyway в System Settings → Privacy &amp; Security. Нужна macOS 14 или новее на Apple Silicon / Intel.';
 const asks = ['Использовать буфер обмена', 'Читать и записывать папку Shared этой мини-ВМ', 'Использовать ключи SSH из ssh-agent вашего Mac, спросив вас', 'Воспроизводить звук, спросив вас', 'Использовать микрофон, спросив вас'];
 const A = en.articles;
 
 export const ru: typeof en = {
   ...en,
   title: 'V2Mac: нативный клиент Xray и V2Ray для Mac',
-  description: 'Бесплатный клиент Xray-core и V2Ray для Mac с открытым кодом. VLESS, REALITY, Hysteria2, Trojan и Shadowsocks в нативном приложении SwiftUI в строке меню для Apple Silicon.',
+  description: 'Бесплатный клиент Xray-core и V2Ray для Mac с открытым кодом. VLESS, REALITY, Hysteria2, Trojan и Shadowsocks в нативном приложении SwiftUI в строке меню для Apple Silicon / Intel.',
   hero: {
     name: 'V2Mac',
     tagline: 'Нативный клиент Xray-core для macOS.',
     lede: 'VLESS, REALITY, Hysteria2, Trojan и Shadowsocks в быстром приложении SwiftUI в строке меню. Без Electron и без телеметрии.',
     download: 'Скачать для Mac',
+    downloadIntel: 'Mac на Intel',
     source: 'Исходный код на GitHub',
     scroll: 'Прокрутите',
   },
@@ -99,7 +100,7 @@ export const ru: typeof en = {
     { q: 'Как пустить через прокси все приложения, включая те, где нет настроек прокси?', a: 'Включите TUN. Тогда каждое приложение и каждый DNS-запрос пойдут через соединение.' },
     { q: 'Можно ли заменить им Proxifier?', a: 'Да. В нём есть правила по приложениям и хостам, импорт из Proxifier, Clash, sing-box, v2rayN и Shadowrocket и блокировка QUIC.' },
     { q: 'Могут ли им пользоваться другие устройства в моей сети?', a: 'Да. Включите «Разрешить подключения из локальной сети» в Настройки → Proxy, желательно с именем пользователя и паролем, затем укажите на другом устройстве локальный адрес и порт вашего Mac.' },
-    { q: 'Работает ли он на Intel Mac или старых версиях macOS?', a: 'Нет. Нужна macOS 26 или новее на Apple Silicon.' },
+    { q: 'Работает ли он на Intel Mac или старых версиях macOS?', a: 'Да. Поддерживаются macOS 14 и новее на Apple Silicon и Intel. Для песочницы нужны Apple Silicon и macOS 26 или новее.' },
     { q: 'Почему macOS говорит, что не может его открыть?', a: 'DMG не нотаризован. Нажмите Open Anyway в System Settings → Privacy & Security или установите через Homebrew: brew install --cask v2macapp/tap/v2mac.' },
     { q: 'Собирает ли V2Mac данные?', a: 'Нет. Телеметрии нет, а отчёт о проблеме отправляется, только если вы сами вставите его на GitHub.' },
     { q: 'Как остановить утечки WebRTC и DNS в браузере?', a: 'Используйте NoLeaker, бесплатное расширение для Chrome и Firefox из того же проекта, с прокси 127.0.0.1:10808.' },
@@ -177,7 +178,7 @@ export const ru: typeof en = {
       title: 'Чего это стоит',
       items: ['Пока вы впервые не откроете песочницу, ничего не скачивается. Сначала окно покажет размер.', 'Вы задаёте максимум памяти, который она может занять.', 'Она запускается, когда вы открываете приложение из песочницы, и останавливается через 5 минут после закрытия последнего.', '«Удалить песочницу…» удаляет песочницу, все мини-ВМ с их данными и приложения песочницы.'],
       betaTitle: 'Это бета-версия',
-      beta: 'Возможны шероховатости, а список приложений пока короткий. Приложения песочницы не работают без V2Mac: при выходе из V2Mac он спросит, закрыть ли и их. Как и V2Mac, ей нужна macOS 26 или новее на Apple Silicon.',
+      beta: 'Возможны шероховатости, а список приложений пока короткий. Приложения песочницы не работают без V2Mac: при выходе из V2Mac он спросит, закрыть ли и их. Ей нужна macOS 26 или новее на Apple Silicon.',
     },
     faq: [
       { q: 'Можно ли пустить через VPN-сервер только одно приложение на Mac?', a: 'Да. Поместите приложение в мини-ВМ и выберите для неё сервер. Иначе в интернет это приложение не попадёт, а остальной Mac может работать через другой сервер или без сервера.' },
@@ -242,7 +243,7 @@ export const ru: typeof en = {
       table: {
         head: ['', 'V2Mac', 'v2rayN'],
         rows: [
-          ['Работает на', 'macOS 26+, Apple Silicon', 'Windows, Linux, macOS (Intel и Apple Silicon)'],
+          ['Работает на', 'macOS 14+, Apple Silicon / Intel', 'Windows, Linux, macOS (Intel и Apple Silicon)'],
           ['Ядра', 'Xray-core', 'Xray, sing-box и другие'],
           ['Интерфейс', 'Нативный SwiftUI, в строке меню', 'Кроссплатформенное настольное приложение'],
           ['Приложения в своей ВМ и со своим сервером', 'Да, Безопасная песочница (бета)', 'Нет'],
@@ -250,7 +251,7 @@ export const ru: typeof en = {
         ],
       },
       sections: [
-        { h: 'Выбирайте v2rayN, если', list: ['У вас Intel Mac или macOS старше 26. V2Mac там не запустится.', 'Вам нужен sing-box или другое ядро.', 'Вам нужно то же приложение на Windows или Linux.'] },
+        { h: 'Выбирайте v2rayN, если', list: ['У вас macOS старше 14. V2Mac требует macOS 14 или новее.', 'Вам нужен sing-box или другое ядро.', 'Вам нужно то же приложение на Windows или Linux.'] },
         { h: 'Выбирайте V2Mac, если', list: ['Вам нужно приложение, которое выглядит и ведёт себя как остальной Mac.', 'Вы маршрутизируете по приложениям и хостам или переходите с Proxifier.', 'Вы хотите запускать некоторые приложения в мини-ВМ со своим сервером.'] },
         { h: 'Переход', body: 'V2Mac импортирует правила маршрутизации из v2rayN. Серверы переносятся как URL подписки или ссылки: вставьте их в «Добавить подписку» (⌘N).' },
         { h: 'Что нужно знать', body: 'DMG приложения V2Mac не нотаризован, поэтому macOS попросит подтвердить первый запуск. Homebrew обходит этот запрос.' },
@@ -258,7 +259,7 @@ export const ru: typeof en = {
     },
     'v2rayx-alternative': {
       title: 'Альтернатива V2RayX для современных Mac | V2Mac',
-      description: 'V2RayX архивирован 12 января 2024 года. V2Mac — поддерживаемая нативная альтернатива для Apple Silicon с Xray-core, REALITY и Hysteria2.',
+      description: 'V2RayX архивирован 12 января 2024 года. V2Mac — поддерживаемая нативная альтернатива для Apple Silicon / Intel с Xray-core, REALITY и Hysteria2.',
       heading: 'Альтернатива V2RayX',
       lede: 'V2RayX много лет служил пользователям Mac. Его репозиторий архивирован 12 января 2024 года, поэтому обновлений больше не будет.',
       table: {
@@ -267,13 +268,13 @@ export const ru: typeof en = {
           ['Состояние', 'Поддерживается', 'Архивирован 2024-01-12'],
           ['Ядро', 'Xray-core', 'v2ray-core'],
           ['REALITY', 'Да', 'Нет, REALITY появился в Xray'],
-          ['Работает на', 'macOS 26+, Apple Silicon', 'См. его репозиторий'],
+          ['Работает на', 'macOS 14+, Apple Silicon / Intel', 'См. его репозиторий'],
           ['Лицензия', 'GPL-3.0', 'GPL-3.0'],
         ],
       },
       sections: [
         { h: 'Переход', body: 'V2Mac читает ссылки и подписки V2Ray и Xray, а конфигурации Xray JSON можно перетащить на его окно. Добавьте URL подписки или ссылки через «Добавить подписку» (⌘N).' },
-        { h: 'Когда V2Mac не подойдёт', body: 'V2Mac нужна macOS 26 или новее на Apple Silicon. На Intel Mac или старой macOS посмотрите v2rayN: он всё ещё поддерживается и работает на Intel и Apple Silicon.' },
+        { h: 'Когда V2Mac не подойдёт', body: 'V2Mac нужна macOS 14 или новее на Apple Silicon или Intel. На macOS старше 14 посмотрите v2rayN: он всё ещё поддерживается и работает на Intel и Apple Silicon.' },
       ],
     },
     'guides/vless-reality-mac': {

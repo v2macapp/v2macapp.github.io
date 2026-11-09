@@ -18,12 +18,13 @@ async function load(): Promise<Release[]> {
 
 export const releases = await load();
 const latest = releases[0];
-const dmg = latest?.assets.find((a) => a.name === 'V2Mac.dmg') ?? latest?.assets.find((a) => /^V2Mac-.*\.dmg$/.test(a.name));
+const dmg = latest?.assets.find((a) => a.name === 'V2Mac.dmg') ?? latest?.assets.find((a) => /^V2Mac-[0-9.]+\.dmg$/.test(a.name));
 
 // Releases before the stable V2Mac.dmg asset fall back to the versioned file.
 export const DOWNLOAD_URL = dmg?.browser_download_url ?? 'https://github.com/v2macapp/v2mac/releases/latest';
+export const INTEL_DOWNLOAD_URL = 'https://github.com/v2macapp/v2mac/releases/latest/download/V2Mac-Intel.dmg';
 export const VERSION = latest?.tag_name.replace(/^v/, '');
-export const downloadMeta = [VERSION && `v${VERSION}`, dmg && `${Math.round(dmg.size / 1e6)} MB`, 'macOS 26+', 'Apple Silicon'].filter(Boolean).join(' · ');
+export const downloadMeta = [VERSION && `v${VERSION}`, dmg && `${Math.round(dmg.size / 1e6)} MB`, 'macOS 14+', 'Apple Silicon / Intel'].filter(Boolean).join(' · ');
 
 export const softwareApp = (description: string) => ({
   '@context': 'https://schema.org',
@@ -33,7 +34,7 @@ export const softwareApp = (description: string) => ({
   screenshot: 'https://v2macapp.github.io/app/main.webp',
   description,
   applicationCategory: 'UtilitiesApplication',
-  operatingSystem: 'macOS 26 or later, Apple Silicon',
+  operatingSystem: 'macOS 14 or later, Apple Silicon or Intel',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   downloadUrl: DOWNLOAD_URL,
   ...(VERSION ? { softwareVersion: VERSION } : {}),

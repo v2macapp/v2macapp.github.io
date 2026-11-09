@@ -2,12 +2,13 @@
 export const en = {
   title: 'V2Mac: native Xray and V2Ray client for Mac',
   description:
-    'Free, open-source Xray-core and V2Ray client for Mac. VLESS, REALITY, Hysteria2, Trojan and Shadowsocks in a native SwiftUI menu bar app for Apple Silicon.',
+    'Free, open-source Xray-core and V2Ray client for Mac. VLESS, REALITY, Hysteria2, Trojan and Shadowsocks in a native SwiftUI menu bar app for Apple Silicon / Intel.',
   hero: {
     name: 'V2Mac',
     tagline: 'A native macOS client for Xray-core.',
     lede: 'VLESS, REALITY, Hysteria2, Trojan and Shadowsocks in a fast SwiftUI menu bar app. No Electron, no telemetry.',
     download: 'Download for Mac',
+    downloadIntel: 'Intel Mac',
     source: 'Source on GitHub',
     scroll: 'Scroll',
   },
@@ -101,7 +102,7 @@ export const en = {
     { q: 'How do I proxy all apps, including ones without proxy settings?', a: 'Turn on TUN. Every app and every DNS lookup then goes through the connection.' },
     { q: 'Can I use it as a Proxifier replacement?', a: 'Yes. It has rules by app and host, imports from Proxifier, Clash, sing-box, v2rayN and Shadowrocket, and can block QUIC.' },
     { q: 'Can other devices on my network use it?', a: 'Yes. Turn on Allow connections from LAN in Settings → Proxy, ideally with a username and password, then point the other device at your Mac’s LAN address and port.' },
-    { q: 'Does it work on Intel Macs or older macOS?', a: 'No. It needs macOS 26 or later on Apple Silicon.' },
+    { q: 'Does it work on Intel Macs or older macOS?', a: 'Yes. V2Mac supports macOS 14 or later on Apple Silicon and Intel. Secure Sandbox needs Apple Silicon and macOS 26 or later.' },
     { q: 'Why does macOS say it can’t be opened?', a: 'The DMG is not notarized. Click Open Anyway in System Settings → Privacy & Security, or install with Homebrew: brew install --cask v2macapp/tap/v2mac.' },
     { q: 'Does V2Mac collect data?', a: 'No. There is no telemetry, and a problem report is only sent if you paste it into GitHub yourself.' },
     { q: 'How do I stop WebRTC and DNS leaks in my browser?', a: 'Use NoLeaker, a free Chrome and Firefox extension from the same project, with the proxy 127.0.0.1:10808.' },
@@ -189,7 +190,7 @@ export const en = {
       title: 'What it costs you',
       items: ['Nothing downloads until you open the sandbox for the first time. The sheet shows the size first.', 'You set the most memory it may use.', 'It starts when you open a sandbox app and stops 5 minutes after the last one closes.', 'Remove Sandbox deletes the sandbox, every mini VM with its data, and the sandbox apps.'],
       betaTitle: 'It’s a beta',
-      beta: 'Expect rough edges and a short list of apps. Sandbox apps never run without V2Mac: quitting V2Mac asks whether to quit them too. It needs macOS 26 or later on Apple Silicon, like V2Mac.',
+      beta: 'Expect rough edges and a short list of apps. Sandbox apps never run without V2Mac: quitting V2Mac asks whether to quit them too. It needs macOS 26 or later on Apple Silicon.',
     },
     faq: [
       { q: 'Can I run one app through a VPN server on my Mac?', a: 'Yes. Put the app in a mini VM and pick a server for it. Nothing that app does reaches the internet any other way. It keeps working while the rest of your Mac uses another server or no server.' },
@@ -262,7 +263,7 @@ export const en = {
       table: {
         head: ['', 'V2Mac', 'v2rayN'],
         rows: [
-          ['Runs on', 'macOS 26+, Apple Silicon', 'Windows, Linux, macOS (Intel and Apple Silicon)'],
+          ['Runs on', 'macOS 14+, Apple Silicon / Intel', 'Windows, Linux, macOS (Intel and Apple Silicon)'],
           ['Cores', 'Xray-core', 'Xray, sing-box and others'],
           ['Interface', 'Native SwiftUI, in the menu bar', 'Cross-platform desktop app'],
           ['Apps in their own VM and server', 'Yes, Secure Sandbox (beta)', 'No'],
@@ -270,7 +271,7 @@ export const en = {
         ],
       },
       sections: [
-        { h: 'Pick v2rayN if', list: ['You have an Intel Mac, or a macOS older than 26. V2Mac won’t run there.', 'You want sing-box or another core.', 'You want the same app on Windows or Linux too.'] },
+        { h: 'Pick v2rayN if', list: ['You use macOS older than 14. V2Mac requires macOS 14 or later.', 'You want sing-box or another core.', 'You want the same app on Windows or Linux too.'] },
         { h: 'Pick V2Mac if', list: ['You want an app that looks and behaves like the rest of your Mac.', 'You route by app and host, or are moving from Proxifier.', 'You want some apps in a mini VM with their own server.'] },
         { h: 'Moving over', body: 'V2Mac imports routing rules from v2rayN. Servers come over as a subscription URL or as share links: paste them into Add Subscription (⌘N).' },
         { h: 'One thing to know', body: 'V2Mac’s DMG is not notarized, so macOS asks you to approve the first launch. Homebrew skips that prompt.' },
@@ -278,7 +279,7 @@ export const en = {
     },
     'v2rayx-alternative': {
       title: 'V2RayX alternative for modern Macs | V2Mac',
-      description: 'V2RayX was archived on 2024-01-12. V2Mac is a maintained native alternative for Apple Silicon with Xray-core, REALITY and Hysteria2.',
+      description: 'V2RayX was archived on 2024-01-12. V2Mac is a maintained native alternative for Apple Silicon / Intel with Xray-core, REALITY and Hysteria2.',
       heading: 'A V2RayX alternative',
       lede: 'V2RayX served Mac users for years. Its repository was archived on 12 January 2024, so it gets no more updates.',
       table: {
@@ -287,13 +288,13 @@ export const en = {
           ['State', 'Maintained', 'Archived on 2024-01-12'],
           ['Core', 'Xray-core', 'v2ray-core'],
           ['REALITY', 'Yes', 'No, REALITY comes from Xray'],
-          ['Runs on', 'macOS 26+, Apple Silicon', 'See its repository'],
+          ['Runs on', 'macOS 14+, Apple Silicon / Intel', 'See its repository'],
           ['License', 'GPL-3.0', 'GPL-3.0'],
         ],
       },
       sections: [
         { h: 'Moving over', body: 'V2Mac reads V2Ray and Xray share links and subscriptions, and you can drop Xray JSON configs on its window. Add your subscription URL or links with Add Subscription (⌘N).' },
-        { h: 'When V2Mac is not the answer', body: 'V2Mac needs macOS 26 or later on Apple Silicon. On an Intel Mac or older macOS, look at v2rayN, which is still maintained and supports both Intel and Apple Silicon.' },
+        { h: 'When V2Mac is not the answer', body: 'V2Mac needs macOS 14 or later on Apple Silicon or Intel. On macOS older than 14, look at v2rayN, which is still maintained and supports both Intel and Apple Silicon.' },
       ],
     },
     'guides/vless-reality-mac': {
@@ -302,7 +303,7 @@ export const en = {
       heading: 'VLESS REALITY on a Mac',
       lede: 'REALITY borrows a real website’s handshake, so to anyone on the path your connection looks like a visit to that site. You need a server that offers it, from your provider or your own.',
       sections: [
-        { h: '1. Install V2Mac', body: 'With Homebrew: <code>brew install --cask v2macapp/tap/v2mac</code>. Or use the DMG, and click Open Anyway in System Settings → Privacy &amp; Security the first time. It needs macOS 26 or later on Apple Silicon.' },
+        { h: '1. Install V2Mac', body: 'With Homebrew: <code>brew install --cask v2macapp/tap/v2mac</code>. Or use the DMG, and click Open Anyway in System Settings → Privacy &amp; Security the first time. It needs macOS 14 or later on Apple Silicon / Intel.' },
         { h: '2. Add the server', body: 'Press ⌘N and paste your subscription URL or your link. A REALITY link looks like this, with your own values:', code: 'vless://UUID@server.example.com:443?security=reality&sni=www.example.com&pbk=PUBLIC_KEY&sid=SHORT_ID&fp=chrome&type=tcp&flow=xtls-rprx-vision#My%20server' },
         { h: 'Or enter it by hand', body: 'Choose Enter Details Manually… in the same sheet. Pick REALITY under security and fill in SNI, fingerprint, public key, short ID and spider X. All of them come from your server’s settings.' },
         { h: '3. Test and connect', body: 'Press ⌘T for the real delay: a request through the server, timed. Then double-click the server. The connection bar shows the country your traffic leaves from. If it says “No answer through this server”, the core runs but the server does not pass traffic.' },
@@ -316,7 +317,7 @@ export const en = {
       heading: 'Hysteria2 on a Mac',
       lede: 'Hysteria2 runs on QUIC over UDP and is built for lossy links. On the path it looks like encrypted QUIC. You need a server that offers it, from your provider or your own.',
       sections: [
-        { h: '1. Install V2Mac', body: 'With Homebrew: <code>brew install --cask v2macapp/tap/v2mac</code>. Or use the DMG, and click Open Anyway in System Settings → Privacy &amp; Security the first time. It needs macOS 26 or later on Apple Silicon.' },
+        { h: '1. Install V2Mac', body: 'With Homebrew: <code>brew install --cask v2macapp/tap/v2mac</code>. Or use the DMG, and click Open Anyway in System Settings → Privacy &amp; Security the first time. It needs macOS 14 or later on Apple Silicon / Intel.' },
         { h: '2. Add the server', body: 'Press ⌘N and paste your subscription URL or your link. V2Mac reads both <code>hysteria2://</code> and <code>hy2://</code>. With your own values:', code: 'hy2://PASSWORD@server.example.com:443?sni=server.example.com#My%20server' },
         { h: 'Optional settings', body: 'The server editor (⌘E) has the password, Salamander obfuscation, port hopping (ports and interval), SNI, ALPN, a certificate pin and allow insecure. Set them to match your server.' },
         { h: '3. Test it the right way', body: 'TCP ping shows “n/a” for Hysteria2, because it runs on UDP. That is normal. Use real delay (⌘T), which sends a request through the server.' },

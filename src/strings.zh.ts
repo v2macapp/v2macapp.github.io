@@ -1,19 +1,20 @@
 // Simplified Chinese. Names of buttons and settings follow the app (Localizable.xcstrings) and ../wiki/zh-*.md.
 import { en } from './strings';
 
-const install = '使用 Homebrew：<code>brew install --cask v2macapp/tap/v2mac</code>。也可以使用 DMG，首次打开时在 System Settings → Privacy &amp; Security 中点击 Open Anyway。需要 Apple Silicon 上的 macOS 26 或更高版本。';
+const install = '使用 Homebrew：<code>brew install --cask v2macapp/tap/v2mac</code>。也可以使用 DMG，首次打开时在 System Settings → Privacy &amp; Security 中点击 Open Anyway。需要 Apple Silicon / Intel 上的 macOS 14 或更高版本。';
 const asks = ['使用剪贴板', '读写此迷你虚拟机的 Shared 文件夹', '在征得你同意后使用 Mac 的 ssh-agent 中的 SSH 密钥', '在征得你同意后播放声音', '在征得你同意后使用麦克风'];
 const A = en.articles;
 
 export const zh: typeof en = {
   ...en,
   title: 'V2Mac：原生 Mac Xray 与 V2Ray 客户端',
-  description: '免费开源的 Mac 版 Xray-core 和 V2Ray 客户端。在面向 Apple Silicon 的原生 SwiftUI 菜单栏应用中使用 VLESS、REALITY、Hysteria2、Trojan 和 Shadowsocks。',
+  description: '免费开源的 Mac 版 Xray-core 和 V2Ray 客户端。在面向 Apple Silicon / Intel 的原生 SwiftUI 菜单栏应用中使用 VLESS、REALITY、Hysteria2、Trojan 和 Shadowsocks。',
   hero: {
     name: 'V2Mac',
     tagline: '原生 macOS Xray-core 客户端。',
     lede: '在快速的 SwiftUI 菜单栏应用中使用 VLESS、REALITY、Hysteria2、Trojan 和 Shadowsocks。没有 Electron，没有遥测。',
     download: '下载 Mac 版',
+    downloadIntel: 'Intel Mac',
     source: 'GitHub 源代码',
     scroll: '向下滚动',
   },
@@ -99,7 +100,7 @@ export const zh: typeof en = {
     { q: '如何让所有应用都走代理，包括没有代理设置的应用？', a: '打开 TUN。这样每个应用和每次 DNS 查询都会经过该连接。' },
     { q: '可以用它代替 Proxifier 吗？', a: '可以。它支持按应用和主机设置规则，可从 Proxifier、Clash、sing-box、v2rayN 和 Shadowrocket 导入，还能阻止 QUIC。' },
     { q: '网络中的其他设备可以使用它吗？', a: '可以。在设置 → Proxy 中打开“允许来自局域网的连接”，最好设置用户名和密码，然后让其他设备指向你 Mac 的局域网地址和端口。' },
-    { q: '它能在 Intel Mac 或旧版 macOS 上运行吗？', a: '不能。它需要 Apple Silicon 上的 macOS 26 或更高版本。' },
+    { q: '它能在 Intel Mac 或旧版 macOS 上运行吗？', a: '支持 Apple Silicon 和 Intel 上的 macOS 14 或更高版本。安全沙盒需要 Apple Silicon 和 macOS 26 或更高版本。' },
     { q: '为什么 macOS 提示无法打开？', a: 'DMG 未经公证。在 System Settings → Privacy & Security 中点击 Open Anyway，或用 Homebrew 安装：brew install --cask v2macapp/tap/v2mac。' },
     { q: 'V2Mac 会收集数据吗？', a: '不会。它没有遥测，问题报告只有在你自己粘贴到 GitHub 时才会发送。' },
     { q: '如何阻止浏览器中的 WebRTC 和 DNS 泄漏？', a: '使用同一项目的免费 Chrome 和 Firefox 扩展 NoLeaker，代理设为 127.0.0.1:10808。' },
@@ -177,7 +178,7 @@ export const zh: typeof en = {
       title: '你需要付出什么',
       items: ['在第一次打开沙盒之前不会下载任何内容，面板会先显示大小。', '你可以设置它最多使用多少内存。', '它在你打开沙盒应用时启动，在最后一个应用关闭 5 分钟后停止。', '“移除沙盒…”会删除沙盒、所有迷你虚拟机及其数据，以及沙盒应用。'],
       betaTitle: '这是测试版',
-      beta: '可能会有不完善之处，应用也不多。沙盒应用绝不会脱离 V2Mac 运行：退出 V2Mac 时会询问是否一并退出。与 V2Mac 一样，它需要 Apple Silicon 上的 macOS 26 或更高版本。',
+      beta: '可能会有不完善之处，应用也不多。沙盒应用绝不会脱离 V2Mac 运行：退出 V2Mac 时会询问是否一并退出。它需要 Apple Silicon 上的 macOS 26 或更高版本。',
     },
     faq: [
       { q: '可以在 Mac 上只让一个应用走 VPN 服务器吗？', a: '可以。把应用放进迷你虚拟机并为它选择服务器。该应用的一切活动都只能经此访问互联网，而 Mac 的其余部分可以使用其他服务器或不用服务器。' },
@@ -242,7 +243,7 @@ export const zh: typeof en = {
       table: {
         head: ['', 'V2Mac', 'v2rayN'],
         rows: [
-          ['运行平台', 'macOS 26+，Apple Silicon', 'Windows、Linux、macOS（Intel 和 Apple Silicon）'],
+          ['运行平台', 'macOS 14+，Apple Silicon / Intel', 'Windows、Linux、macOS（Intel 和 Apple Silicon）'],
           ['核心', 'Xray-core', 'Xray、sing-box 等'],
           ['界面', '原生 SwiftUI，位于菜单栏', '跨平台桌面应用'],
           ['应用使用独立虚拟机和服务器', '支持，安全沙盒（测试版）', '不支持'],
@@ -250,7 +251,7 @@ export const zh: typeof en = {
         ],
       },
       sections: [
-        { h: '选择 v2rayN，如果', list: ['你用的是 Intel Mac 或低于 26 的 macOS。V2Mac 无法在那里运行。', '你想用 sing-box 或其他核心。', '你还想在 Windows 或 Linux 上使用同一款应用。'] },
+        { h: '选择 v2rayN，如果', list: ['你使用低于 14 的 macOS。V2Mac 需要 macOS 14 或更高版本。', '你想用 sing-box 或其他核心。', '你还想在 Windows 或 Linux 上使用同一款应用。'] },
         { h: '选择 V2Mac，如果', list: ['你想要外观和行为都与 Mac 其他部分一致的应用。', '你按应用和主机路由，或正从 Proxifier 迁移。', '你想让部分应用运行在有独立服务器的迷你虚拟机中。'] },
         { h: '迁移', body: 'V2Mac 可以从 v2rayN 导入路由规则。服务器可通过订阅 URL 或分享链接迁移：把它们粘贴到“添加订阅”（⌘N）。' },
         { h: '需要了解的一点', body: 'V2Mac 的 DMG 未经公证，因此 macOS 会在首次启动时要求你确认。Homebrew 可以跳过这一提示。' },
@@ -258,7 +259,7 @@ export const zh: typeof en = {
     },
     'v2rayx-alternative': {
       title: '适合新款 Mac 的 V2RayX 替代品 | V2Mac',
-      description: 'V2RayX 已于 2024 年 1 月 12 日归档。V2Mac 是持续维护的原生替代品，面向 Apple Silicon，支持 Xray-core、REALITY 和 Hysteria2。',
+      description: 'V2RayX 已于 2024 年 1 月 12 日归档。V2Mac 是持续维护的原生替代品，面向 Apple Silicon / Intel，支持 Xray-core、REALITY 和 Hysteria2。',
       heading: 'V2RayX 替代品',
       lede: 'V2RayX 曾服务 Mac 用户多年。它的仓库已于 2024 年 1 月 12 日归档，不会再有更新。',
       table: {
@@ -267,13 +268,13 @@ export const zh: typeof en = {
           ['状态', '持续维护', '已于 2024-01-12 归档'],
           ['核心', 'Xray-core', 'v2ray-core'],
           ['REALITY', '支持', '不支持，REALITY 来自 Xray'],
-          ['运行平台', 'macOS 26+，Apple Silicon', '见其仓库'],
+          ['运行平台', 'macOS 14+，Apple Silicon / Intel', '见其仓库'],
           ['许可证', 'GPL-3.0', 'GPL-3.0'],
         ],
       },
       sections: [
         { h: '迁移', body: 'V2Mac 可以读取 V2Ray 和 Xray 的分享链接与订阅，也可以把 Xray JSON 配置拖到窗口上。用“添加订阅”（⌘N）添加你的订阅 URL 或链接。' },
-        { h: '什么时候 V2Mac 不合适', body: 'V2Mac 需要 Apple Silicon 上的 macOS 26 或更高版本。在 Intel Mac 或旧版 macOS 上，可以看看 v2rayN，它仍在维护，并同时支持 Intel 和 Apple Silicon。' },
+        { h: '什么时候 V2Mac 不合适', body: 'V2Mac 需要 Apple Silicon / Intel 上的 macOS 14 或更高版本。在低于 14 的 macOS 上，可以看看 v2rayN，它仍在维护，并同时支持 Intel 和 Apple Silicon。' },
       ],
     },
     'guides/vless-reality-mac': {
