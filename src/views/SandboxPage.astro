@@ -91,7 +91,7 @@ const t = en.sandboxPage;
     gsap.registerPlugin(ScrollTrigger);
     document.documentElement.classList.add('scene');
     const fail = document.querySelector('.fail')!;
-    gsap.timeline({ scrollTrigger: { trigger: fail, start: 'center center', end: '+=160%', pin: true, scrub: 0.5 } })
+    gsap.timeline({ scrollTrigger: { trigger: fail, start: 'center center', end: '+=160%', pin: true, anticipatePin: 1, scrub: 0.5 } })
       .set('.fail .packet', { left: '0%', opacity: 1 })
       .to('.fail .packet', { left: '100%', duration: 2, ease: 'none' })
       .set('.fail .packet', { opacity: 0 })

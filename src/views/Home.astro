@@ -101,8 +101,12 @@ const website = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'V
     // ---- Scroll: one timeline per chapter; the 3D reads `progress`.
     const progress: Progress = { burst: 0, title: 0, out: 0, build: 0, sub: 0, mag: 0, rules: 0, conns: 0, dim: 0 };
     const scrub = 0.6;
-    // Wheel and trackpad scrolling glide; touch keeps the phone's own scrolling.
-    ScrollSmoother.create({ wrapper: '#smooth-wrapper', content: '#smooth-content', smooth: reducedMotion() ? 0 : 1.2, smoothTouch: false });
+    // Wheel and trackpad scrolling glide. Phones get no smoother at all: even with smoothTouch off it
+    // moves the content by transform a frame behind the native scroll, so text shakes while scrolling.
+    if (ScrollTrigger.isTouch !== 1)
+      ScrollSmoother.create({ wrapper: '#smooth-wrapper', content: '#smooth-content', smooth: reducedMotion() ? 0 : 1.2 });
+    // The address bar showing and hiding resizes the page; don't re-measure the pins for it.
+    ScrollTrigger.config({ ignoreMobileResize: true });
 
     gsap.to(progress, { burst: 1, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub } });
     gsap.to('.hero .copy, .hero .scroll', { opacity: 0, y: -60, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: '60% top', scrub: true } });
@@ -120,7 +124,7 @@ const website = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'V
       { opacity: 1, scale: 1, scrollTrigger: { trigger: '.app', start: 'top 15%', end: 'top top', scrub } });
     gsap.set('.app .rules, .app .conns, .app .sub', { opacity: 0 });
 
-    const app = gsap.timeline({ defaults: { ease: 'power2.inOut' }, scrollTrigger: { trigger: '.app', start: 'top top', end: '+=400%', pin: true, scrub } });
+    const app = gsap.timeline({ defaults: { ease: 'power2.inOut' }, scrollTrigger: { trigger: '.app', start: 'top top', end: '+=400%', pin: true, anticipatePin: 1, scrub } });
     // 1: the Add Subscription sheet drops over the window, then leaves the servers it added
     // Each DOM move has its 3D twin in `progress` at the same place.
     app.fromTo('.app .sub', { y: -40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 })
@@ -160,7 +164,7 @@ const website = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'V
     gsap.to(progress, { title: 1, ease: 'none', scrollTrigger: { trigger: '.see', start: 'top bottom', end: 'top top', scrub } });
     // The window explodes again as it leaves.
     gsap.fromTo(progress, { build: 1 }, { build: 0, ease: 'none', immediateRender: false, scrollTrigger: { trigger: '.see', start: 'top bottom', end: 'top top', scrub } });
-    ScrollTrigger.create({ trigger: '.see', start: 'top top', end: '+=100%', pin: true });
+    ScrollTrigger.create({ trigger: '.see', start: 'top top', end: '+=100%', pin: true, anticipatePin: 1 });
 
     // Chapter 4: the sandbox title; the particle title can't scroll with the page, so it fades as the stage unpins.
     const next = (title: number, sel: string) => gsap.fromTo(progress, { title: title - 1 }, {
@@ -184,7 +188,7 @@ const website = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'V
     let scriptedCut = false, playing = false;
     const sb = gsap.timeline({
       defaults: { ease: 'power2.inOut' },
-      scrollTrigger: { trigger: '.sandbox', start: 'top top', end: '+=800%', pin: true, scrub },
+      scrollTrigger: { trigger: '.sandbox', start: 'top top', end: '+=800%', pin: true, anticipatePin: 1, scrub },
       onUpdate() { // only when the playhead crosses, so it never undoes the visitor's own clicks
         const inside = sb.time() >= sb.labels.cut && sb.time() < sb.labels.ask;
         if (inside !== scriptedCut) { scriptedCut = inside; setCut(0, inside); }
