@@ -110,10 +110,11 @@ Built with rebuilt UI (no Sandbox screenshots exist yet), the Earth only (no par
 - Phones: the main button becomes **Send to my Mac** (share sheet: AirDrop, Telegram, copy link).
 
 ## Download button
-- The app's release CI also uploads `V2Mac.dmg`, so
-  `https://github.com/v2macapp/v2mac/releases/latest/download/V2Mac.dmg` never breaks.
-  Check the in-app updater ignores the extra asset.
-- The same CI triggers a site rebuild, which bakes in "Version X.Y.Z · size · macOS 26+ · Apple Silicon".
+- The app's release CI uploads stable aliases `V2Mac.dmg` for Apple Silicon and
+  `V2Mac-Intel.dmg` for Intel under `releases/latest/download/`. The website offers both;
+  the in-app updater selects only its own architecture.
+- The same CI triggers a site rebuild, which bakes in "Version X.Y.Z · size · macOS 14+ · Apple Silicon / Intel".
+  Secure Sandbox still requires Apple Silicon and macOS 26+.
 
 ## SEO
 - English only at launch; all text in one strings file so fa (RTL), zh and ru can follow.
