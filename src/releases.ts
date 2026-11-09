@@ -20,8 +20,8 @@ export const releases = await load();
 const latest = releases[0];
 const dmg = latest?.assets.find((a) => a.name === 'V2Mac.dmg') ?? latest?.assets.find((a) => /^V2Mac-[0-9.]+\.dmg$/.test(a.name));
 
-// Releases before the stable V2Mac.dmg asset fall back to the versioned file.
-export const DOWNLOAD_URL = dmg?.browser_download_url ?? 'https://github.com/v2macapp/v2mac/releases/latest';
+// The unversioned names always point at the newest release, so a site rebuild is not needed after one.
+export const DOWNLOAD_URL = 'https://github.com/v2macapp/v2mac/releases/latest/download/V2Mac.dmg';
 export const INTEL_DOWNLOAD_URL = 'https://github.com/v2macapp/v2mac/releases/latest/download/V2Mac-Intel.dmg';
 export const VERSION = latest?.tag_name.replace(/^v/, '');
 export const downloadMeta = [VERSION && `v${VERSION}`, dmg && `${Math.round(dmg.size / 1e6)} MB`, 'macOS 14+', 'Apple Silicon / Intel'].filter(Boolean).join(' · ');
