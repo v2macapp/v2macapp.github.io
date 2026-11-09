@@ -14,7 +14,7 @@ export const fa: typeof en = {
     tagline: 'کلاینت بومی macOS برای Xray-core.',
     lede: 'VLESS، REALITY، Hysteria2، Trojan و Shadowsocks در یک برنامهٔ سریع SwiftUI در نوار منو. بدون Electron، بدون تله‌متری.',
     download: 'دانلود برای مک',
-    downloadIntel: 'مک Intel',
+    downloadFor: 'دانلود برای',
     source: 'سورس در GitHub',
     scroll: 'اسکرول کنید',
   },

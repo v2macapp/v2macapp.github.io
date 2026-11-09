@@ -14,7 +14,7 @@ export const zhHant: typeof en = {
     tagline: '原生 macOS Xray-core 客戶端。',
     lede: '在快速的 SwiftUI 菜單欄應用中使用 VLESS、REALITY、Hysteria2、Trojan 和 Shadowsocks。沒有 Electron，沒有遙測。',
     download: '下載 Mac 版',
-    downloadIntel: 'Intel Mac',
+    downloadFor: '下載適用於',
     source: 'GitHub 源代碼',
     scroll: '向下滾動',
   },

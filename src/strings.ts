@@ -8,7 +8,7 @@ export const en = {
     tagline: 'A native macOS client for Xray-core.',
     lede: 'VLESS, REALITY, Hysteria2, Trojan and Shadowsocks in a fast SwiftUI menu bar app. No Electron, no telemetry.',
     download: 'Download for Mac',
-    downloadIntel: 'Intel Mac',
+    downloadFor: 'Download for',
     source: 'Source on GitHub',
     scroll: 'Scroll',
   },

@@ -14,7 +14,7 @@ export const ru: typeof en = {
     tagline: 'Нативный клиент Xray-core для macOS.',
     lede: 'VLESS, REALITY, Hysteria2, Trojan и Shadowsocks в быстром приложении SwiftUI в строке меню. Без Electron и без телеметрии.',
     download: 'Скачать для Mac',
-    downloadIntel: 'Mac на Intel',
+    downloadFor: 'Скачать для',
     source: 'Исходный код на GitHub',
     scroll: 'Прокрутите',
   },

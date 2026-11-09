@@ -147,6 +147,14 @@ const ogImage = new URL(og, Astro.site).href;
   }
   .button.primary { background: var(--blue); border-color: rgba(255, 255, 255, 0.25); box-shadow: 0 8px 32px rgba(10, 132, 255, 0.45); }
   .button:hover { filter: brightness(1.12); }
+  /* Same look as the README's download buttons. */
+  .actions:has(.dl) { align-items: center; }
+  .button.dl { display: inline-flex; align-items: center; gap: 14px; padding: 10px 24px 10px 18px; border-radius: 14px; text-align: start; }
+  .button.dl.intel { background: #2c2c2e; border-color: #48484a; }
+  .dl svg { width: 28px; height: 28px; flex: none; }
+  .dl span { display: flex; flex-direction: column; line-height: 1.2; }
+  .dl small { font-size: 12px; font-weight: 400; opacity: 0.8; }
+  .dl b { font-size: 19px; font-weight: 600; }
   .scroll { margin-top: 5svh; color: var(--dim); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; }
 
   /* Short or very narrow screens: the pinned chapters and the hero have to fit on one screen. */

@@ -12,7 +12,7 @@ export const de: typeof en = {
     name: 'V2Mac', tagline: 'Ein nativer macOS-Client für Xray-core.',
     lede: 'VLESS, REALITY, Hysteria2, Trojan und Shadowsocks in einer schnellen SwiftUI-Menüleisten-App. Ohne Electron, ohne Telemetrie.',
     download: 'Für Mac laden', source: 'Quellcode auf GitHub', scroll: 'Scrollen',
-    downloadIntel: 'Intel-Mac',
+    downloadFor: 'Download für',
   },
   app: {
     title: 'Das ist V2Mac.', icon: 'Das V2Mac-App-Symbol',
